@@ -1,8 +1,10 @@
-.PHONY: server
+.PHONY: server db_new
 
 buildserver:
-	cd server && go build -o build/server cmd/main.go
+	cd api-server && go build -o build/server cmd/main.go
 runserver:
-	cd server && ./build/server
+	cd api-server && ./build/server
 server:
 	make buildserver && make runserver
+db_new: 
+	migrate create -ext sql -dir api-server/migrations -seq "migration_step_please_change_name"
