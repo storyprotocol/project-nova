@@ -7,15 +7,3 @@ https://kubernetes-sigs.github.io/kustomize/api-reference/glossary/
 
 This includes the [base](https://kubernetes-sigs.github.io/kustomize/api-reference/glossary/#base) deployment
 configurations. This is shared acriss all environments.
-
-# `overlays/dev`
-
-This includes custom patches for `dev` environment.
-
-# `overlays/staging`
-
-This includes custom patches for `staging` environment.
-
-# `overlays/prod`
-
-This includes custom patches for `prod` environment.
