@@ -11,15 +11,10 @@ import (
 
 var (
 	// DimeLogPath Dime log file write path
-	DimeLogPath    = "/var/log/dime/dime.log"
-	DimeLogFileMax = 500 // 500 megabytes
-
-	DimeLogAlertLevelP0 = "DIME_SERVICE_ALERT_P0"
-	DimeLogAlertLevelP1 = "DIME_SERVICE_ALERT_P1"
-
+	LogPath      = "/var/log/storyprotocol/storyprotocol.log"
+	LogFileMax   = 500     // 500 megabytes
 	doLoggerOnce sync.Once // to avoid race condition
 	Log          *zap.SugaredLogger
-	zLogger      *zap.Logger
 )
 
 // default logger at infolevel
@@ -51,8 +46,8 @@ func getEncoder() zapcore.Encoder {
 func getLogWriter() zapcore.WriteSyncer {
 	// lumberjack.Logger is safe for concurrent use
 	lumberJackLogger := &lumberjack.Logger{
-		Filename:   DimeLogPath,
-		MaxSize:    DimeLogFileMax,
+		Filename:   LogPath,
+		MaxSize:    LogFileMax,
 		MaxBackups: 3,
 		MaxAge:     30,
 		Compress:   false,
