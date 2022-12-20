@@ -8,6 +8,8 @@ import (
 	"github.com/shopspring/decimal"
 )
 
+// The code is from https://goethereumbook.org/en/util-go/
+
 // IsValidAddress validate hex address
 func IsValidAddress(iaddress interface{}) bool {
 	re := regexp.MustCompile("^0x[0-9a-fA-F]{40}$")
