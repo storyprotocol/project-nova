@@ -37,7 +37,7 @@ builder: ecr-auth
 build-%:
 	docker-compose build $*
 
-push-api:
+push-api: ecr-auth
 	docker tag ${API_SERVER_IMAGE} ${ECR}/${API_SERVER_IMAGE}:${TAG}
 	docker tag ${API_SERVER_IMAGE} ${ECR}/${API_SERVER_IMAGE}:latest
 	docker push ${ECR}/${API_SERVER_IMAGE}:${TAG}

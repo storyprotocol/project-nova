@@ -33,6 +33,7 @@ type MembershipModel struct {
 	Address   string
 	Logins    uint64
 	CreatedAt time.Time
+	Username  string
 }
 
 func (MembershipModel) TableName() string {
@@ -42,6 +43,7 @@ func (MembershipModel) TableName() string {
 type MembershipResp struct {
 	Name     string
 	Symbol   string
+	UserName string
 	Grade    string
 	Count    uint64
 	URI      string
@@ -65,8 +67,12 @@ func main() {
 		logger.Fatal("Failed to connect to DB")
 	}
 
-	r.GET("/health", func(c *gin.Context) {
+	r.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, "Hello")
+	})
+
+	r.GET("/health", func(c *gin.Context) {
+		c.JSON(http.StatusOK, "Healthy")
 	})
 
 	r.GET("/mint/proof", func(c *gin.Context) {
@@ -252,6 +258,7 @@ func main() {
 		c.JSON(http.StatusOK, &MembershipResp{
 			Name:     nameStr,
 			Symbol:   symbolStr,
+			UserName: dbResult.Username,
 			Count:    balanceBigInt.Uint64(),
 			URI:      tokenURIStr,
 			Grade:    tokenGradeStr,
