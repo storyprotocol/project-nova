@@ -15,6 +15,7 @@ import (
 type AppConfig struct {
 	DatabaseURI string `yaml:"database_uri"`
 	Server      Server `yaml:"server"`
+	AbiPath     string `yaml:"abi_path"`
 }
 
 type Server struct {
