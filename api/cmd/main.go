@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"math/big"
@@ -13,12 +14,13 @@ import (
 	"github.com/project-nova/backend/pkg/database"
 	"github.com/project-nova/backend/pkg/logger"
 	"github.com/thirdweb-dev/go-sdk/v2/thirdweb"
+	"gorm.io/gorm"
 )
 
 type WhitelistWalletModel struct {
 	ID          string `gorm:"primaryKey;column:id"`
-	Address     *string
-	MerkleProof *string
+	Address     string
+	MerkleProof string
 	CreatedAt   time.Time
 }
 
@@ -29,7 +31,7 @@ func (WhitelistWalletModel) TableName() string {
 type MembershipModel struct {
 	ID        string
 	Address   string
-	LogIns    uint64
+	Logins    uint64
 	CreatedAt time.Time
 }
 
@@ -60,8 +62,9 @@ func main() {
 
 	db, err := database.NewGormDB(cfg.DatabaseURI)
 	if err != nil {
-		logger.Error("Failed to connect to DB")
+		logger.Fatal("Failed to connect to DB")
 	}
+
 	r.GET("/health", func(c *gin.Context) {
 		c.JSON(http.StatusOK, "Hello")
 	})
@@ -82,13 +85,18 @@ func main() {
 
 		result := &WhitelistWalletModel{}
 		r := db.Where("address = ?", address).First(&result)
+		if errors.Is(r.Error, gorm.ErrRecordNotFound) {
+			c.JSON(http.StatusOK, gin.H{})
+			return
+		}
 		if r.Error != nil {
-			c.String(http.StatusBadRequest, fmt.Sprintf("address is invalid: %v", r.Error))
+			logger.Errorf("Failed to query db: %v", err)
+			c.String(http.StatusInternalServerError, "Internal server error")
 			return
 		}
 
 		c.JSON(http.StatusOK, gin.H{
-			"proof": *result.MerkleProof,
+			"proof": result.MerkleProof,
 		})
 	})
 
@@ -102,10 +110,15 @@ func main() {
 			return
 		}
 
-		result := &MembershipModel{}
-		r := db.Where("address = ?", address).First(&result)
+		dbResult := &MembershipModel{}
+		r := db.Where("address = ?", address).First(&dbResult)
+		if errors.Is(r.Error, gorm.ErrRecordNotFound) {
+			c.JSON(http.StatusOK, gin.H{})
+			return
+		}
 		if r.Error != nil {
-			c.String(http.StatusBadRequest, fmt.Sprintf("address is invalid: %v", r.Error))
+			logger.Errorf("Failed to query db: %v", err)
+			c.String(http.StatusInternalServerError, "Internal server error")
 			return
 		}
 
@@ -147,105 +160,104 @@ func main() {
 			return
 		}
 
-		var response *MembershipResp
-
-		if balanceBigInt.Uint64() > 0 {
-			name, err := contract.Call(c, "name")
-			if err != nil {
-				logger.Errorf("Failed to get name: %v \n", err)
-				c.String(http.StatusInternalServerError, "Internal server error")
-				return
-			}
-
-			nameStr, ok := name.(string)
-			if !ok {
-				logger.Errorf("Failed to convert name to string\n")
-				c.String(http.StatusInternalServerError, "Internal server error")
-				return
-			}
-
-			symbol, err := contract.Call(c, "symbol")
-			if err != nil {
-				logger.Errorf("Failed to get symbol: %v \n", err)
-				c.String(http.StatusInternalServerError, "Internal server error")
-				return
-			}
-
-			symbolStr, ok := symbol.(string)
-			if !ok {
-				logger.Errorf("Failed to convert symbol to string\n")
-				c.String(http.StatusInternalServerError, "Internal server error")
-				return
-			}
-
-			tokenID, err := contract.Call(c, "tokenOfOwnerByIndex", address, 0)
-			if err != nil {
-				logger.Errorf("Failed to get tokenID: %v \n", err)
-				c.String(http.StatusInternalServerError, "Internal server error")
-				return
-			}
-
-			tokenIDBigInt, ok := tokenID.(*big.Int)
-			if !ok {
-				logger.Errorf("Failed to convert tokenID to bigint\n")
-				c.String(http.StatusInternalServerError, "Internal server error")
-				return
-			}
-
-			tokenURI, err := contract.Call(c, "tokenURI", int(tokenIDBigInt.Int64()))
-			if err != nil {
-				logger.Errorf("Failed to get tokenURI: %v \n", err)
-				c.String(http.StatusInternalServerError, "Internal server error")
-				return
-			}
-
-			tokenURIStr, ok := tokenURI.(string)
-			if !ok {
-				logger.Errorf("Failed to convert tokenURI to string\n")
-				c.String(http.StatusInternalServerError, "Internal server error")
-				return
-			}
-
-			tokenGradeID, err := contract.Call(c, "tokenGrades", int(tokenIDBigInt.Int64()))
-			if err != nil {
-				logger.Errorf("Failed to get tokenGradeID: %v \n", err)
-				c.String(http.StatusInternalServerError, "Internal server error")
-				return
-			}
-
-			tokenGradeIDBigInt, ok := tokenGradeID.(*big.Int)
-			if !ok {
-				logger.Errorf("Failed to convert tokenGradeID to big int\n")
-				c.String(http.StatusInternalServerError, "Internal server error")
-				return
-			}
-
-			tokenGrade, err := contract.Call(c, "grades", int(tokenGradeIDBigInt.Int64()))
-			if err != nil {
-				logger.Errorf("Failed to get tokenGrade: %v \n", err)
-				c.String(http.StatusInternalServerError, "Internal server error")
-				return
-			}
-
-			tokenGradeStr, ok := tokenGrade.(string)
-			if !ok {
-				logger.Errorf("Failed to convert tokenGradeID to big int\n")
-				c.String(http.StatusInternalServerError, "Internal server error")
-				return
-			}
-
-			response = &MembershipResp{
-				Name:     nameStr,
-				Symbol:   symbolStr,
-				Count:    balanceBigInt.Uint64(),
-				URI:      tokenURIStr,
-				Grade:    tokenGradeStr,
-				LogIns:   result.LogIns,
-				JoinedAt: result.CreatedAt,
-			}
+		if balanceBigInt.Uint64() == 0 {
+			c.JSON(http.StatusOK, gin.H{})
+			return
 		}
 
-		c.JSON(http.StatusOK, response)
+		name, err := contract.Call(c, "name")
+		if err != nil {
+			logger.Errorf("Failed to get name: %v \n", err)
+			c.String(http.StatusInternalServerError, "Internal server error")
+			return
+		}
+
+		nameStr, ok := name.(string)
+		if !ok {
+			logger.Errorf("Failed to convert name to string\n")
+			c.String(http.StatusInternalServerError, "Internal server error")
+			return
+		}
+
+		symbol, err := contract.Call(c, "symbol")
+		if err != nil {
+			logger.Errorf("Failed to get symbol: %v \n", err)
+			c.String(http.StatusInternalServerError, "Internal server error")
+			return
+		}
+
+		symbolStr, ok := symbol.(string)
+		if !ok {
+			logger.Errorf("Failed to convert symbol to string\n")
+			c.String(http.StatusInternalServerError, "Internal server error")
+			return
+		}
+
+		tokenID, err := contract.Call(c, "tokenOfOwnerByIndex", address, 0)
+		if err != nil {
+			logger.Errorf("Failed to get tokenID: %v \n", err)
+			c.String(http.StatusInternalServerError, "Internal server error")
+			return
+		}
+
+		tokenIDBigInt, ok := tokenID.(*big.Int)
+		if !ok {
+			logger.Errorf("Failed to convert tokenID to bigint\n")
+			c.String(http.StatusInternalServerError, "Internal server error")
+			return
+		}
+
+		tokenURI, err := contract.Call(c, "tokenURI", int(tokenIDBigInt.Int64()))
+		if err != nil {
+			logger.Errorf("Failed to get tokenURI: %v \n", err)
+			c.String(http.StatusInternalServerError, "Internal server error")
+			return
+		}
+
+		tokenURIStr, ok := tokenURI.(string)
+		if !ok {
+			logger.Errorf("Failed to convert tokenURI to string\n")
+			c.String(http.StatusInternalServerError, "Internal server error")
+			return
+		}
+
+		tokenGradeID, err := contract.Call(c, "tokenGrades", int(tokenIDBigInt.Int64()))
+		if err != nil {
+			logger.Errorf("Failed to get tokenGradeID: %v \n", err)
+			c.String(http.StatusInternalServerError, "Internal server error")
+			return
+		}
+
+		tokenGradeIDBigInt, ok := tokenGradeID.(*big.Int)
+		if !ok {
+			logger.Errorf("Failed to convert tokenGradeID to big int\n")
+			c.String(http.StatusInternalServerError, "Internal server error")
+			return
+		}
+
+		tokenGrade, err := contract.Call(c, "grades", int(tokenGradeIDBigInt.Int64()))
+		if err != nil {
+			logger.Errorf("Failed to get tokenGrade: %v \n", err)
+			c.String(http.StatusInternalServerError, "Internal server error")
+			return
+		}
+
+		tokenGradeStr, ok := tokenGrade.(string)
+		if !ok {
+			logger.Errorf("Failed to convert tokenGradeID to big int\n")
+			c.String(http.StatusInternalServerError, "Internal server error")
+			return
+		}
+
+		c.JSON(http.StatusOK, &MembershipResp{
+			Name:     nameStr,
+			Symbol:   symbolStr,
+			Count:    balanceBigInt.Uint64(),
+			URI:      tokenURIStr,
+			Grade:    tokenGradeStr,
+			LogIns:   dbResult.Logins,
+			JoinedAt: dbResult.CreatedAt,
+		})
 	})
 
 	port := fmt.Sprintf(":%d", cfg.Server.Port)
