@@ -1,0 +1,3 @@
+BEGIN
+DROP TABLE IF EXISTS whitelist_wallet;
+END

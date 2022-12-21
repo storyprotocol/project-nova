@@ -1,0 +1,13 @@
+version: '3.7'
+services:
+  api:
+    build:
+      # Read Makefile to understand why we want to build from the top-level "." context.
+      context: .
+      dockerfile: dockerfile/api/Dockerfile
+    image: api-server:latest
+    command: [
+      "/app/api/build/server"
+    ]
+    ports:
+      - "20005:20005"

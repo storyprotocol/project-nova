@@ -1,0 +1,33 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: edge 
+  name: api-server
+  labels:
+    app: storyprotocol
+    service: api-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: api-server
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+  minReadySeconds: 2
+  template:
+    metadata:
+      labels:
+        service: api-server
+    spec:
+      containers:
+      - image: 243963068353.dkr.ecr.us-west-2.amazonaws.com/api-server:latest
+        imagePullPolicy: "Always"
+        name: api-server
+        ports:
+        - containerPort: 8090
+        args:
+          - "/app/api/build/server"
+          - "--config=/app/api/config/prod.yaml"
