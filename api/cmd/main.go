@@ -131,7 +131,7 @@ func main() {
 			return
 		}
 
-		content, err := os.ReadFile("./resource/abi/story_pass.json")
+		content, err := os.ReadFile(cfg.AbiPath + "story_pass.json")
 		if err != nil {
 			logger.Errorf("Failed to read JSON files: %v \n", err)
 			c.String(http.StatusInternalServerError, "Internal server error")
