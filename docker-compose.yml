@@ -7,7 +7,8 @@ services:
       dockerfile: dockerfile/api/Dockerfile
     image: api-server:latest
     command: [
-      "/app/api/build/server"
+      "/app/api/build/server",
+      "--config=/app/api/config/prod.yaml"
     ]
     ports:
       - "20005:20005"

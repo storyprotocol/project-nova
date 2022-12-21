@@ -15,22 +15,36 @@ import (
 	"github.com/thirdweb-dev/go-sdk/v2/thirdweb"
 )
 
-type WhitelistWallet struct {
+type WhitelistWalletModel struct {
 	ID          string `gorm:"primaryKey;column:id"`
 	Address     *string
 	MerkleProof *string
 	CreatedAt   time.Time
 }
 
-type StoryNFT struct {
-	Name   string
-	Symbol string
-	Count  uint64
-	URI    string
+func (WhitelistWalletModel) TableName() string {
+	return "whitelist_wallet"
 }
 
-func (WhitelistWallet) TableName() string {
-	return "whitelist_wallet"
+type MembershipModel struct {
+	ID        string
+	Address   string
+	LogIns    uint64
+	CreatedAt time.Time
+}
+
+func (MembershipModel) TableName() string {
+	return "membership"
+}
+
+type MembershipResp struct {
+	Name     string
+	Symbol   string
+	Grade    string
+	Count    uint64
+	URI      string
+	LogIns   uint64
+	JoinedAt time.Time
 }
 
 func main() {
@@ -46,8 +60,11 @@ func main() {
 
 	db, err := database.NewGormDB(cfg.DatabaseURI)
 	if err != nil {
-		logger.Fatal("Failed to connect to DB")
+		logger.Error("Failed to connect to DB")
 	}
+	r.GET("/health", func(c *gin.Context) {
+		c.JSON(http.StatusOK, "Hello")
+	})
 
 	r.GET("/mint/proof", func(c *gin.Context) {
 		address := c.DefaultQuery("address", "")
@@ -63,7 +80,7 @@ func main() {
 			return
 		}
 
-		result := &WhitelistWallet{}
+		result := &WhitelistWalletModel{}
 		r := db.Where("address = ?", address).First(&result)
 		if r.Error != nil {
 			c.String(http.StatusBadRequest, fmt.Sprintf("address is invalid: %v", r.Error))
@@ -75,13 +92,20 @@ func main() {
 		})
 	})
 
-	r.GET("/nfts", func(c *gin.Context) {
+	r.GET("/membership", func(c *gin.Context) {
 		privateKey := "a6cd3f393b1cddf8be66e2ff784640adbafbce852267ec1ec000000000000000" // Fake Key
 		contractAddress := "0x64432E5A76a93e79be2f7F3F12982059a32Fd794"
 		address := c.DefaultQuery("address", "")
 		// Validate address
 		if address == "" {
 			c.String(http.StatusBadRequest, fmt.Sprintf("input address is invalid, address: %s", address))
+			return
+		}
+
+		result := &MembershipModel{}
+		r := db.Where("address = ?", address).First(&result)
+		if r.Error != nil {
+			c.String(http.StatusBadRequest, fmt.Sprintf("address is invalid: %v", r.Error))
 			return
 		}
 
@@ -123,7 +147,7 @@ func main() {
 			return
 		}
 
-		var response []*StoryNFT
+		var response *MembershipResp
 
 		if balanceBigInt.Uint64() > 0 {
 			name, err := contract.Call(c, "name")
@@ -182,12 +206,43 @@ func main() {
 				return
 			}
 
-			response = append(response, &StoryNFT{
-				Name:   nameStr,
-				Symbol: symbolStr,
-				Count:  balanceBigInt.Uint64(),
-				URI:    tokenURIStr,
-			})
+			tokenGradeID, err := contract.Call(c, "tokenGrades", int(tokenIDBigInt.Int64()))
+			if err != nil {
+				logger.Errorf("Failed to get tokenGradeID: %v \n", err)
+				c.String(http.StatusInternalServerError, "Internal server error")
+				return
+			}
+
+			tokenGradeIDBigInt, ok := tokenGradeID.(*big.Int)
+			if !ok {
+				logger.Errorf("Failed to convert tokenGradeID to big int\n")
+				c.String(http.StatusInternalServerError, "Internal server error")
+				return
+			}
+
+			tokenGrade, err := contract.Call(c, "grades", int(tokenGradeIDBigInt.Int64()))
+			if err != nil {
+				logger.Errorf("Failed to get tokenGrade: %v \n", err)
+				c.String(http.StatusInternalServerError, "Internal server error")
+				return
+			}
+
+			tokenGradeStr, ok := tokenGrade.(string)
+			if !ok {
+				logger.Errorf("Failed to convert tokenGradeID to big int\n")
+				c.String(http.StatusInternalServerError, "Internal server error")
+				return
+			}
+
+			response = &MembershipResp{
+				Name:     nameStr,
+				Symbol:   symbolStr,
+				Count:    balanceBigInt.Uint64(),
+				URI:      tokenURIStr,
+				Grade:    tokenGradeStr,
+				LogIns:   result.LogIns,
+				JoinedAt: result.CreatedAt,
+			}
 		}
 
 		c.JSON(http.StatusOK, response)

@@ -22,4 +22,4 @@ RUN mkdir -p /var/log/storyprotocol
 
 WORKDIR /app
 COPY --from=build /build/api /app/api
-CMD ["/app/api/build/server"]
+CMD ["/app/api/build/server", "--config=/app/api/config/prod.yaml"]

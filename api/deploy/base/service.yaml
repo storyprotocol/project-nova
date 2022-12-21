@@ -12,7 +12,7 @@ spec:
   - name: api-server
     port: 8090
     targetPort: 8090
-  type: ClusterIP
+  type: NodePort
   selector:
     service: api-server
 ---
