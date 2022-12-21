@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"math/big"
 	"net/http"
@@ -8,6 +9,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/project-nova/backend/api/internal/config"
 	"github.com/project-nova/backend/pkg/database"
 	"github.com/project-nova/backend/pkg/logger"
 	"github.com/thirdweb-dev/go-sdk/v2/thirdweb"
@@ -33,6 +35,19 @@ func (WhitelistWallet) TableName() string {
 
 func main() {
 	r := gin.Default()
+	flag.Parse()
+	Logger := logger.InitLogger(logger.Levels.Info)
+	defer Logger.Sync()
+
+	cfg, err := config.InitializeConfigWithFlag()
+	if err != nil {
+		logger.Fatal("Failed to init config")
+	}
+
+	db, err := database.NewGormDB(cfg.DatabaseURI)
+	if err != nil {
+		logger.Fatal("Failed to connect to DB")
+	}
 
 	r.GET("/mint/proof", func(c *gin.Context) {
 		address := c.DefaultQuery("address", "")
@@ -43,7 +58,6 @@ func main() {
 			return
 		}
 
-		db, err := database.NewGormDB("postgresql://postgres:@localhost:23005/postgres?sslmode=disable")
 		if err != nil {
 			c.String(http.StatusInternalServerError, "Internal server error")
 			return
@@ -147,7 +161,14 @@ func main() {
 				return
 			}
 
-			tokenURI, err := contract.Call(c, "tokenURI", tokenID)
+			tokenIDBigInt, ok := tokenID.(*big.Int)
+			if !ok {
+				logger.Errorf("Failed to convert tokenID to bigint\n")
+				c.String(http.StatusInternalServerError, "Internal server error")
+				return
+			}
+
+			tokenURI, err := contract.Call(c, "tokenURI", int(tokenIDBigInt.Int64()))
 			if err != nil {
 				logger.Errorf("Failed to get tokenURI: %v \n", err)
 				c.String(http.StatusInternalServerError, "Internal server error")
@@ -172,5 +193,6 @@ func main() {
 		c.JSON(http.StatusOK, response)
 	})
 
-	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
+	port := fmt.Sprintf(":%d", cfg.Server.Port)
+	r.Run(port)
 }

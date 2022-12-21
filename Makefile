@@ -17,7 +17,7 @@ buildserver:
 	cd api && CGO_ENABLED=0 go build --ldflags "-extldflags '-static -s'" -o build/server cmd/main.go
 
 runserver:
-	cd api && ./build/server
+	cd api && ./build/server --config=config/local.yaml
 
 .PHONY: server
 server:
