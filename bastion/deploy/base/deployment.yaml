@@ -23,14 +23,3 @@ spec:
       - name: bastion
         image: 243963068353.dkr.ecr.us-west-2.amazonaws.com/bastion:latest
         imagePullPolicy: "Always"
-        livenessProbe:
-          exec:
-            command:
-            - psql
-            - -U
-            - postgres
-            - -c
-            - SELECT 1
-          initialDelaySeconds: 30
-          periodSeconds: 10
-          timeoutSeconds: 5
