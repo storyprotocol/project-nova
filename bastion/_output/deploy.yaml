@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: bastion
+  name: bastion
+  namespace: edge
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bastion
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: bastion
+    spec:
+      containers:
+      - env:
+        - name: SERVER_ENV
+          value: dev
+        image: 243963068353.dkr.ecr.us-west-2.amazonaws.com/bastion:zehuang-local-0bf1460
+        imagePullPolicy: Always
+        livenessProbe:
+          exec:
+            command:
+            - psql
+            - -U
+            - postgres
+            - -c
+            - SELECT 1
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+        name: bastion
+        resources:
+          limits:
+            cpu: 500m
+            memory: 1000Mi
+          requests:
+            cpu: 300m
+            memory: 800Mi

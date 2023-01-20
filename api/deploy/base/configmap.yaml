@@ -1,7 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: story-configmap
-  namespace: edge
-data:
-  db_url: "story-demo-rds.cvxjd0hcq1cs.us-west-2.rds.amazonaws.com"
