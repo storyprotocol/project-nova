@@ -7,11 +7,12 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     unzip \
     curl \
     tar \
-    make
+    make 
 
 RUN curl -OL https://dl.google.com/go/go1.19.4.linux-amd64.tar.gz && \
     tar -C /usr/local -xzf go1.19.4.linux-amd64.tar.gz
 ENV PATH "$PATH:/usr/local/go/bin:/root/go/bin"
+
 
 # Golang related.
 # https://maelvls.dev/go111module-everywhere/
