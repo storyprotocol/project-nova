@@ -23,7 +23,7 @@ spec:
       - env:
         - name: SERVER_ENV
           value: dev
-        image: 243963068353.dkr.ecr.us-west-2.amazonaws.com/bastion:zehuang-local-0bf1460
+        image: 243963068353.dkr.ecr.us-west-2.amazonaws.com/bastion:zehuang-local-28631f1
         imagePullPolicy: Always
         livenessProbe:
           exec:
