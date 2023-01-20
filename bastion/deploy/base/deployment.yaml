@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bastion
+  namespace: edge
+  labels:
+    app: bastion
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bastion
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: bastion
+    spec:
+      containers:
+      - name: bastion
+        image: 243963068353.dkr.ecr.us-west-2.amazonaws.com/bastion:latest
+        imagePullPolicy: "Always"
+        livenessProbe:
+          exec:
+            command:
+            - psql
+            - -U
+            - postgres
+            - -c
+            - SELECT 1
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5

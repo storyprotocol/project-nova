@@ -12,3 +12,9 @@ services:
     ]
     ports:
       - "20005:20005"
+  bastion:
+    build:
+      # Read Makefile to understand why we want to build from the top-level "." context.
+      context: .
+      dockerfile: dockerfile/bastion/Dockerfile
+    image: bastion:latest

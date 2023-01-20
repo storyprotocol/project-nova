@@ -37,6 +37,12 @@ builder: ecr-auth
 build-%:
 	docker-compose build $*
 
+push-%: ecr-auth
+	docker tag $* ${ECR}/$*:${TAG}
+	docker tag $* ${ECR}/$*:latest
+	docker push ${ECR}/$*:${TAG}
+	docker push ${ECR}/$*:latest	
+
 push-api: ecr-auth
 	docker tag ${API_SERVER_IMAGE} ${ECR}/${API_SERVER_IMAGE}:${TAG}
 	docker tag ${API_SERVER_IMAGE} ${ECR}/${API_SERVER_IMAGE}:latest
@@ -44,4 +50,4 @@ push-api: ecr-auth
 	docker push ${ECR}/${API_SERVER_IMAGE}:latest	
 
 deploy-%:
-	cd $*; make deploy
+	cd $*; ENV=${ENV} make deploy
