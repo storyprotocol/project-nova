@@ -13,99 +13,136 @@ on:
   workflow_dispatch:
 
 env:
-  COMPONENT: builder
-  AWS_ACCCOUNT_ID: 243963068353
+  COMPONENT_BUILDER: builder
+  COMPONENT_API: api
+  AWS_ACCCOUNT_ID:  ${{ secrets.AWS_ACCCOUNT_ID }}
   AWS_ECR_REGION: us-west-2
+  GITHUB_SHA_SHORT: $(git rev-parse --short "$GITHUB_SHA")
 
 jobs:
-  lint-dockerfile:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+  # lint-dockerfile:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v3
 
-      - name: Lint builder Dockerfile
-        # # Only run on pull requests, disable on workflow development
-        if: github.event_name == 'pull_request'
-        uses: hadolint/hadolint-action@v2.1.0
-        with:
-          dockerfile: ./dockerfile/builder/Dockerfile
+  #     - name: Lint builder Dockerfile
+  #       # # Only run on pull requests, disable on workflow development
+  #       if: github.event_name == 'pull_request'
+  #       uses: hadolint/hadolint-action@v2.1.0
+  #       with:
+  #         dockerfile: ./dockerfile/builder/Dockerfile
 
-      - name: Lint api Dockerfile
-        # # Only run on pull requests, disable on workflow development
-        if: github.event_name == 'pull_request'
-        uses: hadolint/hadolint-action@v2.1.0
-        with:
-          dockerfile: ./dockerfile/api/Dockerfile
+  #     - name: Lint api Dockerfile
+  #       # # Only run on pull requests, disable on workflow development
+  #       if: github.event_name == 'pull_request'
+  #       uses: hadolint/hadolint-action@v2.1.0
+  #       with:
+  #         dockerfile: ./dockerfile/api/Dockerfile
 
-  build-application:
-    needs: [lint-dockerfile]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+  # build-application:
+  #   needs: [lint-dockerfile]
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v3
 
-      - uses: actions/setup-go@v3
-        with:
-          go-version: ">=1.19.0"
-      - run: go version
+  #     - uses: actions/setup-go@v3
+  #       with:
+  #         go-version: ">=1.19.0"
+  #     - run: go version
 
-      - name: build server
-        run: |
-          make buildserver
+  #     - name: build server
+  #       run: |
+  #         make buildserver
 
-  build-scan-builder-images:
-    needs: [build-application]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+  # build-scan-builder-images:
+  #   needs: [build-application]
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v3
 
-      - name: Build builder image
-        run: |
-          docker build \
-            -t ${{ env.AWS_ACCCOUNT_ID }}.dkr.ecr.${{ env.AWS_ECR_REGION }}.amazonaws.com/${{ env.COMPONENT }}:latest \
-            -f ./dockerfile/builder/Dockerfile \
-            .
+  #     - name: Build builder image
+  #       run: |
+  #         docker build \
+  #           -t ${{ env.AWS_ACCCOUNT_ID }}.dkr.ecr.${{ env.AWS_ECR_REGION }}.amazonaws.com/${{ env.COMPONENT_BUILDER }}:${{ env.GITHUB_SHA_SHORT }} \
+  #           -f ./dockerfile/builder/Dockerfile \
+  #           .
 
-      - name: Scan builder image using Trivy
-        # # Only run on pull requests, disable on workflow development
-        if: github.event_name == 'pull_request'
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: ${{ env.AWS_ACCCOUNT_ID }}.dkr.ecr.${{ env.AWS_ECR_REGION }}.amazonaws.com/${{ env.COMPONENT }}:latest
-          format: template
-          template: "@/contrib/sarif.tpl"
-          output: trivy-results.sarif
-          exit-code: 1
-          severity: CRITICAL,HIGH
-          ignore-unfixed: true
+  #     - name: Scan builder image using Trivy
+  #       # # Only run on pull requests, disable on workflow development
+  #       if: github.event_name == 'pull_request'
+  #       uses: aquasecurity/trivy-action@master
+  #       with:
+  #         image-ref: ${{ env.AWS_ACCCOUNT_ID }}.dkr.ecr.${{ env.AWS_ECR_REGION }}.amazonaws.com/${{ env.COMPONENT_BUILDER }}:${{ env.GITHUB_SHA_SHORT }}
+  #         format: template
+  #         template: "@/contrib/sarif.tpl"
+  #         output: ${{ env.COMPONENT_BUILDER }}-trivy-results.sarif
+  #         exit-code: 1
+  #         severity: CRITICAL,HIGH
+  #         ignore-unfixed: true
 
-  build-scan-api-images:
-    needs: [build-scan-builder-images]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+  # build-scan-api-images:
+  #   needs: [build-scan-builder-images]
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v3
 
-      - name: Build api image
-        run: |
-          docker build \
-            -t ${{ env.AWS_ACCCOUNT_ID }}.dkr.ecr.${{ env.AWS_ECR_REGION }}.amazonaws.com/${{ env.COMPONENT }}:latest \
-            -f ./dockerfile/api/Dockerfile \
-            .
+  #     - name: Build api image
+  #       run: |
+  #         docker build \
+  #           -t ${{ env.AWS_ACCCOUNT_ID }}.dkr.ecr.${{ env.AWS_ECR_REGION }}.amazonaws.com/${{ env.COMPONENT_API }}:${{ env.GITHUB_SHA_SHORT }} \
+  #           -f ./dockerfile/api/Dockerfile \
+  #           --build-arg builder_image_tag=${{ env.GITHUB_SHA_SHORT }} \
+  #           .
 
-      - name: Scan api image using Trivy
-        # # Only run on pull requests, disable on workflow development
-        if: github.event_name == 'pull_request'
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: ${{ env.AWS_ACCCOUNT_ID }}.dkr.ecr.${{ env.AWS_ECR_REGION }}.amazonaws.com/${{ env.COMPONENT }}:latest
-          format: template
-          template: "@/contrib/sarif.tpl"
-          output: trivy-results.sarif
-          exit-code: 1
-          severity: CRITICAL,HIGH
-          ignore-unfixed: true
+  #     - name: Scan api image using Trivy
+  #       # # Only run on pull requests, disable on workflow development
+  #       if: github.event_name == 'pull_request'
+  #       uses: aquasecurity/trivy-action@master
+  #       with:
+  #         image-ref: ${{ env.AWS_ACCCOUNT_ID }}.dkr.ecr.${{ env.AWS_ECR_REGION }}.amazonaws.com/${{ env.COMPONENT_API }}:${{ env.GITHUB_SHA_SHORT }}
+  #         format: template
+  #         template: "@/contrib/sarif.tpl"
+  #         output: ${{ env.COMPONENT_BUILDER }}-trivy-results.sarif
+  #         exit-code: 1
+  #         severity: CRITICAL,HIGH
+  #         ignore-unfixed: true
 
   # push-images-to-ecr:
+
+
+  update-deployment-using-kustomize:
+    # # Only run on 'push' to the main/master, disable on workflow development
+    # if: github.event_name == 'push'
+    # needs: [build-scan-api-images]
+    runs-on: ubuntu-latest
+    steps:
+      - name: install kustomize
+        run: |
+          curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash
+          sudo mv kustomize /usr/local/bin/
+
+      - name: Checkout code from project-nova repo
+        uses: actions/checkout@v3
+        with:
+          path: project-nova
+
+      - name: Checkout code from project-nova-cd repo
+        uses: actions/checkout@v3
+        with:
+          repository: storyprotocol/project-nova-cd
+          path: project-nova-cd
+          token: ${{ secrets.PAT_TOKEN_FOR_PROJECT_NOVA_CD }}
+
+      # - name: Update deployment using kustomize
+      #   run: |
+      #     kustomize edit set image ${{ env.AWS_ACCCOUNT_ID }}.dkr.ecr.${{ env.AWS_ECR_REGION }}.amazonaws.com/${{ env.COMPONENT_API }}:${{ env.GITHUB_SHA_SHORT }}
+
+      # - name: Commit changes
+      #   run: |
+      #     git config --local user.email "
+
+

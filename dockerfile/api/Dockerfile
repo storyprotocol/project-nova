@@ -1,4 +1,5 @@
-FROM 243963068353.dkr.ecr.us-west-2.amazonaws.com/builder:latest as build
+ARG builder_image_tag
+FROM 243963068353.dkr.ecr.us-west-2.amazonaws.com/builder:${builder_image_tag} as build
 
 WORKDIR /build/
 
