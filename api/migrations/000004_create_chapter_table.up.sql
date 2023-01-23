@@ -1,6 +1,6 @@
 BEGIN;
 
-CREATE TABLE IF NOT EXISTS chapter (
+CREATE TABLE IF NOT EXISTS story_chapter (
     id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
     seq_num INTEGER NOT NULL,
     title VARCHAR,
@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS chapter (
 );
 
 CREATE TRIGGER set_updated_at
-BEFORE UPDATE ON chapter
+BEFORE UPDATE ON story_chapter
 FOR EACH ROW
 EXECUTE PROCEDURE trigger_set_updated_at();
 

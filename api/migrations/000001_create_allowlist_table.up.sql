@@ -8,7 +8,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TABLE IF NOT EXISTS allowlist (
+CREATE TABLE IF NOT EXISTS nft_allowlist (
     id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
     type VARCHAR NOT NULL,
     collection_address VARCHAR NOT NULL,
@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS allowlist (
 );
 
 CREATE TRIGGER set_updated_at
-BEFORE UPDATE ON allowlist
+BEFORE UPDATE ON nft_allowlist
 FOR EACH ROW
 EXECUTE PROCEDURE trigger_set_updated_at();
 

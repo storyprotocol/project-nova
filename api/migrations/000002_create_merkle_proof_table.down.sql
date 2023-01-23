@@ -1,3 +1,3 @@
 BEGIN;
-DROP TABLE IF EXISTS merkle_proof;
+DROP TABLE IF EXISTS wallet_merkle_proof;
 END
