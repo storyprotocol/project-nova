@@ -1,3 +1,3 @@
 BEGIN;
-DROP TABLE IF EXISTS allowlist;
+DROP TABLE IF EXISTS nft_allowlist;
 END

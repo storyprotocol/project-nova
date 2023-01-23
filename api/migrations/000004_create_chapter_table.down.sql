@@ -1,0 +1,3 @@
+BEGIN;
+DROP TABLE IF EXISTS story_chapter;
+END
