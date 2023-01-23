@@ -10,6 +10,21 @@ API_SERVER_IMAGE ?= api-server
 
 DOCKER_BUILD=docker build --cache-from
 
+help:
+	@echo '  ecr-auth:            - Authenticate ECR'
+	@echo '  builder:             - Build and push builder image'
+	@echo '  buildserver:         - Build api server locally'
+	@echo '  runserver:           - Run api server locally'
+	@echo '  server:              - Build and then run api server locally'
+	@echo '  push-api:            - Push local api server image to ECR'
+	@echo ''
+	@echo '  db_new:              - Create new DB migration script for api server'
+	@echo ''
+	@echo '  build-{service}:     - Build specific service'
+	@echo '  push-{service}:      - Push the current local image for the service to ECR'
+	@echo '  deploy-{service}:    - Deploy the specific service using the latest image in the ECR, need to specific environment with ENV'
+	@echo '                         For example: ENV=dev make deploy-bastion'
+
 ecr-auth:
 	aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin ${ECR}
 
@@ -51,8 +66,3 @@ push-api: ecr-auth
 
 deploy-%:
 	cd $*; ENV=${ENV} make deploy
-
-
-.PHONY: db_new
-db_new: 
-	migrate create -ext sql -dir $(service)/migrations -seq "migration_step_please_change_name"
