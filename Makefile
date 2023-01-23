@@ -51,3 +51,8 @@ push-api: ecr-auth
 
 deploy-%:
 	cd $*; ENV=${ENV} make deploy
+
+
+.PHONY: db_new
+db_new: 
+	migrate create -ext sql -dir $(service)/migrations -seq "migration_step_please_change_name"
