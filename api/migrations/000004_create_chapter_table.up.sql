@@ -2,6 +2,7 @@ BEGIN;
 
 CREATE TABLE IF NOT EXISTS story_chapter (
     id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    story_id uuid NOT NULL,
     seq_num INTEGER NOT NULL,
     title VARCHAR,
     cover_url VARCHAR,
