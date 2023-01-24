@@ -10,6 +10,8 @@ services:
       "/app/api/build/server",
       "--config=/app/api/config/prod.yaml"
     ]
+    depends_on:
+      - api-database
     ports:
       - "20005:20005"
   bastion:
@@ -18,3 +20,10 @@ services:
       context: .
       dockerfile: dockerfile/bastion/Dockerfile
     image: bastion:latest
+  api-database:
+    image: "postgres:12.4"
+    container_name: "api-database"
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust # https://andrew.hawker.io/dailies/2020/02/25/postgres-uninitialized-error/
+    ports:
+      - "23005:5432"
