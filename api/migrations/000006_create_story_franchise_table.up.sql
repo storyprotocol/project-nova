@@ -1,0 +1,15 @@
+BEGIN;
+
+CREATE TABLE IF NOT EXISTS story_franchise (
+    id BIGSERIAL PRIMARY KEY,
+    name VARCHAR NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TRIGGER set_updated_at
+BEFORE UPDATE ON story_franchise
+FOR EACH ROW
+EXECUTE PROCEDURE trigger_set_updated_at();
+
+END

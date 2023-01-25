@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS wallet_merkle_proof (
     id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
     proof VARCHAR NOT NULL,
     allowlist_id uuid NOT NULL,
-    wallet_address uuid NOT NULL,
+    wallet_address VARCHAR NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	// DimeLogPath Dime log file write path
+	// log file write path
 	LogPath      = "/var/log/storyprotocol/storyprotocol.log"
 	LogFileMax   = 500     // 500 megabytes
 	doLoggerOnce sync.Once // to avoid race condition

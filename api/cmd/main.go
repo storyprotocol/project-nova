@@ -11,6 +11,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/project-nova/backend/api/internal/config"
+	"github.com/project-nova/backend/api/internal/handler"
 	"github.com/project-nova/backend/pkg/database"
 	"github.com/project-nova/backend/pkg/logger"
 	"github.com/thirdweb-dev/go-sdk/v2/thirdweb"
@@ -75,17 +76,28 @@ func main() {
 		c.JSON(http.StatusOK, "Healthy")
 	})
 
+	// Endpoint to get the metadata of all story nfts owned by the wallet
+	r.GET("/wallet/:walletAddress/nfts", handler.NewGetWalletNftsHandler(db))
+
+	// Endpoint to get the merkle proof for the wallet address per allowlist
+	r.GET("/wallet/:walletAddress/proof", handler.NewGetWalletProofHandler(db))
+
+	// Endpoint to get all story chapters' information
+	r.GET("/story/:storyNum/chapters", handler.NewGetStoryChaptersHandler(db))
+
+	// Endpoint to get story chapter contents
+	r.GET("/story/:storyNum/chapter/:chapterNum/contents", handler.NewGetStoryChapterContentsHandler(db))
+
+	// Endpoint to update nft backstory for the nft owner
+	r.POST("/nft/:id/backstory", handler.NewUpdateNftBackstoryHandler(db))
+
+	// Deprecated
 	r.GET("/mint/proof", func(c *gin.Context) {
 		address := c.DefaultQuery("address", "")
 
 		// Validate address
 		if address == "" {
 			c.String(http.StatusBadRequest, fmt.Sprintf("input address is invalid, address: %s", address))
-			return
-		}
-
-		if err != nil {
-			c.String(http.StatusInternalServerError, "Internal server error")
 			return
 		}
 
@@ -106,6 +118,7 @@ func main() {
 		})
 	})
 
+	// Deprecated
 	r.GET("/membership", func(c *gin.Context) {
 		privateKey := "a6cd3f393b1cddf8be66e2ff784640adbafbce852267ec1ec000000000000000" // Fake Key
 		contractAddress := "0x64432E5A76a93e79be2f7F3F12982059a32Fd794"
