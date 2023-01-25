@@ -42,16 +42,19 @@ runserver:
 server:
 	make buildserver && make runserver
 
+preparedb:
+	docker compose up -d bastion api-database
+
 .PHONY: db_new
 db_new: 
 	migrate create -ext sql -dir api/migrations -seq "migration_step_please_change_name"
 
 .PHONY: db_up
-db_up:
+db_up: preparedb
 	docker exec project-nova-bastion-1 migrate -database ${DEVELOPMENT_DB_URI} -path /build/api/migrations -verbose up
 
 PHONY: db_shell
-db_shell:
+db_shell: preparedb
 	docker exec -it project-nova-bastion-1 psql ${DEVELOPMENT_DB_URI} 
 
 .PHONY: builder

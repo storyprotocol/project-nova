@@ -36,7 +36,7 @@ func NewGetWalletProofHandler(db *gorm.DB) func(c *gin.Context) {
 		}
 
 		result := &WalletMerkleProofModel{}
-		r := db.Where("address = ? and allowlist_id = ?", address, allowlistId).First(&result)
+		r := db.Where("wallet_address = ? and allowlist_id = ?", address, allowlistId).First(&result)
 		if errors.Is(r.Error, gorm.ErrRecordNotFound) {
 			c.JSON(http.StatusOK, gin.H{})
 			return
@@ -50,10 +50,9 @@ func NewGetWalletProofHandler(db *gorm.DB) func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"proof": result.Proof,
 		})
-
 	}
 }
 
-func GetWalletNftsHandler(c *gin.Context) {
-
+func NewGetWalletNftsHandler(db *gorm.DB) func(c *gin.Context) {
+	return func(c *gin.Context) {}
 }

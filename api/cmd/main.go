@@ -77,19 +77,19 @@ func main() {
 	})
 
 	// Endpoint to get the metadata of all story nfts owned by the wallet
-	r.GET("/wallet/:walletAddress/nfts", handler.GetWalletNftsHandler)
+	r.GET("/wallet/:walletAddress/nfts", handler.NewGetWalletNftsHandler(db))
 
 	// Endpoint to get the merkle proof for the wallet address per allowlist
 	r.GET("/wallet/:walletAddress/proof", handler.NewGetWalletProofHandler(db))
 
 	// Endpoint to get all story chapters' information
-	r.GET("/story/:storyNum/chapters", handler.GetStoryChaptersHandler)
+	r.GET("/story/:storyNum/chapters", handler.NewGetStoryChaptersHandler(db))
 
 	// Endpoint to get story chapter contents
-	r.GET("/story/:storyNum/chapter/:chapterNum/contents", handler.GetStoryChapterContentsHandler)
+	r.GET("/story/:storyNum/chapter/:chapterNum/contents", handler.NewGetStoryChapterContentsHandler(db))
 
 	// Endpoint to update nft backstory for the nft owner
-	r.POST("/nft/:id/backstory", handler.UpdateNftBackstoryHandler)
+	r.POST("/nft/:id/backstory", handler.NewUpdateNftBackstoryHandler(db))
 
 	// Deprecated
 	r.GET("/mint/proof", func(c *gin.Context) {
