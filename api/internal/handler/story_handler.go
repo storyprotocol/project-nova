@@ -52,7 +52,6 @@ func NewGetStoryChaptersHandler(db *gorm.DB) func(c *gin.Context) {
 		franchiseId := c.DefaultQuery("franchiseId", "")
 		storyNum := c.Param("storyNum")
 
-		// Validate address
 		if franchiseId == "" {
 			c.String(http.StatusBadRequest, fmt.Sprint("franchise id is not specified"))
 			return
