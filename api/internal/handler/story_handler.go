@@ -1,44 +1,15 @@
 package handler
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
-	"time"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/project-nova/backend/api/internal/repository"
 	"github.com/project-nova/backend/pkg/logger"
 	"gorm.io/gorm"
 )
-
-type StoryInfoModel struct {
-	ID          string `gorm:"primaryKey;column:id"`
-	FranchiseId int64
-	SeqNum      int
-	Title       string
-	Subtitle    string
-	CoverUrl    string
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
-}
-
-func (StoryInfoModel) TableName() string {
-	return "story_info"
-}
-
-type StoryChapterModel struct {
-	ID        string `gorm:"primaryKey;column:id"`
-	StoryId   string
-	SeqNum    int
-	Title     string
-	CoverUrl  string
-	CreatedAt time.Time
-	UpdatedAt time.Time
-}
-
-func (StoryChapterModel) TableName() string {
-	return "story_chapter"
-}
 
 type GetStoryChaptersResp struct {
 	ChapterNum int
@@ -47,37 +18,37 @@ type GetStoryChaptersResp struct {
 	CoverUrl   string
 }
 
-func NewGetStoryChaptersHandler(db *gorm.DB) func(c *gin.Context) {
+func NewGetStoryChaptersHandler(
+	storyChapterRepo repository.StoryChapterRepository,
+	storyInfoRepo repository.StoryInfoRepository,
+) func(c *gin.Context) {
 	return func(c *gin.Context) {
-		franchiseId := c.DefaultQuery("franchiseId", "")
-		storyNum := c.Param("storyNum")
-
-		if franchiseId == "" {
-			c.String(http.StatusBadRequest, fmt.Sprint("franchise id is not specified"))
+		franchiseId, err := strconv.ParseInt(c.DefaultQuery("franchiseId", ""), 10, 64)
+		if err != nil {
+			logger.Errorf("Failed to convert franchise id: %v", err)
+			c.String(http.StatusBadRequest, fmt.Sprintf("franchise id is invalid, id: %v", franchiseId))
 			return
 		}
 
-		storyInfoResult := &StoryInfoModel{}
-		r := db.Where("franchise_id = ? and seq_num = ?", franchiseId, storyNum).First(&storyInfoResult)
-		if errors.Is(r.Error, gorm.ErrRecordNotFound) {
-			c.JSON(http.StatusOK, gin.H{})
+		storyNum, err := strconv.Atoi(c.Param("storyNum"))
+		if err != nil {
+			logger.Errorf("Failed to convert story num: %v", err)
+			c.String(http.StatusBadRequest, fmt.Sprintf("story num is invalid, number: %v", storyNum))
 			return
 		}
-		if r.Error != nil {
-			logger.Errorf("Failed to query db: %v", r.Error)
+
+		storyInfoResult, err := storyInfoRepo.GetStoryByFranchise(franchiseId, storyNum)
+		if err != nil {
+			logger.Errorf("Failed to get story info: %v", err)
 			c.String(http.StatusInternalServerError, "Internal server error")
 			return
 		}
 
 		storyId := storyInfoResult.ID
-		storyChapterResults := []*StoryChapterModel{}
-		r = db.Where("story_id = ?", storyId).Order("seq_num asc").Find(&storyChapterResults)
-		if errors.Is(r.Error, gorm.ErrRecordNotFound) {
-			c.JSON(http.StatusOK, gin.H{})
-			return
-		}
-		if r.Error != nil {
-			logger.Errorf("Failed to query db: %v", r.Error)
+
+		storyChapterResults, err := storyChapterRepo.GetChaptersByID(storyId)
+		if err != nil {
+			logger.Errorf("Failed to get story chapters: %v", err)
 			c.String(http.StatusInternalServerError, "Internal server error")
 			return
 		}

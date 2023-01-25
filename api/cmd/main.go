@@ -12,6 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/project-nova/backend/api/internal/config"
 	"github.com/project-nova/backend/api/internal/handler"
+	"github.com/project-nova/backend/api/internal/repository"
 	"github.com/project-nova/backend/pkg/database"
 	"github.com/project-nova/backend/pkg/logger"
 	"github.com/thirdweb-dev/go-sdk/v2/thirdweb"
@@ -68,6 +69,9 @@ func main() {
 		logger.Fatal("Failed to connect to DB")
 	}
 
+	storyChapterRepository := repository.NewStoryChapterDbImpl(db)
+	storyInfoRepository := repository.NewStoryInfoDbImpl(db)
+
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, "Hello")
 	})
@@ -83,7 +87,7 @@ func main() {
 	r.GET("/wallet/:walletAddress/proof", handler.NewGetWalletProofHandler(db))
 
 	// Endpoint to get all story chapters' information
-	r.GET("/story/:storyNum/chapters", handler.NewGetStoryChaptersHandler(db))
+	r.GET("/story/:storyNum/chapters", handler.NewGetStoryChaptersHandler(storyChapterRepository, storyInfoRepository))
 
 	// Endpoint to get story chapter contents
 	r.GET("/story/:storyNum/chapter/:chapterNum/contents", handler.NewGetStoryChapterContentsHandler(db))
