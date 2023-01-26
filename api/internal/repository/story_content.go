@@ -7,6 +7,10 @@ import (
 	"strings"
 )
 
+type StoryContentRepository interface {
+	GetContentByChapter(franchiseId int64, storyNum int, chapterNum int) ([]*StorySectionModel, error)
+}
+
 type StorySectionModel struct {
 	Type string             `json:"type"`
 	Data []*StoryMediaModel `json:"data"`
@@ -17,10 +21,6 @@ type StoryMediaModel struct {
 	Content     string `json:"content"`
 	Url         string `json:"url"`
 	Description string `json:"description,omitempty"`
-}
-
-type StoryContentRepository interface {
-	GetContentByChapter(franchiseId int64, storyNum int, chapterNum int) ([]*StorySectionModel, error)
 }
 
 func NewStoryContentFsImpl(contentFilePath string) (StoryContentRepository, error) {
@@ -37,7 +37,6 @@ func NewStoryContentFsImpl(contentFilePath string) (StoryContentRepository, erro
 		if err != nil {
 			return nil, fmt.Errorf("failed to read directory %s, error: %v", dirName, err)
 		}
-
 		for _, file := range files {
 			rawData, err := os.ReadFile(dirName + "/" + file.Name())
 			if err != nil {
