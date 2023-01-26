@@ -10,6 +10,9 @@ CREATE TABLE IF NOT EXISTS story_chapter (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+CREATE INDEX idx_story_chapter_on_story_id ON story_chapter(story_id);
+CREATE INDEX idx_story_chapter_on_seq_num ON story_chapter(seq_num);
+
 CREATE TRIGGER set_updated_at
 BEFORE UPDATE ON story_chapter
 FOR EACH ROW
