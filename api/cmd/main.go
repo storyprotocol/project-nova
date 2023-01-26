@@ -71,7 +71,7 @@ func main() {
 
 	storyChapterRepository := repository.NewStoryChapterDbImpl(db)
 	storyInfoRepository := repository.NewStoryInfoDbImpl(db)
-	storyContentRepository, err := repository.NewStoryContentFsImpl("resource/content/1:1/1.json")
+	storyContentRepository, err := repository.NewStoryContentFsImpl("resource/content")
 	if err != nil {
 		logger.Errorf("Failed to init story content fs implementation: %v", err)
 		return

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 )
 
 type StorySectionModel struct {
@@ -23,19 +24,37 @@ type StoryContentRepository interface {
 }
 
 func NewStoryContentFsImpl(contentFilePath string) (StoryContentRepository, error) {
-	file, err := os.ReadFile(contentFilePath)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read the story content file: %s, error: %v", contentFilePath, err)
-	}
-
-	var data []*StorySectionModel
-	err = json.Unmarshal([]byte(file), &data)
-	if err != nil {
-		return nil, fmt.Errorf("failed to unmarshal story content file data, error: %v", err)
-	}
-
 	contentMap := make(map[string][]*StorySectionModel)
-	contentMap["1:1:1"] = data
+
+	dirs, err := os.ReadDir(contentFilePath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read directory %s, error: %v", contentFilePath, err)
+	}
+	// Load contents from the content directories
+	for _, dir := range dirs {
+		dirName := contentFilePath + "/" + dir.Name()
+		files, err := os.ReadDir(dirName)
+		if err != nil {
+			return nil, fmt.Errorf("failed to read directory %s, error: %v", dirName, err)
+		}
+
+		for _, file := range files {
+			rawData, err := os.ReadFile(dirName + "/" + file.Name())
+			if err != nil {
+				return nil, fmt.Errorf("failed to read file %s, error: %v", file.Name(), err)
+			}
+
+			var data []*StorySectionModel
+			err = json.Unmarshal([]byte(rawData), &data)
+			if err != nil {
+				return nil, fmt.Errorf("failed to unmarshal story content file data, error: %v", err)
+			}
+
+			fileName := strings.Split(file.Name(), ".")[0]
+			contentKey := dir.Name() + ":" + fileName
+			contentMap[contentKey] = data
+		}
+	}
 
 	return &storyContentFsImpl{
 		contentMap: contentMap,
