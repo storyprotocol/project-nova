@@ -71,6 +71,11 @@ func main() {
 
 	storyChapterRepository := repository.NewStoryChapterDbImpl(db)
 	storyInfoRepository := repository.NewStoryInfoDbImpl(db)
+	storyContentRepository, err := repository.NewStoryContentFsImpl("resource/content/1:1/1.json")
+	if err != nil {
+		logger.Errorf("Failed to init story content fs implementation: %v", err)
+		return
+	}
 
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, "Hello")
@@ -90,7 +95,7 @@ func main() {
 	r.GET("/story/:storyNum/chapters", handler.NewGetStoryChaptersHandler(storyChapterRepository, storyInfoRepository))
 
 	// Endpoint to get story chapter contents
-	r.GET("/story/:storyNum/chapter/:chapterNum/contents", handler.NewGetStoryChapterContentsHandler(db))
+	r.GET("/story/:storyNum/chapter/:chapterNum/contents", handler.NewGetStoryChapterContentsHandler(storyContentRepository))
 
 	// Endpoint to update nft backstory for the nft owner
 	r.POST("/nft/:id/backstory", handler.NewUpdateNftBackstoryHandler(db))

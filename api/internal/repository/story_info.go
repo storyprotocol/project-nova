@@ -9,7 +9,7 @@ import (
 )
 
 type StoryInfoRepository interface {
-	GetStoryByFranchise(franchiseId int64, seqNum int) (*StoryInfoModel, error)
+	GetStoryByFranchise(franchiseId int64, storyNum int) (*StoryInfoModel, error)
 }
 
 type StoryInfoModel struct {
@@ -37,9 +37,9 @@ type storyInfoDbImpl struct {
 	db *gorm.DB
 }
 
-func (s *storyInfoDbImpl) GetStoryByFranchise(franchiseId int64, seqNum int) (*StoryInfoModel, error) {
+func (s *storyInfoDbImpl) GetStoryByFranchise(franchiseId int64, storyNum int) (*StoryInfoModel, error) {
 	result := &StoryInfoModel{}
-	r := s.db.Where("franchise_id = ? and seq_num = ?", franchiseId, seqNum).First(&result)
+	r := s.db.Where("franchise_id = ? and seq_num = ?", franchiseId, storyNum).First(&result)
 	if errors.Is(r.Error, gorm.ErrRecordNotFound) {
 		return nil, r.Error
 	}
