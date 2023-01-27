@@ -6,21 +6,37 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/project-nova/backend/api/internal/repository"
+	"github.com/project-nova/backend/pkg/auth"
 	"github.com/project-nova/backend/pkg/logger"
 )
 
 func NewUpdateNftBackstoryHandler(nftTokenRepository repository.NftTokenRepository) func(c *gin.Context) {
 	return func(c *gin.Context) {
+		message := "hello"
+
 		type UpdateNftBackstoryRequestBody struct {
 			CollectionAddress string `json:"collectionAddress"`
 			WalletAddress     string `json:"walletAddress"`
 			Backstory         string `json:"backstory"`
+			Signature         string `json:"signature"`
 		}
 
 		var requestBody UpdateNftBackstoryRequestBody
 		if err := c.BindJSON(&requestBody); err != nil {
 			logger.Errorf("Failed to read request body: %v", err)
 			c.String(http.StatusBadRequest, "invalid request body")
+			return
+		}
+
+		recoveredAddress, err := auth.RecoverAddress(message, requestBody.Signature)
+		if err != nil {
+			logger.Errorf("failed to recover address: %v", err)
+			return
+		}
+
+		if recoveredAddress != requestBody.WalletAddress {
+			logger.Errorf("wallet verification failed, recovered address: %s, wallet address: %s", recoveredAddress, requestBody.WalletAddress)
+			c.String(http.StatusForbidden, "The wallet doesn't have permission for this operation")
 			return
 		}
 
