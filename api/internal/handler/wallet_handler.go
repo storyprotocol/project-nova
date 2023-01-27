@@ -1,30 +1,16 @@
 package handler
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/project-nova/backend/api/internal/repository"
 	"github.com/project-nova/backend/pkg/logger"
 	"gorm.io/gorm"
 )
 
-type WalletMerkleProofModel struct {
-	ID            string `gorm:"primaryKey;column:id"`
-	AllowlistId   string
-	WalletAddress string
-	Proof         string
-	CreatedAt     time.Time
-	UpdatedAt     time.Time
-}
-
-func (WalletMerkleProofModel) TableName() string {
-	return "wallet_merkle_proof"
-}
-
-func NewGetWalletProofHandler(db *gorm.DB) func(c *gin.Context) {
+func NewGetWalletProofHandler(walletMerkleProofRepo repository.WalletMerkleProofRepository) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		allowlistId := c.DefaultQuery("allowlistId", "")
 		address := c.Param("walletAddress")
@@ -35,14 +21,9 @@ func NewGetWalletProofHandler(db *gorm.DB) func(c *gin.Context) {
 			return
 		}
 
-		result := &WalletMerkleProofModel{}
-		r := db.Where("wallet_address = ? and allowlist_id = ?", address, allowlistId).First(&result)
-		if errors.Is(r.Error, gorm.ErrRecordNotFound) {
-			c.JSON(http.StatusOK, gin.H{})
-			return
-		}
-		if r.Error != nil {
-			logger.Errorf("Failed to query db: %v", r.Error)
+		result, err := walletMerkleProofRepo.GetMerkleProof(address, allowlistId)
+		if err != nil {
+			logger.Errorf("Failed to get wallet merkle proof: %v", err)
 			c.String(http.StatusInternalServerError, "Internal server error")
 			return
 		}

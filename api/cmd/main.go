@@ -69,6 +69,8 @@ func main() {
 		logger.Fatal("Failed to connect to DB")
 	}
 
+	walletMerkleProofRepository := repository.NewWalletMerkleProofDbImpl(db)
+	nftTokenRepository := repository.NewNftTokenDbImpl(db)
 	storyChapterRepository := repository.NewStoryChapterDbImpl(db)
 	storyInfoRepository := repository.NewStoryInfoDbImpl(db)
 	storyContentRepository, err := repository.NewStoryContentFsImpl(cfg.ContentPath)
@@ -89,7 +91,7 @@ func main() {
 	r.GET("/wallet/:walletAddress/nfts", handler.NewGetWalletNftsHandler(db))
 
 	// Endpoint to get the merkle proof for the wallet address per allowlist
-	r.GET("/wallet/:walletAddress/proof", handler.NewGetWalletProofHandler(db))
+	r.GET("/wallet/:walletAddress/proof", handler.NewGetWalletProofHandler(walletMerkleProofRepository))
 
 	// Endpoint to get all story chapters' information
 	r.GET("/story/:storyNum/chapters", handler.NewGetStoryChaptersHandler(storyChapterRepository, storyInfoRepository))
@@ -98,7 +100,7 @@ func main() {
 	r.GET("/story/:storyNum/chapter/:chapterNum/contents", handler.NewGetStoryChapterContentsHandler(storyContentRepository))
 
 	// Endpoint to update nft backstory for the nft owner
-	r.POST("/nft/:id/backstory", handler.NewUpdateNftBackstoryHandler(db))
+	r.POST("/nft/:id/backstory", handler.NewUpdateNftBackstoryHandler(nftTokenRepository))
 
 	// Deprecated
 	r.GET("/mint/proof", func(c *gin.Context) {

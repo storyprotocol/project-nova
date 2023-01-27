@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -25,14 +24,14 @@ func NewGetStoryChaptersHandler(
 		franchiseId, err := strconv.ParseInt(c.DefaultQuery("franchiseId", ""), 10, 64)
 		if err != nil {
 			logger.Errorf("Failed to convert franchise id: %v", err)
-			c.String(http.StatusBadRequest, fmt.Sprintf("franchise id is invalid, id: %v", franchiseId))
+			c.String(http.StatusBadRequest, "franchise id is invalid")
 			return
 		}
 
 		storyNum, err := strconv.Atoi(c.Param("storyNum"))
 		if err != nil {
 			logger.Errorf("Failed to convert story num: %v", err)
-			c.String(http.StatusBadRequest, fmt.Sprintf("story num is invalid, number: %v", storyNum))
+			c.String(http.StatusBadRequest, "story num is invalid")
 			return
 		}
 
@@ -70,21 +69,21 @@ func NewGetStoryChapterContentsHandler(storyContentRepo repository.StoryContentR
 		franchiseId, err := strconv.ParseInt(c.DefaultQuery("franchiseId", ""), 10, 64)
 		if err != nil {
 			logger.Errorf("Failed to convert franchise id: %v", err)
-			c.String(http.StatusBadRequest, fmt.Sprintf("franchise id is invalid, id: %v", franchiseId))
+			c.String(http.StatusBadRequest, "franchise id is invalid")
 			return
 		}
 
 		storyNum, err := strconv.Atoi(c.Param("storyNum"))
 		if err != nil {
 			logger.Errorf("Failed to convert story num: %v", err)
-			c.String(http.StatusBadRequest, fmt.Sprintf("story num is invalid, number: %v", storyNum))
+			c.String(http.StatusBadRequest, "story num is invalid")
 			return
 		}
 
 		chapterNum, err := strconv.Atoi(c.Param("chapterNum"))
 		if err != nil {
 			logger.Errorf("Failed to convert chapter num: %v", err)
-			c.String(http.StatusBadRequest, fmt.Sprintf("chapter num is invalid, number: %v", chapterNum))
+			c.String(http.StatusBadRequest, "chapter num is invalid")
 			return
 		}
 
