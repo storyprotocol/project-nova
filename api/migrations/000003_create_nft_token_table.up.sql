@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS nft_token (
     collection_address VARCHAR NOT NULL,
     token_id INTEGER NOT NULL,
     owner_address VARCHAR,
+    franchise_id BIGINT NOT NULL,
     image_url VARCHAR,
     traits VARCHAR,
     backstory VARCHAR(3000),

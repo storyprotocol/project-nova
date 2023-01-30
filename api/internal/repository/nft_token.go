@@ -11,6 +11,7 @@ import (
 
 type NftTokenRepository interface {
 	GetNftByTokenId(tokenId int, collectionAddress string) (*NftTokenModel, error)
+	GetNftsByOwner(franchiseId int64, walletAddress string) ([]*NftTokenModel, error)
 	UpdateNftBackstory(tokenId int, collectionAddress string, backstory *string) (*NftTokenModel, error)
 }
 
@@ -43,6 +44,20 @@ type nftTokenDbImpl struct {
 func (n *nftTokenDbImpl) GetNftByTokenId(tokenId int, collectionAddress string) (*NftTokenModel, error) {
 	results := &NftTokenModel{}
 	r := n.db.Where("token_id = ? and collection_address = ?", tokenId, collectionAddress).First(&results)
+	if errors.Is(r.Error, gorm.ErrRecordNotFound) {
+		return nil, r.Error
+	}
+	if r.Error != nil {
+		return nil, fmt.Errorf("failed to query db: %v", r.Error)
+	}
+
+	return results, nil
+}
+
+func (n *nftTokenDbImpl) GetNftsByOwner(franchiseId int64, walletAddress string) ([]*NftTokenModel, error) {
+	results := []*NftTokenModel{}
+	r := n.db.Where("franchise_id = ? and owner_address = ?", franchiseId, walletAddress).
+		Order("collection_address").Order("token_id").Find(&results)
 	if errors.Is(r.Error, gorm.ErrRecordNotFound) {
 		return nil, r.Error
 	}

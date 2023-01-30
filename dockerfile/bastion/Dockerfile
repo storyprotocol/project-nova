@@ -12,6 +12,7 @@ RUN curl -L https://github.com/golang-migrate/migrate/releases/download/v4.13.0/
 RUN mv ./migrate.linux-amd64 /usr/local/bin/migrate
 
 COPY api/migrations api/migrations
+COPY script/dropdb.sh script/dropdb.sh
 COPY bastion bastion
 
 CMD ["sh", "-c", "tail -f /dev/null"]
