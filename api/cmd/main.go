@@ -88,7 +88,7 @@ func main() {
 	})
 
 	// Endpoint to get the metadata of all story nfts owned by the wallet
-	r.GET("/wallet/:walletAddress/nfts", handler.NewGetWalletNftsHandler(db))
+	r.GET("/wallet/:walletAddress/nfts", handler.NewGetWalletNftsHandler(nftTokenRepository))
 
 	// Endpoint to get the merkle proof for the wallet address per allowlist
 	r.GET("/wallet/:walletAddress/proof", handler.NewGetWalletProofHandler(walletMerkleProofRepository))
