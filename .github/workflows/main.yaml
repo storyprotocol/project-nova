@@ -148,7 +148,7 @@ jobs:
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
   update-deployment-using-kustomize:
-    if: github.event_name == 'push'
+#     if: github.event_name == 'push'
     needs: [build-push-api-image]
     runs-on: ubuntu-latest
     steps:
