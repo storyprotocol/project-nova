@@ -102,7 +102,7 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v1
 
       - name: Build and push BUILDER image
-        if: steps.file_changed.outputs.file_changed == 'true'
+#         if: steps.file_changed.outputs.file_changed == 'true'
         id: build-image-builder
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
