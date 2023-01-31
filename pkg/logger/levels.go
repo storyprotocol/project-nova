@@ -27,25 +27,24 @@ var Levels = struct {
 	Fatal:  "fatal",
 }
 
-func (l Level) toZapLevel() zapcore.Level {
+func (l Level) toZapLevel() (zapcore.Level, error) {
 	switch l {
 	case Levels.Debug:
-		return zap.DebugLevel
+		return zap.DebugLevel, nil
 	case Levels.Info:
-		return zap.InfoLevel
+		return zap.InfoLevel, nil
 	case Levels.Warn:
-		return zap.WarnLevel
+		return zap.WarnLevel, nil
 	case Levels.Error:
-		return zap.ErrorLevel
+		return zap.ErrorLevel, nil
 	case Levels.Dpanic:
-		return zap.DPanicLevel
+		return zap.DPanicLevel, nil
 	case Levels.Panic:
-		return zap.PanicLevel
+		return zap.PanicLevel, nil
 	case Levels.Fatal:
-		return zap.FatalLevel
-	default:
-		panic(fmt.Sprintf("unknown logger level: %v", l))
+		return zap.FatalLevel, nil
 	}
+	return zap.FatalLevel, fmt.Errorf("unknown logger level: %v", l)
 }
 
 var (

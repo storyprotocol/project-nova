@@ -29,6 +29,7 @@ help:
 	@echo '  push-{service}:      - Push the current local image for the service to ECR'
 	@echo '  deploy-{service}:    - Deploy the specific service using the latest image in the ECR, need to specific environment with ENV'
 	@echo '                         For example: ENV=dev make deploy-bastion'
+	@echo '  lint:                - Run linter'
 
 ecr-auth:
 	aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin ${ECR}
@@ -86,3 +87,6 @@ push-api: ecr-auth
 
 deploy-%:
 	cd $*; ENV=${ENV} make deploy
+
+lint:
+	golangci-lint run

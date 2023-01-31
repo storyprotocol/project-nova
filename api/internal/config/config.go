@@ -4,12 +4,12 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"strings"
 
 	"github.com/project-nova/backend/pkg/logger"
-	"gopkg.in/validator.v2"
-	"gopkg.in/yaml.v2"
+	validator "gopkg.in/validator.v2"
+	yaml "gopkg.in/yaml.v2"
 )
 
 type AppConfig struct {
@@ -47,7 +47,7 @@ func LoadFiles(config interface{}, fileNames ...string) error {
 
 	for _, file := range fileNames {
 		fmt.Println("Load config file: " + file)
-		data, err := ioutil.ReadFile(file)
+		data, err := os.ReadFile(file)
 		if err != nil {
 			return err
 		}

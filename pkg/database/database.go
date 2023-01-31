@@ -1,7 +1,7 @@
 package database
 
 import (
-	"github.com/cenkalti/backoff/v4"
+	backoff "github.com/cenkalti/backoff/v4"
 	_ "github.com/lib/pq" // postgres driver
 	"github.com/pkg/errors"
 	"github.com/project-nova/backend/pkg/logger"
