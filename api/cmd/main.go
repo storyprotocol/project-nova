@@ -56,8 +56,13 @@ type MembershipResp struct {
 func main() {
 	r := gin.Default()
 	flag.Parse()
-	Logger := logger.InitLogger(logger.Levels.Info)
-	defer Logger.Sync()
+	Logger, err := logger.InitLogger(logger.Levels.Info)
+	if err != nil {
+		logger.Fatal("Failed to init logger")
+	}
+	defer func() {
+		_ = Logger.Sync()
+	}()
 
 	cfg, err := config.InitializeConfigWithFlag()
 	if err != nil {
@@ -292,5 +297,5 @@ func main() {
 	})
 
 	port := fmt.Sprintf(":%d", cfg.Server.Port)
-	r.Run(port)
+	_ = r.Run(port)
 }
