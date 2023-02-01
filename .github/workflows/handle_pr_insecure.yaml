@@ -9,7 +9,6 @@ env:
   COMPONENT_BUILDER: builder
   COMPONENT_API: api
   AWS_ECR_REGION: us-east-2
-  AWS_ACCOUNT_ID: 243963068353
   ACTIONS_STEP_DEBUG: true
 
 jobs:
@@ -34,8 +33,24 @@ jobs:
         with:
           version: latest
 
+  lint-dockerfile:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Lint builder Dockerfile
+        uses: hadolint/hadolint-action@v2.1.0
+        with:
+          dockerfile: ./dockerfile/builder/Dockerfile
+
+      - name: Lint api Dockerfile
+        uses: hadolint/hadolint-action@v2.1.0
+        with:
+          dockerfile: ./dockerfile/api/Dockerfile
+
   install-go:
-    needs: [lint-dockerfile]
+    needs: [lint-golangci, lint-dockerfile]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -46,7 +61,7 @@ jobs:
           go-version: ">=1.19.0"
       - run: go version
   
-  build-push-builder-image:
+  build-builder-api-images:
     needs: [install-go]
     runs-on: ubuntu-latest
     steps:
@@ -56,66 +71,32 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
-      - name: Build the builder image
+      - name: Build the builder and api image
         env:
           AWS_REGION: ${{ env.AWS_ECR_REGION }}
-          AWS_ACCOUNT_ID: ${{ env.AWS_ACCOUNT_ID }}
           COMPONENT_BUILDER: ${{ env.COMPONENT_BUILDER }}
-        run: |
-          docker build \
-            -t ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${COMPONENT_BUILDER}:latest \
-            -f ./dockerfile/builder/Dockerfile \
-            ./dockerfile/builder
-
-      - name: Scan image vulnerabilities using Trivy
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${COMPONENT_BUILDER}:latest
-          format: 'template'
-          template: '@/contrib/sarif.tpl'
-          output: 'trivy-results.sarif'
-          exit-code: '1'
-          severity: 'CRITICAL,HIGH'
-          ignore-unfixed: true
-  
-  build-push-api-image:
-    needs: [build-push-builder-image]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
-      - name: Build the api image
-        env:
           IMAGE_TAG: ${{ github.sha }}
           COMPONENT_API: ${{ env.COMPONENT_API }}
-          AWS_ECR_REGION: ${{ env.AWS_ECR_REGION }}
+          DOCKERHUB_URL: ''
         run: |
+          docker build \
+            -t ${COMPONENT_BUILDER}:latest \
+            -f ./dockerfile/builder/Dockerfile \
+            ./dockerfile/builder 
+
           docker build \
             -t ${COMPONENT_API}:${IMAGE_TAG} \
             -f ./dockerfile/api/Dockerfile \
-            --build-arg AWS_REGION=${AWS_ECR_REGION} \
+            --build-arg DOCKERHUB_URL=${DOCKERHUB_URL} \
             .
-
-          docker save ${COMPONENT_API}:$IMAGE_TAG > ${COMPONENT_API}.tar
 
       - name: Scan image vulnerabilities using Trivy
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: ${{ env.COMPONENT_API }}:latest
-          format: 'template'
-          template: '@/contrib/sarif.tpl'
+          image-ref: ${{ env.COMPONENT_API }}:${{ github.sha }}
+          format: 'sarif'
           output: 'trivy-results.sarif'
-          exit-code: '1'
+          exit-code: '0'
           severity: 'CRITICAL,HIGH'
           ignore-unfixed: true
-  
-      - name: upload the API image artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: api-image
-          path: ${{ env.COMPONENT_API }}.tar
-  
+

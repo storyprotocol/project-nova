@@ -18,19 +18,22 @@ var (
 )
 
 // default logger at infolevel
-func InitDefaultLogger() *zap.Logger {
+func InitDefaultLogger() (*zap.Logger, error) {
 	return InitLogger(Levels.Info)
 }
 
-func InitLogger(l Level) *zap.Logger {
-	level := l.toZapLevel()
+func InitLogger(l Level) (*zap.Logger, error) {
+	level, err := l.toZapLevel()
+	if err != nil {
+		return nil, err
+	}
 	encoder := getEncoder()
 	writeSyncer := zapcore.NewMultiWriteSyncer(zapcore.AddSync(os.Stdout), getLogWriter())
 	core := zapcore.NewCore(encoder, writeSyncer, level)
 	logger := zap.New(core, zap.AddCaller(), zap.AddCallerSkip(1))
 	Log = logger.Sugar()
 	zap.ReplaceGlobals(logger)
-	return logger
+	return logger, nil
 }
 
 func getEncoder() zapcore.Encoder {
@@ -59,7 +62,7 @@ func getLogWriter() zapcore.WriteSyncer {
 func Default() *zap.SugaredLogger {
 	doLoggerOnce.Do(func() {
 		if Log == nil {
-			InitDefaultLogger()
+			_, _ = InitDefaultLogger()
 		}
 	})
 	return Log

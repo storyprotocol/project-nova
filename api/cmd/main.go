@@ -56,8 +56,13 @@ type MembershipResp struct {
 func main() {
 	r := gin.Default()
 	flag.Parse()
-	Logger := logger.InitLogger(logger.Levels.Info)
-	defer Logger.Sync()
+	Logger, err := logger.InitLogger(logger.Levels.Info)
+	if err != nil {
+		logger.Fatal("Failed to init logger")
+	}
+	defer func() {
+		_ = Logger.Sync()
+	}()
 
 	cfg, err := config.InitializeConfigWithFlag()
 	if err != nil {
@@ -88,7 +93,7 @@ func main() {
 	})
 
 	// Endpoint to get the metadata of all story nfts owned by the wallet
-	r.GET("/wallet/:walletAddress/nfts", handler.NewGetWalletNftsHandler(db))
+	r.GET("/wallet/:walletAddress/nfts", handler.NewGetWalletNftsHandler(nftTokenRepository))
 
 	// Endpoint to get the merkle proof for the wallet address per allowlist
 	r.GET("/wallet/:walletAddress/proof", handler.NewGetWalletProofHandler(walletMerkleProofRepository))
@@ -292,5 +297,5 @@ func main() {
 	})
 
 	port := fmt.Sprintf(":%d", cfg.Server.Port)
-	r.Run(port)
+	_ = r.Run(port)
 }

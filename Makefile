@@ -22,12 +22,14 @@ help:
 	@echo ''
 	@echo '  db_new:              - Create new DB migration script for api server'
 	@echo '  db_up:               - Apply new DB migration script to local Postgres DB for testing'
+	@echo '  db_down:             - Tear down local Postgres DB tables'
 	@echo '  db_shell:            - Open local Postgres DB console'
 	@echo ''
 	@echo '  build-{service}:     - Build specific service'
 	@echo '  push-{service}:      - Push the current local image for the service to ECR'
 	@echo '  deploy-{service}:    - Deploy the specific service using the latest image in the ECR, need to specific environment with ENV'
 	@echo '                         For example: ENV=dev make deploy-bastion'
+	@echo '  lint:                - Run linter'
 
 ecr-auth:
 	aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin ${ECR}
@@ -52,6 +54,10 @@ db_new:
 .PHONY: db_up
 db_up: preparedb
 	docker exec project-nova-bastion-1 migrate -database ${DEVELOPMENT_DB_URI} -path /build/api/migrations -verbose up
+
+.PHONY: db_down
+db_down: preparedb
+	docker exec -e DATABASE_URI=${DEVELOPMENT_DB_URI} project-nova-bastion-1 sh /build/script/dropdb.sh 	
 
 PHONY: db_shell
 db_shell: preparedb
@@ -81,3 +87,6 @@ push-api: ecr-auth
 
 deploy-%:
 	cd $*; ENV=${ENV} make deploy
+
+lint:
+	golangci-lint run
