@@ -1,5 +1,5 @@
-ARG AWS_REGION
-FROM 243963068353.dkr.ecr.${AWS_REGION}.amazonaws.com/builder:latest as build
+ARG DOCKERHUB_URL
+FROM ${DOCKERHUB_URL}builder:latest as build
 
 WORKDIR /build/
 
