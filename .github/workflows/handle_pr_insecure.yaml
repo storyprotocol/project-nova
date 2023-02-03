@@ -9,7 +9,6 @@ env:
   COMPONENT_BUILDER: builder
   COMPONENT_API: api
   AWS_ECR_REGION: us-east-2
-  ACTIONS_STEP_DEBUG: true
 
 jobs:
 
@@ -94,9 +93,5 @@ jobs:
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: ${{ env.COMPONENT_API }}:${{ github.sha }}
-          format: 'sarif'
-          output: 'trivy-results.sarif'
-          exit-code: '0'
-          severity: 'CRITICAL,HIGH'
-          ignore-unfixed: true
+          trivy-config: .github/trivy.yaml
 
