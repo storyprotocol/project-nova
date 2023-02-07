@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS nft_token (
     image_url VARCHAR,
     traits VARCHAR,
     backstory VARCHAR(3000),
-    owner_updated_at TIMESTAMP NOT NULL DEFAULT now(),
+    owner_updated_at TIMESTAMP,
     story_updated_at TIMESTAMP
 );
 

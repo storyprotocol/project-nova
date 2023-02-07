@@ -13,18 +13,20 @@ type NftTokenRepository interface {
 	GetNftByTokenId(tokenId int, collectionAddress string) (*NftTokenModel, error)
 	GetNftsByOwner(franchiseId int64, walletAddress string) ([]*NftTokenModel, error)
 	UpdateNftBackstory(tokenId int, collectionAddress string, backstory *string) (*NftTokenModel, error)
+	CreateNft(nftToken *NftTokenModel) (*NftTokenModel, error)
 }
 
 type NftTokenModel struct {
 	ID                string `gorm:"primaryKey;column:id"`
 	CollectionAddress string
 	TokenId           int
-	OwnerAddress      string
-	ImageUrl          string
-	Traits            string
-	Backstory         string
-	OwnerUpdatedAt    time.Time
-	StoryUpdatedAt    time.Time
+	FranchiseId       int64
+	OwnerAddress      *string
+	ImageUrl          *string
+	Traits            *string
+	Backstory         *string
+	OwnerUpdatedAt    *time.Time
+	StoryUpdatedAt    *time.Time
 }
 
 func (NftTokenModel) TableName() string {
@@ -76,6 +78,18 @@ func (n *nftTokenDbImpl) UpdateNftBackstory(tokenId int, collectionAddress strin
 	}
 	if r.Error != nil {
 		return nil, fmt.Errorf("failed to query db: %v", r.Error)
+	}
+
+	return nftToken, nil
+}
+
+func (n *nftTokenDbImpl) CreateNft(nftToken *NftTokenModel) (*NftTokenModel, error) {
+	r := n.db.Create(nftToken)
+	if r.RowsAffected == 0 {
+		return nil, gorm.ErrRecordNotFound
+	}
+	if r.Error != nil {
+		return nil, fmt.Errorf("failed to insert into db: %v", r.Error)
 	}
 
 	return nftToken, nil

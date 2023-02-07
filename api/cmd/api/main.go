@@ -9,6 +9,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/gin-gonic/gin"
 	"github.com/project-nova/backend/api/internal/config"
 	"github.com/project-nova/backend/api/internal/handler"
@@ -74,6 +75,11 @@ func main() {
 		logger.Fatal("Failed to connect to DB")
 	}
 
+	client, err := ethclient.Dial(cfg.ProviderURL)
+	if err != nil {
+		logger.Fatal("Failed to connect to the blockchain provider")
+	}
+
 	walletMerkleProofRepository := repository.NewWalletMerkleProofDbImpl(db)
 	nftTokenRepository := repository.NewNftTokenDbImpl(db)
 	storyChapterRepository := repository.NewStoryChapterDbImpl(db)
@@ -106,6 +112,12 @@ func main() {
 
 	// Endpoint to update nft backstory for the nft owner
 	r.POST("/nft/:id/backstory", handler.NewUpdateNftBackstoryHandler(nftTokenRepository))
+
+	// Endpoint to get the metadata of story nfts
+	r.GET("/nfts", handler.NewGetNftsHandler(nftTokenRepository))
+
+	// Admin Endpoint to batch update nft metadata
+	r.POST("/nft/:id", handler.NewUpdateNftHandler(nftTokenRepository, client))
 
 	// Deprecated
 	r.GET("/mint/proof", func(c *gin.Context) {
