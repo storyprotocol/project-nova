@@ -16,6 +16,7 @@ type GetStoryChaptersResp struct {
 	CoverUrl   string
 }
 
+// NewGetStoryChaptersHandler: https://documenter.getpostman.com/view/25015244/2s935ppNga#d41d5285-1dce-42dd-aac1-1ef49cb0c427
 func NewGetStoryChaptersHandler(
 	storyChapterRepo repository.StoryChapterRepository,
 	storyInfoRepo repository.StoryInfoRepository,
@@ -64,6 +65,7 @@ func NewGetStoryChaptersHandler(
 	}
 }
 
+// NewGetStoryChapterContentsHandler: https://documenter.getpostman.com/view/25015244/2s935ppNga#889d8e0e-4543-4708-b712-43445b0573e1
 func NewGetStoryChapterContentsHandler(storyContentRepo repository.StoryContentRepository) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		franchiseId, err := strconv.ParseInt(c.DefaultQuery("franchiseId", ""), 10, 64)
