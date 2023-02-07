@@ -10,6 +10,7 @@ import (
 	"github.com/project-nova/backend/pkg/logger"
 )
 
+// NewGetWalletProofHandler: https://documenter.getpostman.com/view/25015244/2s935ppNga#0ca9c937-a6f1-41b9-a957-2222668d37c5
 func NewGetWalletProofHandler(walletMerkleProofRepo repository.WalletMerkleProofRepository) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		allowlistId := c.DefaultQuery("allowlistId", "")
@@ -34,6 +35,7 @@ func NewGetWalletProofHandler(walletMerkleProofRepo repository.WalletMerkleProof
 	}
 }
 
+// NewGetWalletNftsHandler: https://documenter.getpostman.com/view/25015244/2s935ppNga#e27f94d6-bc3c-4d0b-b160-a39624828818
 func NewGetWalletNftsHandler(nftTokenRepository repository.NftTokenRepository) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		address := c.Param("walletAddress")

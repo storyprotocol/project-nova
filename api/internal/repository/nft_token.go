@@ -22,7 +22,11 @@ type NftTokenModel struct {
 	TokenId           int
 	FranchiseId       int64
 	OwnerAddress      *string
+	Name              *string
+	Description       *string
 	ImageUrl          *string
+	Image             *string
+	AnimationUrl      *string
 	Traits            *string
 	Backstory         *string
 	OwnerUpdatedAt    *time.Time

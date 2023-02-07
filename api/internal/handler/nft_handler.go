@@ -4,7 +4,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"io"
 	"math/big"
 	"net/http"
 	"strconv"
@@ -20,6 +19,7 @@ import (
 	"github.com/project-nova/backend/pkg/logger"
 )
 
+// NewUpdateNftBackstoryHandler: https://documenter.getpostman.com/view/25015244/2s935ppNga#d4af7069-ec5a-440a-b158-55524412da58
 func NewUpdateNftBackstoryHandler(nftTokenRepository repository.NftTokenRepository) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		message := "hello"
@@ -64,7 +64,7 @@ func NewUpdateNftBackstoryHandler(nftTokenRepository repository.NftTokenReposito
 			return
 		}
 
-		if *nftToken.OwnerAddress != requestBody.WalletAddress {
+		if nftToken.OwnerAddress == nil || *nftToken.OwnerAddress != requestBody.WalletAddress {
 			logger.Errorf("The request wallet is not the owner of the nft, owner address: %s, wallet address: %s", nftToken.OwnerAddress, requestBody.WalletAddress)
 			c.String(http.StatusForbidden, "The wallet doesn't have permission for this operation")
 			return
@@ -124,15 +124,9 @@ func NewUpdateNftHandler(nftTokenRepository repository.NftTokenRepository, clien
 			return
 		}
 
-		var nft *repository.NftTokenModel
-		if strings.Contains(uri, "ipfs") {
-			nft, err = createIpfsNftRecord(uri, franchiseId, int(tokenId), collectionAddress)
-			logger.Errorf("Failed to construct ipfs nft record: %v", err)
-		} else {
-			nft, err = createSvgNftRecord(uri, franchiseId, int(tokenId), collectionAddress)
-			logger.Errorf("Failed to construct svg nft record: %v", err)
-		}
+		nft, err := createNftRecord(uri, franchiseId, int(tokenId), collectionAddress)
 		if err != nil {
+			logger.Errorf("Failed to construct svg nft record: %v", err)
 			c.String(http.StatusInternalServerError, "Internal server error")
 			return
 		}
@@ -148,65 +142,60 @@ func NewUpdateNftHandler(nftTokenRepository repository.NftTokenRepository, clien
 	}
 }
 
-func createSvgNftRecord(uri string, franchiseId int64, tokenId int, collectionAddress string) (*repository.NftTokenModel, error) {
+func createNftRecord(uri string, franchiseId int64, tokenId int, collectionAddress string) (*repository.NftTokenModel, error) {
 	splittedStr := strings.Split(uri, ",")
 	if len(splittedStr) != 2 {
 		return nil, fmt.Errorf("failed to split uri string to 2 parts. uri: %v", uri)
 	}
 
-	decodedUri, err := base64.URLEncoding.DecodeString(splittedStr[1])
+	decodedMetadata, err := base64.URLEncoding.DecodeString(splittedStr[1])
 	if err != nil {
 		return nil, fmt.Errorf("failed to decode uri: %v", err)
 	}
 
-	var result map[string]any
-	err = json.Unmarshal(decodedUri, &result)
+	result := struct {
+		Name         *string
+		Description  *string
+		Image        *string
+		AnimationUrl *string
+		Attributes   []struct {
+			TraitType string
+			Value     string
+		}
+	}{}
+
+	err = json.Unmarshal(decodedMetadata, &result)
 	if err != nil {
-		return nil, fmt.Errorf("failed to unmarshal json: %v", err)
+		return nil, fmt.Errorf("failed to unmarshal metadata: %v", err)
 	}
 
-	resultStr := string(decodedUri)
-
-	return &repository.NftTokenModel{
+	nft := &repository.NftTokenModel{
 		ID:                uuid.New().String(),
 		FranchiseId:       franchiseId,
 		TokenId:           tokenId,
 		CollectionAddress: collectionAddress,
-		Traits:            &resultStr,
-	}, nil
-}
-
-func createIpfsNftRecord(uri string, franchiseId int64, tokenId int, collectionAddress string) (*repository.NftTokenModel, error) {
-	resp, err := http.Get(uri)
-	if err != nil {
-		return nil, fmt.Errorf("failed to query ipfs link: %v", err)
-	}
-	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read ipfs response body: %v", err)
 	}
 
-	var result map[string]any
-	err = json.Unmarshal(body, &result)
-	if err != nil {
-		return nil, fmt.Errorf("failed to unmarshal json: %v", err)
+	if result.Name != nil {
+		nft.Name = result.Name
+	}
+	if result.Description != nil {
+		nft.Description = result.Description
+	}
+	if result.Image != nil {
+		nft.Image = result.Image
+	}
+	if result.AnimationUrl != nil {
+		nft.AnimationUrl = result.AnimationUrl
+	}
+	if result.Attributes != nil {
+		traits, err := json.Marshal(result.Attributes)
+		if err != nil {
+			return nil, fmt.Errorf("failed to marshal attributes: %v", err)
+		}
+		traitsStr := string(traits)
+		nft.Traits = &traitsStr
 	}
 
-	imageUrl := result["animation_url"].(string)
-	traits, err := json.Marshal(result["attributes"])
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal json: %v", err)
-	}
-	traitsStr := string(traits)
-
-	return &repository.NftTokenModel{
-		ID:                uuid.New().String(),
-		FranchiseId:       franchiseId,
-		TokenId:           tokenId,
-		CollectionAddress: collectionAddress,
-		ImageUrl:          &imageUrl,
-		Traits:            &traitsStr,
-	}, nil
+	return nft, nil
 }
