@@ -35,7 +35,7 @@ ecr-auth:
 	aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin ${ECR}
 
 buildserver:
-	cd api && CGO_ENABLED=0 go build --ldflags "-extldflags '-static -s'" -o build/server cmd/main.go
+	cd api && CGO_ENABLED=0 go build --ldflags "-extldflags '-static -s'" -o build/server cmd/api/main.go
 
 runserver:
 	cd api && ./build/server --config=config/local.yaml
