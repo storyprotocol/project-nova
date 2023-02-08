@@ -13,7 +13,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"github.com/project-nova/backend/api/internal/abi"
+	"github.com/project-nova/backend/api/internal/abi/erc721"
 	"github.com/project-nova/backend/api/internal/repository"
 	"github.com/project-nova/backend/pkg/auth"
 	"github.com/project-nova/backend/pkg/logger"
@@ -110,7 +110,7 @@ func NewUpdateNftHandler(nftTokenRepository repository.NftTokenRepository, clien
 		}
 
 		address := common.HexToAddress(collectionAddress)
-		contract, err := abi.NewAbi(address, client)
+		contract, err := erc721.NewErc721(address, client)
 		if err != nil {
 			logger.Errorf("Failed to instantiate the contract: %v", err)
 			c.String(http.StatusInternalServerError, "Internal server error")
