@@ -30,6 +30,8 @@ help:
 	@echo '  deploy-{service}:    - Deploy the specific service using the latest image in the ECR, need to specific environment with ENV'
 	@echo '                         For example: ENV=dev make deploy-bastion'
 	@echo '  lint:                - Run linter'
+	@echo '  abigen:              - Create golang abi client for smart contracts based on the input json file.'
+	@echo '                         For example: make abigen package=erc721. package corresponding to the input json name and output package name'
 
 ecr-auth:
 	aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin ${ECR}
@@ -90,3 +92,7 @@ deploy-%:
 
 lint:
 	golangci-lint run
+
+.PHONY: abigen
+abigen:
+	cd api; mkdir ./internal/abi/${package}; abigen --abi=./resource/abi/${package}.json --pkg=${package} --out=./internal/abi/${package}/${package}.go
