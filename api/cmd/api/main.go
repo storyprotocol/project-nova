@@ -56,28 +56,30 @@ type MembershipResp struct {
 
 func main() {
 	r := gin.Default()
+
 	flag.Parse()
+
 	Logger, err := logger.InitLogger(logger.Levels.Info)
 	if err != nil {
-		logger.Fatal("Failed to init logger")
+		logger.Fatalf("Failed to init logger, error: %v", err)
 	}
 	defer func() {
 		_ = Logger.Sync()
 	}()
 
-	cfg, err := config.InitializeConfigWithFlag()
+	cfg, err := config.GetConfig()
 	if err != nil {
-		logger.Fatal("Failed to init config")
+		logger.Fatalf("Failed to init config, error: %v", err)
 	}
 
 	db, err := database.NewGormDB(cfg.DatabaseURI)
 	if err != nil {
-		logger.Fatal("Failed to connect to DB")
+		logger.Fatalf("Failed to connect to DB, error: %v", err)
 	}
 
 	client, err := ethclient.Dial(cfg.ProviderURL)
 	if err != nil {
-		logger.Fatal("Failed to connect to the blockchain provider")
+		logger.Fatalf("Failed to connect to the blockchain provider, error: %v", err)
 	}
 
 	walletMerkleProofRepository := repository.NewWalletMerkleProofDbImpl(db)
@@ -99,25 +101,25 @@ func main() {
 	})
 
 	// Endpoint to get the metadata of all story nfts owned by the wallet
-	r.GET("/wallet/:walletAddress/nfts", handler.NewGetWalletNftsHandler(nftTokenRepository))
+	r.GET("/v1/wallet/:walletAddress/nfts", handler.NewGetWalletNftsHandler(nftTokenRepository))
 
 	// Endpoint to get the merkle proof for the wallet address per allowlist
-	r.GET("/wallet/:walletAddress/proof", handler.NewGetWalletProofHandler(walletMerkleProofRepository))
+	r.GET("/v1/wallet/:walletAddress/proof", handler.NewGetWalletProofHandler(walletMerkleProofRepository))
 
 	// Endpoint to get all story chapters' information
-	r.GET("/story/:storyNum/chapters", handler.NewGetStoryChaptersHandler(storyChapterRepository, storyInfoRepository))
+	r.GET("/v1/story/:storyNum/chapters", handler.NewGetStoryChaptersHandler(storyChapterRepository, storyInfoRepository))
 
 	// Endpoint to get story chapter contents
-	r.GET("/story/:storyNum/chapter/:chapterNum/contents", handler.NewGetStoryChapterContentsHandler(storyContentRepository))
+	r.GET("/v1/story/:storyNum/chapter/:chapterNum/contents", handler.NewGetStoryChapterContentsHandler(storyContentRepository))
 
 	// Endpoint to update nft backstory for the nft owner
-	r.POST("/nft/:id/backstory", handler.NewUpdateNftBackstoryHandler(nftTokenRepository))
+	r.POST("/v1/nft/:id/backstory", handler.NewUpdateNftBackstoryHandler(nftTokenRepository))
 
 	// Endpoint to get the metadata of story nfts
-	r.GET("/nfts", handler.NewGetNftsHandler(nftTokenRepository))
+	r.GET("/v1/nfts", handler.NewGetNftsHandler(nftTokenRepository))
 
 	// Admin Endpoint to batch update nft metadata
-	r.POST("/nft/:id", handler.NewUpdateNftHandler(nftTokenRepository, client))
+	r.POST("/v1/nft/:id", handler.NewUpdateNftHandler(nftTokenRepository, client))
 
 	// Deprecated
 	r.GET("/mint/proof", func(c *gin.Context) {

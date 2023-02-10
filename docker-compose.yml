@@ -5,10 +5,12 @@ services:
       # Read Makefile to understand why we want to build from the top-level "." context.
       context: .
       dockerfile: dockerfile/api/Dockerfile
+      args:
+        - DOCKERHUB_URL=243963068353.dkr.ecr.us-west-2.amazonaws.com/
     image: api-server:latest
     command: [
       "/app/api/build/server",
-      "--config=/app/api/config/local-docker.yaml"
+      "--config=/app/api/config/base.yaml"
     ]
     depends_on:
       - api-database

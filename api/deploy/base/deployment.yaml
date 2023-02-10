@@ -30,4 +30,4 @@ spec:
         - containerPort: 8090
         args:
           - "/app/api/build/server"
-          - "--config=/app/api/config/prod.yaml"
+          - "--config=/app/api/config/base.yaml,/app/api/config/prod.yaml"
