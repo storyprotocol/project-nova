@@ -1,18 +1,17 @@
 package config
 
 import (
-	"errors"
 	"flag"
-	"fmt"
-	"os"
 	"strings"
 
+	"github.com/project-nova/backend/pkg/config"
 	"github.com/project-nova/backend/pkg/logger"
-	validator "gopkg.in/validator.v2"
-	yaml "gopkg.in/yaml.v2"
+	"github.com/project-nova/backend/pkg/secrets"
 )
 
 type AppConfig struct {
+	AppID       string `yaml:"app_id"`
+	Region      string `yaml:"region"`
 	DatabaseURI string `yaml:"database_uri"`
 	ProviderURL string `yaml:"provider_url"`
 	Server      Server `yaml:"server"`
@@ -26,39 +25,29 @@ type Server struct {
 }
 
 var (
-	cfgFlag = flag.String("config", "config.yaml", "config file")
+	cfgFlag        = flag.String("config", "config.yaml", "config file")
+	configInstance *AppConfig
 )
 
-// InitializeConfigWithFlag loads config with list of config files and also loads secrets
-func InitializeConfigWithFlag() (*AppConfig, error) {
+// GetConfig loads the config and return cached instance once loaded
+func GetConfig() (*AppConfig, error) {
+	if configInstance != nil {
+		return configInstance, nil
+	}
 	cfgFiles := strings.Split(*cfgFlag, ",")
-	logger.Info("cfgFiles, %v", cfgFiles)
+	logger.Info(cfgFiles)
 	var cfg AppConfig
-	if err := LoadFiles(&cfg, cfgFiles...); err != nil {
-		logger.Warn("failed to initialize configuration ", "error: ", err)
-		return nil, err
+	if err := config.LoadFiles(&cfg, cfgFiles...); err != nil {
+		logger.Fatalf("Failed to load config file: %v", err)
 	}
+
+	if !config.IsContainSecrets(cfgFiles...) {
+		logger.Infof("Loading secrets %s from secret manager", cfg.AppID)
+		if err := secrets.FetchSecrets(cfg.Region, cfg.AppID, &cfg); err != nil {
+			return nil, err
+		}
+	}
+
+	configInstance = &cfg
 	return &cfg, nil
-}
-
-func LoadFiles(config interface{}, fileNames ...string) error {
-	if len(fileNames) == 0 {
-		return errors.New("no config files to load")
-	}
-
-	for _, file := range fileNames {
-		fmt.Println("Load config file: " + file)
-		data, err := os.ReadFile(file)
-		if err != nil {
-			return err
-		}
-		if err := yaml.Unmarshal(data, config); err != nil {
-			return err
-		}
-	}
-
-	if err := validator.Validate(config); err != nil {
-		return err.(validator.ErrorMap)
-	}
-	return nil
 }

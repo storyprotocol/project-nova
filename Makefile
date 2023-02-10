@@ -29,6 +29,7 @@ help:
 	@echo '  push-{service}:      - Push the current local image for the service to ECR'
 	@echo '  deploy-{service}:    - Deploy the specific service using the latest image in the ECR, need to specific environment with ENV'
 	@echo '                         For example: ENV=dev make deploy-bastion'
+	@echo '                       - Restart API server deployment'
 	@echo '  lint:                - Run linter'
 	@echo '  abigen:              - Create golang abi client for smart contracts based on the input json file.'
 	@echo '                         For example: make abigen package=erc721. package corresponding to the input json name and output package name'
@@ -40,7 +41,7 @@ buildserver:
 	cd api && CGO_ENABLED=0 go build --ldflags "-extldflags '-static -s'" -o build/server cmd/api/main.go
 
 runserver:
-	cd api && ./build/server --config=config/local.yaml
+	cd api && ./build/server --config=config/local.yaml,config/secrets.yaml
 
 .PHONY: server
 server:
@@ -89,6 +90,9 @@ push-api: ecr-auth
 
 deploy-%:
 	cd $*; ENV=${ENV} make deploy
+
+restart-api:
+	kubectl rollout restart deployment api-server -n edge
 
 lint:
 	golangci-lint run
