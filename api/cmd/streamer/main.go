@@ -7,6 +7,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/project-nova/backend/pkg/gateway"
 	"github.com/project-nova/backend/pkg/logger"
 )
 
@@ -18,6 +19,8 @@ func main() {
 	defer func() {
 		_ = Logger.Sync()
 	}()
+
+	apiGateway := gateway.NewApiHttpGateway("http://localhost:8090")
 
 	client, err := ethclient.Dial("wss://eth-goerli.g.alchemy.com/v2/RWhchAQNylFZLnnPO7Rmj3b4T4uZIFuO")
 	if err != nil {
@@ -44,6 +47,14 @@ func main() {
 			logger.Fatal(err)
 		case vlog := <-logs:
 			logger.Infof("vLog: %v", vlog)
+
+			tokenId := vlog.Topics[3].Big().Uint64()
+			collectionAddress := vlog.Address.String()
+
+			err = apiGateway.UpdateNftOwner(int(tokenId), collectionAddress)
+			if err != nil {
+				logger.Errorf("Failed to update nft owner: %v", err)
+			}
 		}
 	}
 }
