@@ -3,6 +3,7 @@ package repository
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"gorm.io/gorm"
@@ -102,6 +103,11 @@ func (n *nftTokenDbImpl) UpdateNftOwner(tokenId int, collectionAddress string, o
 }
 
 func (n *nftTokenDbImpl) CreateNft(nftToken *NftTokenModel) (*NftTokenModel, error) {
+	nftToken.CollectionAddress = strings.ToLower(nftToken.CollectionAddress)
+	if nftToken.OwnerAddress != nil {
+		ownerAddress := strings.ToLower(*nftToken.OwnerAddress)
+		nftToken.OwnerAddress = &ownerAddress
+	}
 	r := n.db.Create(nftToken)
 	if r.RowsAffected == 0 {
 		return nil, gorm.ErrRecordNotFound
