@@ -87,7 +87,7 @@ func NewGetNftsHandler(nftTokenRepository repository.NftTokenRepository) func(c 
 	}
 }
 
-func NewUpdateNftHandler(nftTokenRepository repository.NftTokenRepository, client *ethclient.Client) func(c *gin.Context) {
+func NewCreateNftHandler(nftTokenRepository repository.NftTokenRepository, client *ethclient.Client) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		franchiseId, err := strconv.ParseInt(c.DefaultQuery("franchiseId", ""), 10, 64)
 		if err != nil {
@@ -198,4 +198,45 @@ func createNftRecord(uri string, franchiseId int64, tokenId int, collectionAddre
 	}
 
 	return nft, nil
+}
+
+func NewUpdateNftOwnerHandler(nftTokenRepository repository.NftTokenRepository, client *ethclient.Client) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		tokenId, err := strconv.ParseInt(c.Param("id"), 10, 64)
+		if err != nil {
+			logger.Errorf("Failed to convert token id: %v", err)
+			c.String(http.StatusBadRequest, "token id is invalid")
+			return
+		}
+
+		collectionAddress := c.DefaultQuery("collectionAddress", "")
+		if collectionAddress == "" {
+			c.String(http.StatusBadRequest, fmt.Sprintf("input address is invalid, address: %s", collectionAddress))
+			return
+		}
+
+		address := common.HexToAddress(collectionAddress)
+		contract, err := erc721.NewErc721(address, client)
+		if err != nil {
+			logger.Errorf("Failed to instantiate the contract: %v", err)
+			c.String(http.StatusInternalServerError, "Internal server error")
+			return
+		}
+
+		ownerAddress, err := contract.OwnerOf(nil, big.NewInt(tokenId))
+		if err != nil {
+			logger.Errorf("Failed to query uri: %v", err)
+			c.String(http.StatusInternalServerError, "Internal server error")
+			return
+		}
+
+		nftToken, err := nftTokenRepository.UpdateNftOwner(int(tokenId), collectionAddress, ownerAddress.String())
+		if err != nil {
+			logger.Errorf("Failed to update nft owner: %v", err)
+			c.String(http.StatusInternalServerError, "Internal server error")
+			return
+		}
+
+		c.JSON(http.StatusOK, nftToken)
+	}
 }
