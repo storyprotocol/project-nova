@@ -77,7 +77,7 @@ func main() {
 		logger.Fatalf("Failed to connect to DB, error: %v", err)
 	}
 
-	client, err := ethclient.Dial(cfg.ProviderURL)
+	ethClient, err := ethclient.Dial(cfg.ProviderURL)
 	if err != nil {
 		logger.Fatalf("Failed to connect to the blockchain provider, error: %v", err)
 	}
@@ -118,8 +118,11 @@ func main() {
 	// Endpoint to get the metadata of story nfts
 	r.GET("/v1/nfts", handler.NewGetNftsHandler(nftTokenRepository))
 
-	// Admin Endpoint to batch update nft metadata
-	r.POST("/v1/nft/:id", handler.NewUpdateNftHandler(nftTokenRepository, client))
+	// Admin Endpoint to fetch and create nft metadata
+	r.POST("/admin/v1/nft/:id", handler.NewCreateNftHandler(nftTokenRepository, ethClient))
+
+	// Admin Endpoint to update nft owner address
+	r.POST("/admin/v1/nft/:id/owner", handler.NewUpdateNftOwnerHandler(nftTokenRepository, ethClient))
 
 	// Deprecated
 	r.GET("/mint/proof", func(c *gin.Context) {

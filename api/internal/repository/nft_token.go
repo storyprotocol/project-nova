@@ -13,6 +13,7 @@ type NftTokenRepository interface {
 	GetNftByTokenId(tokenId int, collectionAddress string) (*NftTokenModel, error)
 	GetNftsByOwner(franchiseId int64, walletAddress string) ([]*NftTokenModel, error)
 	UpdateNftBackstory(tokenId int, collectionAddress string, backstory *string) (*NftTokenModel, error)
+	UpdateNftOwner(tokenId int, collectionAddress string, ownerAddress string) (*NftTokenModel, error)
 	CreateNft(nftToken *NftTokenModel) (*NftTokenModel, error)
 }
 
@@ -77,6 +78,19 @@ func (n *nftTokenDbImpl) GetNftsByOwner(franchiseId int64, walletAddress string)
 func (n *nftTokenDbImpl) UpdateNftBackstory(tokenId int, collectionAddress string, backstory *string) (*NftTokenModel, error) {
 	nftToken := &NftTokenModel{}
 	r := n.db.Model(&nftToken).Clauses(clause.Returning{}).Where("token_id = ? and collection_address = ?", tokenId, collectionAddress).Update("backstory", *backstory)
+	if r.RowsAffected == 0 {
+		return nil, gorm.ErrRecordNotFound
+	}
+	if r.Error != nil {
+		return nil, fmt.Errorf("failed to query db: %v", r.Error)
+	}
+
+	return nftToken, nil
+}
+
+func (n *nftTokenDbImpl) UpdateNftOwner(tokenId int, collectionAddress string, ownerAddress string) (*NftTokenModel, error) {
+	nftToken := &NftTokenModel{}
+	r := n.db.Model(&nftToken).Clauses(clause.Returning{}).Where("token_id = ? and collection_address = ?", tokenId, collectionAddress).Update("owner_address", ownerAddress)
 	if r.RowsAffected == 0 {
 		return nil, gorm.ErrRecordNotFound
 	}
