@@ -1,4 +1,6 @@
 build
 _output
-config/*
+config/local.yaml
+config/local-docker.yaml
+config/secrets.yaml
 resource/content

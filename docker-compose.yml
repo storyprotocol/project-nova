@@ -10,7 +10,7 @@ services:
     image: api-server:latest
     command: [
       "/app/api/build/server",
-      "--config=/app/api/config/base.yaml"
+      "--config=/app/api/config/base.yaml,/app/api/config/local-docker.yaml"
     ]
     depends_on:
       - api-database
