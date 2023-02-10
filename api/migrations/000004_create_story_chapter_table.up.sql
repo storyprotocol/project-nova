@@ -7,7 +7,8 @@ CREATE TABLE IF NOT EXISTS story_chapter (
     title VARCHAR,
     cover_url VARCHAR,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE(story_id, seq_num)
 );
 
 CREATE INDEX idx_story_chapter_on_story_id ON story_chapter(story_id);

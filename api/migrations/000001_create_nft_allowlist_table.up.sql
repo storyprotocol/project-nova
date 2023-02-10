@@ -15,7 +15,8 @@ CREATE TABLE IF NOT EXISTS nft_allowlist (
     type VARCHAR NOT NULL,
     collection_address VARCHAR NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE(type, collection_address)
 );
 
 CREATE TRIGGER set_updated_at
