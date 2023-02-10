@@ -6,7 +6,8 @@ CREATE TABLE IF NOT EXISTS wallet_merkle_proof (
     allowlist_id uuid NOT NULL,
     wallet_address VARCHAR NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE(allowlist_id, wallet_address)
 );
 
 CREATE INDEX idx_wallet_merkle_proof_on_allowlist_id ON wallet_merkle_proof(allowlist_id);

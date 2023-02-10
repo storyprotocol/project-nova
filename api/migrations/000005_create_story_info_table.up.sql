@@ -8,7 +8,8 @@ CREATE TABLE IF NOT EXISTS story_info (
     subtitle VARCHAR,
     cover_url VARCHAR,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE(franchise_id, seq_num)
 );
 
 CREATE INDEX idx_story_info_on_franchise_id ON story_info(franchise_id);

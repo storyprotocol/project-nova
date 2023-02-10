@@ -14,7 +14,8 @@ CREATE TABLE IF NOT EXISTS nft_token (
     traits VARCHAR,
     backstory VARCHAR(3000),
     owner_updated_at TIMESTAMP,
-    story_updated_at TIMESTAMP
+    story_updated_at TIMESTAMP,
+    UNIQUE(collection_address, token_id)
 );
 
 CREATE INDEX idx_nft_token_on_collection_address ON nft_token(collection_address);
