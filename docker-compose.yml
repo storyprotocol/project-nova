@@ -2,7 +2,6 @@ version: '3.7'
 services:
   api:
     build:
-      # Read Makefile to understand why we want to build from the top-level "." context.
       context: .
       dockerfile: dockerfile/api/Dockerfile
       args:
@@ -16,9 +15,19 @@ services:
       - api-database
     ports:
       - "20005:20005"
+  streamer:
+    build:
+      context: .
+      dockerfile: dockerfile/api/streamer/Dockerfile
+      args:
+        - DOCKERHUB_URL=243963068353.dkr.ecr.us-west-2.amazonaws.com/
+    image: streamer:latest
+    command: [
+      "/app/api/build/streamer",
+      "--config=/app/api/config/streamer/base.yaml,/app/api/config/streamer/local-docker.yaml"
+    ]
   bastion:
     build:
-      # Read Makefile to understand why we want to build from the top-level "." context.
       context: .
       dockerfile: dockerfile/bastion/Dockerfile
     image: bastion:latest
