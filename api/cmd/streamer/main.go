@@ -7,12 +7,18 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/project-nova/backend/api/internal/config"
 	"github.com/project-nova/backend/pkg/gateway"
 	"github.com/project-nova/backend/pkg/logger"
 	"github.com/project-nova/backend/pkg/utils"
 )
 
+const (
+	TransferTopic = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"
+)
+
 func main() {
+
 	Logger, err := logger.InitLogger(logger.Levels.Info)
 	if err != nil {
 		logger.Fatalf("Failed to init logger, error: %v", err)
@@ -21,18 +27,27 @@ func main() {
 		_ = Logger.Sync()
 	}()
 
-	apiGateway := gateway.NewApiHttpGateway("http://localhost:8090")
+	cfg, err := config.GetStreamerConfig()
+	if err != nil {
+		logger.Fatalf("Failed to init config, error: %v", err)
+	}
 
-	client, err := ethclient.Dial("wss://eth-goerli.g.alchemy.com/v2/RWhchAQNylFZLnnPO7Rmj3b4T4uZIFuO")
+	apiGateway := gateway.NewApiHttpGateway(cfg.ApiGatewayUrl)
+
+	client, err := ethclient.Dial(cfg.ProviderURL)
 	if err != nil {
 		logger.Fatal(err)
 	}
 
-	contractAddress := common.HexToAddress("0x041c1fb84f8673F1Fc40bE20d45B3b012d37769b")
+	contractAddresses := []common.Address{}
+	for _, address := range cfg.MonitorAddresses {
+		contractAddresses = append(contractAddresses, common.HexToAddress(address))
+	}
+
 	query := ethereum.FilterQuery{
-		Addresses: []common.Address{contractAddress},
+		Addresses: contractAddresses,
 		Topics: [][]common.Hash{
-			{common.HexToHash("0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef")},
+			{common.HexToHash(TransferTopic)},
 		},
 	}
 
@@ -41,14 +56,14 @@ func main() {
 	if err != nil {
 		logger.Fatal(err)
 	}
+
 	logger.Info("Streamer starting")
+
 	for {
 		select {
 		case err := <-sub.Err():
 			logger.Fatal(err)
 		case vlog := <-logs:
-			logger.Infof("vLog: %v", vlog)
-
 			collectionAddress := vlog.Address.String()
 			fromAddress := vlog.Topics[1].String()
 			toAddress := vlog.Topics[2].String()

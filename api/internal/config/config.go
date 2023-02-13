@@ -19,14 +19,23 @@ type AppConfig struct {
 	ContentPath string `yaml:"content_path"`
 }
 
+type StreamerConfig struct {
+	AppID            string   `yaml:"app_id"`
+	Region           string   `yaml:"region"`
+	ProviderURL      string   `yaml:"provider_url"`
+	ApiGatewayUrl    string   `yaml:"api_gateway_url"`
+	MonitorAddresses []string `yaml:"monitor_addresses"`
+}
+
 type Server struct {
 	Port int64  `yaml:"port"`
 	Env  string `yaml:"env"`
 }
 
 var (
-	cfgFlag        = flag.String("config", "config.yaml", "config file")
-	configInstance *AppConfig
+	cfgFlag                = flag.String("config", "config.yaml", "config file")
+	configInstance         *AppConfig
+	streamerConfigInstance *StreamerConfig
 )
 
 // GetConfig loads the config and return cached instance once loaded
@@ -34,9 +43,11 @@ func GetConfig() (*AppConfig, error) {
 	if configInstance != nil {
 		return configInstance, nil
 	}
+	var cfg AppConfig
+
 	cfgFiles := strings.Split(*cfgFlag, ",")
 	logger.Info(cfgFiles)
-	var cfg AppConfig
+
 	if err := config.LoadFiles(&cfg, cfgFiles...); err != nil {
 		logger.Fatalf("Failed to load config file: %v", err)
 	}
@@ -49,5 +60,29 @@ func GetConfig() (*AppConfig, error) {
 	}
 
 	configInstance = &cfg
+	return &cfg, nil
+}
+
+func GetStreamerConfig() (*StreamerConfig, error) {
+	if streamerConfigInstance != nil {
+		return streamerConfigInstance, nil
+	}
+	var cfg StreamerConfig
+
+	cfgFiles := strings.Split(*cfgFlag, ",")
+	logger.Info(cfgFiles)
+
+	if err := config.LoadFiles(&cfg, cfgFiles...); err != nil {
+		logger.Fatalf("Failed to load config file: %v", err)
+	}
+
+	if !config.IsContainSecrets(cfgFiles...) {
+		logger.Infof("Loading secrets %s from secret manager", cfg.AppID)
+		if err := secrets.FetchSecrets(cfg.Region, cfg.AppID, &cfg); err != nil {
+			return nil, err
+		}
+	}
+
+	streamerConfigInstance = &cfg
 	return &cfg, nil
 }
