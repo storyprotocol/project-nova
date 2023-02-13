@@ -1,5 +1,6 @@
 build
 _output
+config/streamer
 config/local.yaml
 config/local-docker.yaml
 config/secrets.yaml
