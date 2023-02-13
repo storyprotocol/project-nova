@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/common"
@@ -18,6 +19,7 @@ const (
 )
 
 func main() {
+	flag.Parse()
 
 	Logger, err := logger.InitLogger(logger.Levels.Info)
 	if err != nil {

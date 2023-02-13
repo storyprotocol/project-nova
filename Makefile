@@ -18,6 +18,9 @@ help:
 	@echo '  buildserver:         - Build api server locally'
 	@echo '  runserver:           - Run api server locally'
 	@echo '  server:              - Build and then run api server locally'
+	@echo '  buildstreamer:       - Build streamer locally'
+	@echo '  runstreamer:         - Run streamer locally'
+	@echo '  streamer:            - Build and then run streamer locally'
 	@echo '  push-api:            - Push local api server image to ECR'
 	@echo ''
 	@echo '  db_new:              - Create new DB migration script for api server'
@@ -46,6 +49,16 @@ runserver:
 .PHONY: server
 server:
 	make buildserver && make runserver
+
+buildstreamer:
+	cd api && CGO_ENABLED=0 go build --ldflags "-extldflags '-static -s'" -o build/streamer cmd/streamer/main.go
+
+runstreamer:
+	cd api && ./build/streamer --config=config/streamer/local.yaml,config/streamer/secrets.yaml
+
+.PHONY: streamer
+streamer:
+	make buildstreamer && make runstreamer	
 
 preparedb:
 	docker compose up -d bastion api-database
