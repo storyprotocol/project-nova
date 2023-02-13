@@ -9,6 +9,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/project-nova/backend/pkg/gateway"
 	"github.com/project-nova/backend/pkg/logger"
+	"github.com/project-nova/backend/pkg/utils"
 )
 
 func main() {
@@ -48,13 +49,28 @@ func main() {
 		case vlog := <-logs:
 			logger.Infof("vLog: %v", vlog)
 
-			tokenId := vlog.Topics[3].Big().Uint64()
 			collectionAddress := vlog.Address.String()
+			fromAddress := vlog.Topics[1].String()
+			toAddress := vlog.Topics[2].String()
+			tokenId := vlog.Topics[3].Big().Uint64()
 
-			err = apiGateway.UpdateNftOwner(int(tokenId), collectionAddress)
-			if err != nil {
-				logger.Errorf("Failed to update nft owner: %v", err)
+			if utils.IsZeroAddress(fromAddress) { // Mint
+				err = apiGateway.CreateNftRecord(int(tokenId), collectionAddress)
+				if err != nil {
+					logger.Errorf("Failed to create nft record: %v", err)
+				}
+			} else if utils.IsZeroAddress(toAddress) { // Burn
+				err = apiGateway.DeleteNftRecord(int(tokenId), collectionAddress)
+				if err != nil {
+					logger.Errorf("Failed to delete nft record: %v", err)
+				}
+			} else { // Transfer
+				err = apiGateway.UpdateNftOwner(int(tokenId), collectionAddress)
+				if err != nil {
+					logger.Errorf("Failed to update nft owner: %v", err)
+				}
 			}
+
 		}
 	}
 }
