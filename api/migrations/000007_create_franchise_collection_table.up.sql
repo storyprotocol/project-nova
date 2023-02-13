@@ -1,4 +1,4 @@
-BEGIN
+BEGIN;
 
 CREATE TABLE IF NOT EXISTS franchise_collection (
     id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),

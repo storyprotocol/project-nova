@@ -81,14 +81,10 @@ func NewUpdateNftBackstoryHandler(nftTokenRepository repository.NftTokenReposito
 	}
 }
 
-func NewGetNftsHandler(nftTokenRepository repository.NftTokenRepository) func(c *gin.Context) {
+func NewGetNftsHandler(nftTokenRepository repository.NftTokenRepository, franchiseCollectionRepository repository.FranchiseCollectionRepository) func(c *gin.Context) {
 	return func(c *gin.Context) {
+		walletAddress := c.DefaultQuery("walletAddress", "")
 
-	}
-}
-
-func NewCreateNftHandler(nftTokenRepository repository.NftTokenRepository, client *ethclient.Client) func(c *gin.Context) {
-	return func(c *gin.Context) {
 		franchiseId, err := strconv.ParseInt(c.DefaultQuery("franchiseId", ""), 10, 64)
 		if err != nil {
 			logger.Errorf("Failed to convert franchise id: %v", err)
@@ -96,6 +92,26 @@ func NewCreateNftHandler(nftTokenRepository repository.NftTokenRepository, clien
 			return
 		}
 
+		collectionAddresses, err := franchiseCollectionRepository.GetCollectionAddressesByFranchise(franchiseId)
+		if err != nil {
+			logger.Errorf("Failed to get collection addresses by franchise id: %v", err)
+			c.String(http.StatusInternalServerError, "Record not found")
+			return
+		}
+
+		result, err := nftTokenRepository.GetNfts(collectionAddresses, walletAddress)
+		if err != nil {
+			logger.Errorf("Failed to get nfts: %v", err)
+			c.String(http.StatusInternalServerError, "Internal server error")
+			return
+		}
+
+		c.JSON(http.StatusOK, result)
+	}
+}
+
+func NewCreateNftHandler(nftTokenRepository repository.NftTokenRepository, client *ethclient.Client) func(c *gin.Context) {
+	return func(c *gin.Context) {
 		tokenId, err := strconv.ParseInt(c.Param("id"), 10, 64)
 		if err != nil {
 			logger.Errorf("Failed to convert token id: %v", err)
@@ -124,9 +140,16 @@ func NewCreateNftHandler(nftTokenRepository repository.NftTokenRepository, clien
 			return
 		}
 
-		nft, err := createNftRecord(uri, franchiseId, int(tokenId), collectionAddress)
+		ownerAddress, err := contract.OwnerOf(nil, big.NewInt(tokenId))
 		if err != nil {
-			logger.Errorf("Failed to construct svg nft record: %v", err)
+			logger.Errorf("Failed to query uri: %v", err)
+			c.String(http.StatusInternalServerError, "Internal server error")
+			return
+		}
+
+		nft, err := createNftRecord(uri, int(tokenId), ownerAddress.String(), collectionAddress)
+		if err != nil {
+			logger.Errorf("Failed to construct nft record: %v", err)
 			c.String(http.StatusInternalServerError, "Internal server error")
 			return
 		}
@@ -142,7 +165,7 @@ func NewCreateNftHandler(nftTokenRepository repository.NftTokenRepository, clien
 	}
 }
 
-func createNftRecord(uri string, franchiseId int64, tokenId int, collectionAddress string) (*repository.NftTokenModel, error) {
+func createNftRecord(uri string, tokenId int, ownerAddress string, collectionAddress string) (*repository.NftTokenModel, error) {
 	splittedStr := strings.Split(uri, ",")
 	if len(splittedStr) != 2 {
 		return nil, fmt.Errorf("failed to split uri string to 2 parts. uri: %v", uri)
@@ -171,8 +194,8 @@ func createNftRecord(uri string, franchiseId int64, tokenId int, collectionAddre
 
 	nft := &repository.NftTokenModel{
 		ID:                uuid.New().String(),
-		FranchiseId:       franchiseId,
 		TokenId:           tokenId,
+		OwnerAddress:      &ownerAddress,
 		CollectionAddress: collectionAddress,
 	}
 
@@ -238,5 +261,31 @@ func NewUpdateNftOwnerHandler(nftTokenRepository repository.NftTokenRepository, 
 		}
 
 		c.JSON(http.StatusOK, nftToken)
+	}
+}
+
+func NewDeleteNftHandler(nftTokenRepository repository.NftTokenRepository) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		tokenId, err := strconv.ParseInt(c.Param("id"), 10, 64)
+		if err != nil {
+			logger.Errorf("Failed to convert token id: %v", err)
+			c.String(http.StatusBadRequest, "token id is invalid")
+			return
+		}
+
+		collectionAddress := c.DefaultQuery("collectionAddress", "")
+		if collectionAddress == "" {
+			c.String(http.StatusBadRequest, fmt.Sprintf("input collection address is invalid, address: %s", collectionAddress))
+			return
+		}
+
+		err = nftTokenRepository.DeleteNft(int(tokenId), collectionAddress)
+		if err != nil {
+			logger.Errorf("Failed to delete nft: %v", err)
+			c.String(http.StatusInternalServerError, "Internal server error")
+			return
+		}
+
+		c.JSON(http.StatusOK, nil)
 	}
 }

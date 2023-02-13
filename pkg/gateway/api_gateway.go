@@ -9,6 +9,8 @@ import (
 
 type ApiGateway interface {
 	UpdateNftOwner(tokenId int, collectionAddress string) error
+	CreateNftRecord(tokenId int, collectionAddress string) error
+	DeleteNftRecord(tokenId int, collectionAddress string) error
 }
 
 func NewApiHttpGateway(url string) ApiGateway {
@@ -28,6 +30,24 @@ func (s *apiHttpGateway) UpdateNftOwner(tokenId int, collectionAddress string) e
 	_, err := s.client.Request("POST", requestURL, nil, nil)
 	if err != nil {
 		return fmt.Errorf("http request to update nft owner failed. error %v ", err)
+	}
+	return nil
+}
+
+func (s *apiHttpGateway) CreateNftRecord(tokenId int, collectionAddress string) error {
+	requestURL := fmt.Sprintf("/admin/v1/nft/%s?collectionAddress=%s", strconv.Itoa(tokenId), collectionAddress)
+	_, err := s.client.Request("POST", requestURL, nil, nil)
+	if err != nil {
+		return fmt.Errorf("http request to create nft record failed. error %v ", err)
+	}
+	return nil
+}
+
+func (s *apiHttpGateway) DeleteNftRecord(tokenId int, collectionAddress string) error {
+	requestURL := fmt.Sprintf("/admin/v1/nft/%s?collectionAddress=%s", strconv.Itoa(tokenId), collectionAddress)
+	_, err := s.client.Request("DELETE", requestURL, nil, nil)
+	if err != nil {
+		return fmt.Errorf("http request to delete nft record failed. error %v ", err)
 	}
 	return nil
 }

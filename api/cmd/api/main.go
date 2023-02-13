@@ -86,10 +86,16 @@ func main() {
 	nftTokenRepository := repository.NewNftTokenDbImpl(db)
 	storyChapterRepository := repository.NewStoryChapterDbImpl(db)
 	storyInfoRepository := repository.NewStoryInfoDbImpl(db)
+
 	storyContentRepository, err := repository.NewStoryContentFsImpl(cfg.ContentPath)
 	if err != nil {
-		logger.Errorf("Failed to init story content fs implementation: %v", err)
-		return
+		logger.Fatalf("Failed to init story content fs implementation: %v", err)
+	}
+
+	franchiseCollection := repository.NewFranchiseCollectionDbImpl(db)
+	err = franchiseCollection.GetAndLoadFranchiseCollections()
+	if err != nil {
+		logger.Errorf("Failed to get and load franchise collections: %v", err)
 	}
 
 	r.GET("/", func(c *gin.Context) {
@@ -116,13 +122,16 @@ func main() {
 	r.POST("/v1/nft/:id/backstory", handler.NewUpdateNftBackstoryHandler(nftTokenRepository))
 
 	// Endpoint to get the metadata of story nfts
-	r.GET("/v1/nfts", handler.NewGetNftsHandler(nftTokenRepository))
+	r.GET("/v1/nfts", handler.NewGetNftsHandler(nftTokenRepository, franchiseCollection))
 
 	// Admin Endpoint to fetch and create nft metadata
 	r.POST("/admin/v1/nft/:id", handler.NewCreateNftHandler(nftTokenRepository, ethClient))
 
 	// Admin Endpoint to update nft owner address
 	r.POST("/admin/v1/nft/:id/owner", handler.NewUpdateNftOwnerHandler(nftTokenRepository, ethClient))
+
+	// Admin Endpoint to delete nft
+	r.DELETE("/admin/v1/nft/:id", handler.NewDeleteNftHandler(nftTokenRepository))
 
 	// Deprecated
 	r.GET("/mint/proof", func(c *gin.Context) {
