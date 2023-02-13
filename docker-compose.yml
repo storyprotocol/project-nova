@@ -9,7 +9,7 @@ services:
     image: api-server:latest
     command: [
       "/app/api/build/server",
-      "--config=/app/api/config/base.yaml,/app/api/config/local-docker.yaml"
+      "--config=/app/api/config/base.yaml,/app/api/config/local-docker.yaml,/app/api/config/secrets.yaml"
     ]
     depends_on:
       - api-database
@@ -24,7 +24,7 @@ services:
     image: streamer:latest
     command: [
       "/app/api/build/streamer",
-      "--config=/app/api/config/streamer/base.yaml,/app/api/config/streamer/local-docker.yaml"
+      "--config=/app/api/config/streamer/base.yaml,/app/api/config/streamer/local-docker.yaml,/app/api/config/streamer/secrets.yaml"
     ]
   bastion:
     build:
