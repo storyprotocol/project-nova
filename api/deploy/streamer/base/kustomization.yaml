@@ -1,0 +1,10 @@
+piVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- namespace.yaml
+- deployment.yaml
+images:
+- name: 243963068353.dkr.ecr.us-west-2.amazonaws.com/streamer
+  newName: 243963068353.dkr.ecr.us-west-2.amazonaws.com/streamer
+  newTag: latest

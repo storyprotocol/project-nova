@@ -1,0 +1,33 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: edge 
+  name: streamer 
+  labels:
+    app: storyprotocol
+    service: streamer 
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: streamer 
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+  minReadySeconds: 2
+  template:
+    metadata:
+      labels:
+        service: streamer 
+    spec:
+      containers:
+      - image: 243963068353.dkr.ecr.us-west-2.amazonaws.com/streamer:latest
+        imagePullPolicy: "Always"
+        name: streamer 
+        ports:
+        - containerPort: 8090
+        args:
+          - "/app/api/build/streamer"
+          - "--config=/app/api/config/streamer/base.yaml,/app/api/config/streamer/prod.yaml"

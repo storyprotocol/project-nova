@@ -104,6 +104,9 @@ push-api: ecr-auth
 deploy-%:
 	cd $*; ENV=${ENV} make deploy
 
+deploy-streamer:
+	cd api; ENV=${ENV} make deploy-streamer
+
 restart-api:
 	kubectl rollout restart deployment api-server -n edge
 
