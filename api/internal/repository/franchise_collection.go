@@ -14,11 +14,11 @@ type FranchiseCollectionRepository interface {
 }
 
 type FranchiseCollectionModel struct {
-	ID                string `gorm:"primaryKey;column:id"`
-	FranchiseId       int64
-	CollectionAddress string
-	CreatedAt         time.Time
-	UpdatedAt         time.Time
+	ID                string    `gorm:"primaryKey;column:id" json:"id"`
+	FranchiseId       int64     `json:"franchiseId"`
+	CollectionAddress string    `json:"collectionAddress"`
+	CreatedAt         time.Time `json:"createdAt"`
+	UpdatedAt         time.Time `json:"updatedAt"`
 }
 
 func (FranchiseCollectionModel) TableName() string {

@@ -13,14 +13,14 @@ type StoryInfoRepository interface {
 }
 
 type StoryInfoModel struct {
-	ID          string `gorm:"primaryKey;column:id"`
-	FranchiseId int64
-	SeqNum      int
-	Title       string
-	Subtitle    string
-	CoverUrl    string
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
+	ID          string    `gorm:"primaryKey;column:id" json:"id"`
+	FranchiseId int64     `json:"franchiseId"`
+	SeqNum      int       `json:"seqNum"`
+	Title       string    `json:"title"`
+	Subtitle    string    `json:"subtitle"`
+	CoverUrl    string    `json:"coverUrl"`
+	CreatedAt   time.Time `json:"createdAt"`
+	UpdatedAt   time.Time `json:"updatedAt"`
 }
 
 func (StoryInfoModel) TableName() string {

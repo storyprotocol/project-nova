@@ -10,10 +10,10 @@ import (
 )
 
 type GetStoryChaptersResp struct {
-	ChapterNum int
-	Title      string
-	Subtitle   string
-	CoverUrl   string
+	ChapterNum int    `json:"chapterNum"`
+	Title      string `json:"title"`
+	Subtitle   string `json:"subtitle"`
+	CoverUrl   string `json:"coverUrl"`
 }
 
 // NewGetStoryChaptersHandler: https://documenter.getpostman.com/view/25015244/2s935ppNga#d41d5285-1dce-42dd-aac1-1ef49cb0c427
