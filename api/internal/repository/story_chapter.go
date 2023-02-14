@@ -13,13 +13,13 @@ type StoryChapterRepository interface {
 }
 
 type StoryChapterModel struct {
-	ID        string `gorm:"primaryKey;column:id"`
-	StoryId   string
-	SeqNum    int
-	Title     string
-	CoverUrl  string
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID        string    `gorm:"primaryKey;column:id" json:"id"`
+	StoryId   string    `json:"storyId"`
+	SeqNum    int       `json:"seqNum"`
+	Title     string    `json:"title"`
+	CoverUrl  string    `json:"coverUrl"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
 }
 
 func (StoryChapterModel) TableName() string {

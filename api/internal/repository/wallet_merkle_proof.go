@@ -14,12 +14,12 @@ type WalletMerkleProofRepository interface {
 }
 
 type WalletMerkleProofModel struct {
-	ID            string `gorm:"primaryKey;column:id"`
-	AllowlistId   string
-	WalletAddress string
-	Proof         string
-	CreatedAt     time.Time
-	UpdatedAt     time.Time
+	ID            string    `gorm:"primaryKey;column:id" json:"id"`
+	AllowlistId   string    `json:"allowlistId"`
+	WalletAddress string    `json:"walletAddress"`
+	Proof         string    `json:"proof"`
+	CreatedAt     time.Time `json:"createdAt"`
+	UpdatedAt     time.Time `json:"updatedAt"`
 }
 
 func (WalletMerkleProofModel) TableName() string {

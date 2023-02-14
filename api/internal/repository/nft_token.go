@@ -21,19 +21,19 @@ type NftTokenRepository interface {
 }
 
 type NftTokenModel struct {
-	ID                string `gorm:"primaryKey;column:id"`
-	CollectionAddress string
-	TokenId           int
-	OwnerAddress      *string
-	Name              *string
-	Description       *string
-	ImageUrl          *string
-	Image             *string
-	AnimationUrl      *string
-	Traits            *string
-	Backstory         *string
-	OwnerUpdatedAt    *time.Time
-	StoryUpdatedAt    *time.Time
+	ID                string     `gorm:"primaryKey;column:id" json:"id"`
+	CollectionAddress string     `json:"collectionAddress"`
+	TokenId           int        `json:"tokenId"`
+	OwnerAddress      *string    `json:"ownerAddress"`
+	Name              *string    `json:"name"`
+	Description       *string    `json:"description"`
+	ImageUrl          *string    `json:"imageUrl"`
+	Image             *string    `json:"image"`
+	AnimationUrl      *string    `json:"animationUrl"`
+	Traits            *string    `json:"traits"`
+	Backstory         *string    `json:"backstory"`
+	OwnerUpdatedAt    *time.Time `json:"ownerUpdatedAt"`
+	StoryUpdatedAt    *time.Time `json:"storyUpdatedAt"`
 }
 
 func (NftTokenModel) TableName() string {
