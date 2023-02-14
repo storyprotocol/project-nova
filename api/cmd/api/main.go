@@ -106,7 +106,7 @@ func main() {
 		c.JSON(http.StatusOK, "Healthy")
 	})
 
-	// Endpoint to get the metadata of all story nfts owned by the wallet
+	// (DEPRECATED, use /v1/nfts instead) Endpoint to get the metadata of all story nfts owned by the wallet
 	r.GET("/v1/wallet/:walletAddress/nfts", handler.NewGetWalletNftsHandler(nftTokenRepository))
 
 	// Endpoint to get the merkle proof for the wallet address per allowlist
