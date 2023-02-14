@@ -3,6 +3,7 @@ package repository
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"gorm.io/gorm"
@@ -36,6 +37,8 @@ type walletMerkleProofDbImpl struct {
 }
 
 func (s *walletMerkleProofDbImpl) GetMerkleProof(walletAddress string, allowlistId string) (*WalletMerkleProofModel, error) {
+	walletAddress = strings.ToLower(walletAddress)
+
 	result := &WalletMerkleProofModel{}
 	r := s.db.Where("wallet_address = ? and allowlist_id = ?", walletAddress, allowlistId).First(&result)
 	if errors.Is(r.Error, gorm.ErrRecordNotFound) {
