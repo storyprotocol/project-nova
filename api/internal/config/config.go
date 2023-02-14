@@ -20,11 +20,11 @@ type AppConfig struct {
 }
 
 type StreamerConfig struct {
-	AppID            string   `yaml:"app_id"`
-	Region           string   `yaml:"region"`
-	ProviderURL      string   `yaml:"provider_url"`
-	ApiGatewayUrl    string   `yaml:"api_gateway_url"`
-	MonitorAddresses []string `yaml:"monitor_addresses"`
+	AppID             string   `yaml:"app_id"`
+	Region            string   `yaml:"region"`
+	ProviderWebsocket string   `yaml:"provider_websocket"`
+	ApiGatewayUrl     string   `yaml:"api_gateway_url"`
+	MonitorAddresses  []string `yaml:"monitor_addresses"`
 }
 
 type Server struct {

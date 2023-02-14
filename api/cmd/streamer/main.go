@@ -36,7 +36,7 @@ func main() {
 
 	apiGateway := gateway.NewApiHttpGateway(cfg.ApiGatewayUrl)
 
-	client, err := ethclient.Dial(cfg.ProviderURL)
+	client, err := ethclient.Dial(cfg.ProviderWebsocket)
 	if err != nil {
 		logger.Fatal(err)
 	}
