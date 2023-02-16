@@ -84,6 +84,9 @@ func NewUpdateNftBackstoryHandler(nftTokenRepository repository.NftTokenReposito
 func NewGetNftsHandler(nftTokenRepository repository.NftTokenRepository, franchiseCollectionRepository repository.FranchiseCollectionRepository) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		walletAddress := c.DefaultQuery("walletAddress", "")
+		collectionAddress := c.DefaultQuery("collectionAddress", "")
+		limitStr := c.DefaultQuery("limit", "")
+		offsetStr := c.DefaultQuery("offset", "")
 
 		franchiseId, err := strconv.ParseInt(c.DefaultQuery("franchiseId", ""), 10, 64)
 		if err != nil {
@@ -92,14 +95,41 @@ func NewGetNftsHandler(nftTokenRepository repository.NftTokenRepository, franchi
 			return
 		}
 
-		collectionAddresses, err := franchiseCollectionRepository.GetCollectionAddressesByFranchise(franchiseId)
-		if err != nil {
-			logger.Errorf("Failed to get collection addresses by franchise id: %v", err)
-			c.String(http.StatusInternalServerError, "Record not found")
-			return
+		collectionAddresses := []string{}
+		if collectionAddress != "" {
+			collectionAddresses = append(collectionAddresses, collectionAddress)
+		} else {
+			collectionAddresses, err = franchiseCollectionRepository.GetCollectionAddressesByFranchise(franchiseId)
+			if err != nil {
+				logger.Errorf("Failed to get collection addresses by franchise id: %v", err)
+				c.String(http.StatusInternalServerError, "Record not found")
+				return
+			}
 		}
 
-		result, err := nftTokenRepository.GetNfts(collectionAddresses, walletAddress)
+		var offset *int
+		var limit *int
+		if limitStr != "" {
+			limitInt, err := strconv.Atoi(limitStr)
+			if err != nil {
+				logger.Errorf("Failed to convert limit string to integer : %v", err)
+				c.String(http.StatusBadRequest, "limit is invalid")
+				return
+			}
+			limit = &limitInt
+		}
+
+		if offsetStr != "" {
+			offsetInt, err := strconv.Atoi(offsetStr)
+			if err != nil {
+				logger.Errorf("Failed to convert offset string to integer : %v", err)
+				c.String(http.StatusBadRequest, "offset is invalid")
+				return
+			}
+			offset = &offsetInt
+		}
+
+		result, err := nftTokenRepository.GetNfts(collectionAddresses, walletAddress, offset, limit)
 		if err != nil {
 			logger.Errorf("Failed to get nfts: %v", err)
 			c.String(http.StatusInternalServerError, "Internal server error")
