@@ -12,7 +12,7 @@ import (
 
 type NftTokenRepository interface {
 	GetNftByTokenId(tokenId int, collectionAddress string) (*NftTokenModel, error)
-	GetNfts(collectionAddresses []string, walletAddress string) ([]*NftTokenModel, error)
+	GetNfts(collectionAddresses []string, walletAddress string, offset *int, limit *int) ([]*NftTokenModel, error)
 	GetNftsByOwner(franchiseId int64, walletAddress string) ([]*NftTokenModel, error)
 	UpdateNftBackstory(tokenId int, collectionAddress string, backstory *string) (*NftTokenModel, error)
 	UpdateNftOwner(tokenId int, collectionAddress string, ownerAddress string) (*NftTokenModel, error)
@@ -64,7 +64,7 @@ func (n *nftTokenDbImpl) GetNftByTokenId(tokenId int, collectionAddress string) 
 	return results, nil
 }
 
-func (n *nftTokenDbImpl) GetNfts(collectionAddresses []string, walletAddress string) ([]*NftTokenModel, error) {
+func (n *nftTokenDbImpl) GetNfts(collectionAddresses []string, walletAddress string, offset *int, limit *int) ([]*NftTokenModel, error) {
 	for idx, address := range collectionAddresses {
 		collectionAddresses[idx] = strings.ToLower(address)
 	}
@@ -73,6 +73,14 @@ func (n *nftTokenDbImpl) GetNfts(collectionAddresses []string, walletAddress str
 	if walletAddress != "" {
 		walletAddress = strings.ToLower(walletAddress)
 		query = query.Where("owner_address = ?", walletAddress)
+	}
+
+	if offset != nil {
+		query = query.Offset(*offset)
+	}
+
+	if limit != nil {
+		query = query.Limit(*limit)
 	}
 
 	results := []*NftTokenModel{}

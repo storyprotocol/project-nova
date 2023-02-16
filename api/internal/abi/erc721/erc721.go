@@ -30,7 +30,7 @@ var (
 
 // Erc721MetaData contains all meta data concerning the Erc721 contract.
 var Erc721MetaData = &bind.MetaData{
-	ABI: "[{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"tokenId_\",\"type\":\"uint256\"}],\"name\":\"tokenURI\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"}],\"name\":\"ownerOf\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"totalSupply\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"}]",
+	ABI: "[{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"tokenId_\",\"type\":\"uint256\"}],\"name\":\"tokenURI\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"}],\"name\":\"ownerOf\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"totalQuota\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"totalSupply\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"}]",
 }
 
 // Erc721ABI is the input ABI used to generate the binding from.
@@ -239,6 +239,37 @@ func (_Erc721 *Erc721Session) TokenURI(tokenId_ *big.Int) (string, error) {
 // Solidity: function tokenURI(uint256 tokenId_) view returns(string)
 func (_Erc721 *Erc721CallerSession) TokenURI(tokenId_ *big.Int) (string, error) {
 	return _Erc721.Contract.TokenURI(&_Erc721.CallOpts, tokenId_)
+}
+
+// TotalQuota is a free data retrieval call binding the contract method 0x8adaee58.
+//
+// Solidity: function totalQuota() view returns(uint256)
+func (_Erc721 *Erc721Caller) TotalQuota(opts *bind.CallOpts) (*big.Int, error) {
+	var out []interface{}
+	err := _Erc721.contract.Call(opts, &out, "totalQuota")
+
+	if err != nil {
+		return *new(*big.Int), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+
+	return out0, err
+
+}
+
+// TotalQuota is a free data retrieval call binding the contract method 0x8adaee58.
+//
+// Solidity: function totalQuota() view returns(uint256)
+func (_Erc721 *Erc721Session) TotalQuota() (*big.Int, error) {
+	return _Erc721.Contract.TotalQuota(&_Erc721.CallOpts)
+}
+
+// TotalQuota is a free data retrieval call binding the contract method 0x8adaee58.
+//
+// Solidity: function totalQuota() view returns(uint256)
+func (_Erc721 *Erc721CallerSession) TotalQuota() (*big.Int, error) {
+	return _Erc721.Contract.TotalQuota(&_Erc721.CallOpts)
 }
 
 // TotalSupply is a free data retrieval call binding the contract method 0x18160ddd.
