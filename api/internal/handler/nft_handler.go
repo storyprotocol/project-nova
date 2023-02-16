@@ -19,6 +19,33 @@ import (
 	"github.com/project-nova/backend/pkg/logger"
 )
 
+// NewGetNftCollectionsHandler create the handler to get nft collections data
+func NewGetNftCollectionsHandler(
+	nftCollectionRepository repository.NftCollectionRepository,
+	franchiseCollectionRepository repository.FranchiseCollectionRepository,
+) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		collectionAddress := c.DefaultQuery("collectionAddress", "")
+		franchiseId := c.DefaultQuery("franchiseId", "")
+
+		collectionAddresses, err := getCollectionAddresses(franchiseId, collectionAddress, franchiseCollectionRepository)
+		if err != nil {
+			logger.Errorf("Failed to get collection addresses: %v", err)
+			c.String(http.StatusBadRequest, err.Error())
+			return
+		}
+
+		results, err := nftCollectionRepository.GetCollections(collectionAddresses)
+		if err != nil {
+			logger.Errorf("Failed to get collections: %v", err)
+			c.String(http.StatusInternalServerError, "Internal server error")
+			return
+		}
+
+		c.JSON(http.StatusOK, results)
+	}
+}
+
 // NewUpdateNftBackstoryHandler: https://documenter.getpostman.com/view/25015244/2s935ppNga#d4af7069-ec5a-440a-b158-55524412da58
 func NewUpdateNftBackstoryHandler(nftTokenRepository repository.NftTokenRepository) func(c *gin.Context) {
 	return func(c *gin.Context) {
@@ -87,24 +114,13 @@ func NewGetNftsHandler(nftTokenRepository repository.NftTokenRepository, franchi
 		collectionAddress := c.DefaultQuery("collectionAddress", "")
 		limitStr := c.DefaultQuery("limit", "")
 		offsetStr := c.DefaultQuery("offset", "")
+		franchiseId := c.DefaultQuery("franchiseId", "")
 
-		franchiseId, err := strconv.ParseInt(c.DefaultQuery("franchiseId", ""), 10, 64)
+		collectionAddresses, err := getCollectionAddresses(franchiseId, collectionAddress, franchiseCollectionRepository)
 		if err != nil {
-			logger.Errorf("Failed to convert franchise id: %v", err)
-			c.String(http.StatusBadRequest, "franchise id is invalid")
+			logger.Errorf("Failed to get collection addresses: %v", err)
+			c.String(http.StatusBadRequest, err.Error())
 			return
-		}
-
-		collectionAddresses := []string{}
-		if collectionAddress != "" {
-			collectionAddresses = append(collectionAddresses, collectionAddress)
-		} else {
-			collectionAddresses, err = franchiseCollectionRepository.GetCollectionAddressesByFranchise(franchiseId)
-			if err != nil {
-				logger.Errorf("Failed to get collection addresses by franchise id: %v", err)
-				c.String(http.StatusInternalServerError, "Record not found")
-				return
-			}
 		}
 
 		var offset *int
@@ -318,4 +334,28 @@ func NewDeleteNftHandler(nftTokenRepository repository.NftTokenRepository) func(
 
 		c.JSON(http.StatusOK, nil)
 	}
+}
+
+func getCollectionAddresses(
+	franchiseId string,
+	collectionAddress string,
+	franchiseCollectionRepository repository.FranchiseCollectionRepository,
+) ([]string, error) {
+	collectionAddresses := []string{}
+	if collectionAddress != "" {
+		collectionAddresses = append(collectionAddresses, collectionAddress)
+	} else if franchiseId != "" {
+		franchiseIdInt, err := strconv.ParseInt(franchiseId, 10, 64)
+		if err != nil {
+			return nil, fmt.Errorf("Failed to convert franchise id: %v", err)
+		}
+		collectionAddresses, err = franchiseCollectionRepository.GetCollectionAddressesByFranchise(franchiseIdInt)
+		if err != nil {
+			return nil, fmt.Errorf("Failed to get collection addresses by franchise id: %v", err)
+		}
+	} else {
+		return nil, fmt.Errorf("Neither collection address or franchise id is passed")
+	}
+
+	return collectionAddresses, nil
 }
