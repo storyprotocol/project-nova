@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/project-nova/backend/api/internal/config"
 	"github.com/project-nova/backend/api/internal/handler"
@@ -106,32 +107,39 @@ func main() {
 		c.JSON(http.StatusOK, "Healthy")
 	})
 
-	// (DEPRECATED, use /v1/nfts instead) Endpoint to get the metadata of all story nfts owned by the wallet
-	r.GET("/v1/wallet/:walletAddress/nfts", handler.NewGetWalletNftsHandler(nftTokenRepository))
+	publicV1 := r.Group("/v1")
+	publicV1.Use(cors.Default())
+	{
+		// (DEPRECATED, use /v1/nfts instead) Endpoint to get the metadata of all story nfts owned by the wallet
+		publicV1.GET("/wallet/:walletAddress/nfts", handler.NewGetWalletNftsHandler(nftTokenRepository))
 
-	// Endpoint to get the merkle proof for the wallet address per allowlist
-	r.GET("/v1/wallet/:walletAddress/proof", handler.NewGetWalletProofHandler(walletMerkleProofRepository))
+		// Endpoint to get the merkle proof for the wallet address per allowlist
+		publicV1.GET("/wallet/:walletAddress/proof", handler.NewGetWalletProofHandler(walletMerkleProofRepository))
 
-	// Endpoint to get all story chapters' information
-	r.GET("/v1/story/:storyNum/chapters", handler.NewGetStoryChaptersHandler(storyChapterRepository, storyInfoRepository))
+		// Endpoint to get all story chapters' information
+		publicV1.GET("/story/:storyNum/chapters", handler.NewGetStoryChaptersHandler(storyChapterRepository, storyInfoRepository))
 
-	// Endpoint to get story chapter contents
-	r.GET("/v1/story/:storyNum/chapter/:chapterNum/contents", handler.NewGetStoryChapterContentsHandler(storyContentRepository))
+		// Endpoint to get story chapter contents
+		publicV1.GET("/story/:storyNum/chapter/:chapterNum/contents", handler.NewGetStoryChapterContentsHandler(storyContentRepository))
 
-	// Endpoint to update nft backstory for the nft owner
-	r.POST("/v1/nft/:id/backstory", handler.NewUpdateNftBackstoryHandler(nftTokenRepository))
+		// Endpoint to update nft backstory for the nft owner
+		publicV1.POST("/nft/:id/backstory", handler.NewUpdateNftBackstoryHandler(nftTokenRepository))
 
-	// Endpoint to get the metadata of story nfts
-	r.GET("/v1/nfts", handler.NewGetNftsHandler(nftTokenRepository, franchiseCollection))
+		// Endpoint to get the metadata of story nfts
+		publicV1.GET("/nfts", handler.NewGetNftsHandler(nftTokenRepository, franchiseCollection))
+	}
 
-	// Admin Endpoint to fetch and create nft metadata
-	r.POST("/admin/v1/nft/:id", handler.NewCreateNftHandler(nftTokenRepository, ethClient))
+	adminV1 := r.Group("/admin/v1")
+	{
+		// Admin Endpoint to fetch and create nft metadata
+		adminV1.POST("/nft/:id", handler.NewCreateNftHandler(nftTokenRepository, ethClient))
 
-	// Admin Endpoint to update nft owner address
-	r.POST("/admin/v1/nft/:id/owner", handler.NewUpdateNftOwnerHandler(nftTokenRepository, ethClient))
+		// Admin Endpoint to update nft owner address
+		adminV1.POST("/nft/:id/owner", handler.NewUpdateNftOwnerHandler(nftTokenRepository, ethClient))
 
-	// Admin Endpoint to delete nft
-	r.DELETE("/admin/v1/nft/:id", handler.NewDeleteNftHandler(nftTokenRepository))
+		// Admin Endpoint to delete nft
+		adminV1.DELETE("/nft/:id", handler.NewDeleteNftHandler(nftTokenRepository))
+	}
 
 	// Deprecated
 	r.GET("/mint/proof", func(c *gin.Context) {
