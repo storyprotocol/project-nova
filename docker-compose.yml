@@ -27,6 +27,8 @@ services:
       "--config=/app/api/config/streamer/base.yaml,/app/api/config/streamer/local-docker.yaml,/app/api/config/streamer/secrets.yaml"
     ]
   bastion:
+    environment:
+      - SERVER_ENV=local-docker
     build:
       context: .
       dockerfile: dockerfile/bastion/Dockerfile

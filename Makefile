@@ -115,4 +115,4 @@ lint:
 
 .PHONY: abigen
 abigen:
-	cd api; mkdir ./internal/abi/${package}; abigen --abi=./resource/abi/${package}.json --pkg=${package} --out=./internal/abi/${package}/${package}.go
+	mkdir ./pkg/abi/${package}; abigen --abi=./resource/abi/${package}.json --pkg=${package} --out=./pkg/abi/${package}/${package}.go

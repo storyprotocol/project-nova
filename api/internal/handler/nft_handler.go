@@ -13,9 +13,9 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"github.com/project-nova/backend/api/internal/abi/erc721"
 	"github.com/project-nova/backend/api/internal/constant"
 	"github.com/project-nova/backend/api/internal/repository"
+	"github.com/project-nova/backend/pkg/abi/erc721"
 	"github.com/project-nova/backend/pkg/auth"
 	"github.com/project-nova/backend/pkg/logger"
 )

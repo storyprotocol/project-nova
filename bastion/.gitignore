@@ -1,1 +1,3 @@
 _output
+config/secrets.yaml
+config/local-docker.yaml
