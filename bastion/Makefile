@@ -14,3 +14,7 @@ deploy:
 
 	cd deploy/overlays/${ENV}; kustomize edit set image ${ECR}/${BASTION_IMAGE}=${ECR}/${BASTION_IMAGE}:latest	
 	kubectl apply -f ${OUTPUT}/deploy.yaml
+
+.PHONY: build-task
+build-task:
+	CGO_ENABLED=0 go build --ldflags "-extldflags '-static -s'" -o /usr/local/bin/task task/main.go

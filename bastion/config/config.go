@@ -50,7 +50,6 @@ func GetConfig() (*TaskConfig, error) {
 	default:
 		return nil, fmt.Errorf("unknown environment: %s", env)
 	}
-	logger.Info(cfgFiles)
 
 	if err := config.LoadFiles(&cfg, cfgFiles...); err != nil {
 		logger.Fatalf("Failed to load config file: %v", err)
