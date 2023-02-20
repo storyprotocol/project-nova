@@ -18,6 +18,7 @@ import (
 	"github.com/project-nova/backend/pkg/abi/erc721"
 	"github.com/project-nova/backend/pkg/auth"
 	"github.com/project-nova/backend/pkg/logger"
+	"gorm.io/gorm"
 )
 
 // NewGetNftCollectionsHandler create the handler to get nft collections data
@@ -167,7 +168,7 @@ func NewGetNftsHandler(nftTokenRepository repository.NftTokenRepository, franchi
 	}
 }
 
-func NewCreateNftHandler(nftTokenRepository repository.NftTokenRepository, client *ethclient.Client) func(c *gin.Context) {
+func NewCreateOrUpdateNftHandler(nftTokenRepository repository.NftTokenRepository, client *ethclient.Client) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		tokenId, err := strconv.ParseInt(c.Param("id"), 10, 64)
 		if err != nil {
@@ -211,11 +212,27 @@ func NewCreateNftHandler(nftTokenRepository repository.NftTokenRepository, clien
 			return
 		}
 
-		nftToken, err := nftTokenRepository.CreateNft(nft)
+		_, err = nftTokenRepository.GetNftByTokenId(int(tokenId), collectionAddress)
 		if err != nil {
-			logger.Errorf("Failed to create nft token db record: %v", err)
+			if err == gorm.ErrRecordNotFound { // nft token doesn't exist in DB. Create the nft record
+				nftToken, err := nftTokenRepository.CreateNft(nft)
+				if err != nil {
+					logger.Errorf("Failed to create nft token db record: %v", err)
+					c.JSON(http.StatusInternalServerError, gin.H{"message": "Internal server error"})
+					return
+				}
+				c.JSON(http.StatusOK, nftToken)
+				return
+			}
+			logger.Errorf("Failed to get nft record: %v", err)
 			c.JSON(http.StatusInternalServerError, gin.H{"message": "Internal server error"})
 			return
+		}
+		// nft token exists. Update the record
+		nftToken, err := nftTokenRepository.UpdateNft(nft)
+		if err != nil {
+			logger.Errorf("Failed to update nft token db record: %v", err)
+			c.JSON(http.StatusInternalServerError, gin.H{"message": "Internal server error"})
 		}
 
 		c.JSON(http.StatusOK, nftToken)

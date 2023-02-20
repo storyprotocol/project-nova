@@ -131,7 +131,7 @@ func main() {
 	adminV1 := r.Group("/admin/v1")
 	{
 		// Admin Endpoint to fetch and create nft metadata
-		adminV1.POST("/nft/:id", handler.NewCreateNftHandler(nftTokenRepository, ethClient))
+		adminV1.POST("/nft/:id", handler.NewCreateOrUpdateNftHandler(nftTokenRepository, ethClient))
 
 		// Admin Endpoint to update nft owner address
 		adminV1.POST("/nft/:id/owner", handler.NewUpdateNftOwnerHandler(nftTokenRepository, ethClient))

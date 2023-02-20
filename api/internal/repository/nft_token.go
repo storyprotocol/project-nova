@@ -17,6 +17,7 @@ type NftTokenRepository interface {
 	UpdateNftBackstory(tokenId int, collectionAddress string, backstory *string) (*NftTokenModel, error)
 	UpdateNftOwner(tokenId int, collectionAddress string, ownerAddress string) (*NftTokenModel, error)
 	CreateNft(nftToken *NftTokenModel) (*NftTokenModel, error)
+	UpdateNft(nftToken *NftTokenModel) (*NftTokenModel, error)
 	DeleteNft(tokenId int, collectionAddress string) error
 }
 
@@ -154,6 +155,24 @@ func (n *nftTokenDbImpl) CreateNft(nftToken *NftTokenModel) (*NftTokenModel, err
 	}
 	if r.Error != nil {
 		return nil, fmt.Errorf("failed to insert into db: %v", r.Error)
+	}
+
+	return nftToken, nil
+}
+
+func (n *nftTokenDbImpl) UpdateNft(nftToken *NftTokenModel) (*NftTokenModel, error) {
+	nftToken.CollectionAddress = strings.ToLower(nftToken.CollectionAddress)
+	if nftToken.OwnerAddress != nil {
+		ownerAddress := strings.ToLower(*nftToken.OwnerAddress)
+		nftToken.OwnerAddress = &ownerAddress
+	}
+
+	r := n.db.Model(&NftTokenModel{}).Where("token_id = ?", nftToken.TokenId).Updates(nftToken)
+	if r.RowsAffected == 0 {
+		return nil, gorm.ErrRecordNotFound
+	}
+	if r.Error != nil {
+		return nil, fmt.Errorf("failed to update into db: %v", r.Error)
 	}
 
 	return nftToken, nil
