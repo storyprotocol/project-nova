@@ -3,7 +3,7 @@ module github.com/project-nova/backend
 go 1.19
 
 require (
-	github.com/aws/aws-sdk-go v1.44.197
+	github.com/aws/aws-sdk-go v1.44.204
 	github.com/cenkalti/backoff/v4 v4.2.0
 	github.com/ethereum/go-ethereum v1.10.15
 	github.com/gin-gonic/gin v1.8.1

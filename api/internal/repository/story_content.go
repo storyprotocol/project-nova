@@ -23,6 +23,26 @@ type StoryMediaModel struct {
 	Description string `json:"description,omitempty"`
 }
 
+func NewStoryContentS3Impl(s3Client string) StoryContentRepository {
+	return &storyContentS3Impl{
+		s3Client: s3Client,
+	}
+}
+
+type storyContentS3Impl struct {
+	s3Client string
+}
+
+func (s *storyContentS3Impl) GetContentByChapter(franchiseId int64, storyNum int, chapterNum int) ([]*StorySectionModel, error) {
+	key := fmt.Sprintf("%d:%d:%d", franchiseId, storyNum, chapterNum)
+	val, ok := s.contentMap[key]
+	if !ok {
+		return nil, fmt.Errorf("content not found, key: %s", key)
+	}
+
+	return val, nil
+}
+
 func NewStoryContentFsImpl(contentFilePath string) (StoryContentRepository, error) {
 	contentMap := make(map[string][]*StorySectionModel)
 
