@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -16,6 +18,7 @@ import (
 	"github.com/project-nova/backend/pkg/keymanagement"
 	"github.com/project-nova/backend/pkg/logger"
 	"github.com/project-nova/backend/pkg/middleware"
+	"github.com/project-nova/backend/pkg/s3"
 )
 
 type WhitelistWalletModel struct {
@@ -82,19 +85,27 @@ func main() {
 
 	kmsClient := keymanagement.NewKmsClient(cfg.Region)
 
+	awsSession, err := session.NewSession(&aws.Config{
+		Region: aws.String(cfg.Region),
+	})
+	if err != nil {
+		logger.Fatalf("Failed to create aws session: %v", err)
+	}
+	s3Client := s3.NewS3Client(awsSession)
+
 	walletMerkleProofRepository := repository.NewWalletMerkleProofDbImpl(db)
 	nftTokenRepository := repository.NewNftTokenDbImpl(db)
 	nftCollectionRepository := repository.NewNftCollectionDbImpl(db)
 	storyChapterRepository := repository.NewStoryChapterDbImpl(db)
 	storyInfoRepository := repository.NewStoryInfoDbImpl(db)
 
-	storyContentRepository, err := repository.NewStoryContentFsImpl(cfg.ContentPath)
+	storyContentRepository, err := repository.NewStoryContentS3Impl(s3Client)
 	if err != nil {
-		logger.Fatalf("Failed to init story content fs implementation: %v", err)
+		logger.Fatalf("Failed to init story content s3 implementation: %v", err)
 	}
 
-	franchiseCollection := repository.NewFranchiseCollectionDbImpl(db)
-	err = franchiseCollection.GetAndLoadFranchiseCollections()
+	franchiseCollectionRepository := repository.NewFranchiseCollectionDbImpl(db)
+	err = franchiseCollectionRepository.GetAndLoadFranchiseCollections()
 	if err != nil {
 		logger.Errorf("Failed to get and load franchise collections: %v", err)
 	}
@@ -126,10 +137,10 @@ func main() {
 		publicV1.POST("/nft/:id/backstory", handler.NewUpdateNftBackstoryHandler(nftTokenRepository, cfg.AdminAuthMessage))
 
 		// Endpoint to get the metadata of story nfts
-		publicV1.GET("/nfts", handler.NewGetNftsHandler(nftTokenRepository, franchiseCollection))
+		publicV1.GET("/nfts", handler.NewGetNftsHandler(nftTokenRepository, franchiseCollectionRepository))
 
 		// Endpoint to get the metadata of nft collection
-		publicV1.GET("/nft/collections", handler.NewGetNftCollectionsHandler(nftCollectionRepository, franchiseCollection))
+		publicV1.GET("/nft/collections", handler.NewGetNftCollectionsHandler(nftCollectionRepository, franchiseCollectionRepository))
 	}
 
 	adminV1 := r.Group("/admin/v1")
