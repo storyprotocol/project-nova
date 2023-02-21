@@ -13,7 +13,9 @@ import (
 	"github.com/project-nova/backend/api/internal/handler"
 	"github.com/project-nova/backend/api/internal/repository"
 	"github.com/project-nova/backend/pkg/database"
+	"github.com/project-nova/backend/pkg/keymanagement"
 	"github.com/project-nova/backend/pkg/logger"
+	"github.com/project-nova/backend/pkg/middleware"
 )
 
 type WhitelistWalletModel struct {
@@ -78,6 +80,8 @@ func main() {
 		logger.Fatalf("Failed to connect to the blockchain provider, error: %v", err)
 	}
 
+	kmsClient := keymanagement.NewKmsClient(cfg.Region)
+
 	walletMerkleProofRepository := repository.NewWalletMerkleProofDbImpl(db)
 	nftTokenRepository := repository.NewNftTokenDbImpl(db)
 	nftCollectionRepository := repository.NewNftCollectionDbImpl(db)
@@ -119,7 +123,7 @@ func main() {
 		publicV1.GET("/story/:storyNum/chapter/:chapterNum/contents", handler.NewGetStoryChapterContentsHandler(storyContentRepository))
 
 		// Endpoint to update nft backstory for the nft owner
-		publicV1.POST("/nft/:id/backstory", handler.NewUpdateNftBackstoryHandler(nftTokenRepository))
+		publicV1.POST("/nft/:id/backstory", handler.NewUpdateNftBackstoryHandler(nftTokenRepository, cfg.AdminAuthMessage))
 
 		// Endpoint to get the metadata of story nfts
 		publicV1.GET("/nfts", handler.NewGetNftsHandler(nftTokenRepository, franchiseCollection))
@@ -129,6 +133,7 @@ func main() {
 	}
 
 	adminV1 := r.Group("/admin/v1")
+	adminV1.Use(middleware.AuthAdmin(kmsClient, []byte(cfg.AdminAuthMessage)))
 	{
 		// Admin Endpoint to fetch and create nft metadata
 		adminV1.POST("/nft/:id", handler.NewCreateOrUpdateNftHandler(nftTokenRepository, ethClient))

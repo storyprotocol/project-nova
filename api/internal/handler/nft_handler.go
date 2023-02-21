@@ -49,9 +49,8 @@ func NewGetNftCollectionsHandler(
 }
 
 // NewUpdateNftBackstoryHandler: https://documenter.getpostman.com/view/25015244/2s935ppNga#d4af7069-ec5a-440a-b158-55524412da58
-func NewUpdateNftBackstoryHandler(nftTokenRepository repository.NftTokenRepository) func(c *gin.Context) {
+func NewUpdateNftBackstoryHandler(nftTokenRepository repository.NftTokenRepository, authMessage string) func(c *gin.Context) {
 	return func(c *gin.Context) {
-		message := "hello"
 
 		type UpdateNftBackstoryRequestBody struct {
 			CollectionAddress string `json:"collectionAddress"`
@@ -67,7 +66,7 @@ func NewUpdateNftBackstoryHandler(nftTokenRepository repository.NftTokenReposito
 			return
 		}
 
-		recoveredAddress, err := auth.RecoverAddress(message, requestBody.Signature)
+		recoveredAddress, err := auth.RecoverAddress(authMessage, requestBody.Signature)
 		if err != nil {
 			logger.Errorf("failed to recover address: %v", err)
 			return

@@ -10,6 +10,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/project-nova/backend/api/internal/config"
 	"github.com/project-nova/backend/pkg/gateway"
+	"github.com/project-nova/backend/pkg/keymanagement"
 	"github.com/project-nova/backend/pkg/logger"
 	"github.com/project-nova/backend/pkg/utils"
 )
@@ -36,6 +37,9 @@ func main() {
 	}
 
 	apiGateway := gateway.NewApiHttpGateway(cfg.ApiGatewayUrl)
+
+	kmsClient := keymanagement.NewKmsClient(cfg.Region)
+	encryptedBytes, err := kmsClient.Encrypt([]byte(cfg.AdminAuthMessage))
 
 	client, err := ethclient.Dial(cfg.ProviderWebsocket)
 	if err != nil {
@@ -91,17 +95,17 @@ func main() {
 			tokenId := vlog.Topics[3].Big().Uint64()
 
 			if utils.IsZeroAddress(fromAddress) { // Mint
-				err = apiGateway.CreateNftRecord(int(tokenId), collectionAddress)
+				err = apiGateway.CreateNftRecord(int(tokenId), collectionAddress, string(encryptedBytes))
 				if err != nil {
 					logger.Errorf("Failed to create nft record: %v", err)
 				}
 			} else if utils.IsZeroAddress(toAddress) { // Burn
-				err = apiGateway.DeleteNftRecord(int(tokenId), collectionAddress)
+				err = apiGateway.DeleteNftRecord(int(tokenId), collectionAddress, string(encryptedBytes))
 				if err != nil {
 					logger.Errorf("Failed to delete nft record: %v", err)
 				}
 			} else { // Transfer
-				err = apiGateway.UpdateNftOwner(int(tokenId), collectionAddress)
+				err = apiGateway.UpdateNftOwner(int(tokenId), collectionAddress, string(encryptedBytes))
 				if err != nil {
 					logger.Errorf("Failed to update nft owner: %v", err)
 				}
