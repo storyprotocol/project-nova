@@ -1,16 +1,12 @@
-/*
-Copyright © 2023 NAME HERE <EMAIL ADDRESS>
-*/
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/project-nova/backend/bastion/config"
 	"github.com/project-nova/backend/pkg/abi/erc721"
 	"github.com/project-nova/backend/pkg/gateway"
+	"github.com/project-nova/backend/pkg/logger"
 	"github.com/spf13/cobra"
 )
 
@@ -30,13 +26,13 @@ var backfillCmd = &cobra.Command{
 	`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if collectionAddress == "" {
-			fmt.Printf("[ERROR] collection address required. pass it with the flag --collection")
+			logger.Error("Collection address required. pass it with the flag --collection")
 			return
 		}
 
 		cfg, err := config.GetConfig()
 		if err != nil {
-			fmt.Printf("[ERROR] Failed to get configs: %v", err)
+			logger.Errorf("Failed to get configs: %v", err)
 			return
 		}
 
@@ -44,7 +40,7 @@ var backfillCmd = &cobra.Command{
 
 		ethClient, err := ethclient.Dial(cfg.ProviderURL)
 		if err != nil {
-			fmt.Printf("[ERROR] Failed to connect to the blockchain provider, error: %v", err)
+			logger.Errorf("Failed to connect to the blockchain provider, error: %v", err)
 			return
 		}
 
@@ -56,29 +52,29 @@ var backfillCmd = &cobra.Command{
 			address := common.HexToAddress(collectionAddress)
 			contract, err := erc721.NewErc721(address, ethClient)
 			if err != nil {
-				fmt.Printf("[ERROR] Failed to instantiate the contract: %v", err)
+				logger.Errorf("Failed to instantiate the contract: %v", err)
 				return
 			}
 
 			totalSold, err := contract.TotalSold(nil)
 			if err != nil {
-				fmt.Printf("[ERROR] Failed to query uri: %v", err)
+				logger.Errorf("Failed to query uri: %v", err)
 				return
 			}
 
 			endId = int(totalSold.Int64()) - 1
 		}
 
-		fmt.Printf("[INFO] Starting backfills from id %d to id %d\n\n", startId, endId)
+		logger.Infof("Starting backfills from id %d to id %d\n\n", startId, endId)
 		for i := startId; i <= endId; i++ {
 			err = apiGateway.CreateNftRecord(i, collectionAddress)
-			fmt.Printf("[INFO] Created nft record for id %d\n", i)
+			logger.Infof("Created nft record for id %d\n", i)
 			if err != nil {
-				fmt.Printf("[ERROR] Failed to create nft record for id %d: %v\n", i, err)
+				logger.Errorf("Failed to create nft record for id %d: %v\n", i, err)
 			}
 		}
 
-		fmt.Printf("\nBackfill for collection %s completed\n", collectionAddress)
+		logger.Infof("\nBackfill for collection %s completed\n", collectionAddress)
 	},
 }
 

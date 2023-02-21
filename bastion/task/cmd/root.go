@@ -1,11 +1,9 @@
-/*
-Copyright © 2023 NAME HERE <EMAIL ADDRESS>
-*/
 package cmd
 
 import (
 	"os"
 
+	"github.com/project-nova/backend/pkg/logger"
 	"github.com/spf13/cobra"
 )
 
@@ -28,4 +26,11 @@ func Execute() {
 }
 
 func init() {
+	Logger, err := logger.InitLogger(logger.Levels.Info)
+	if err != nil {
+		logger.Fatalf("Failed to init logger, error: %v", err)
+	}
+	defer func() {
+		_ = Logger.Sync()
+	}()
 }
