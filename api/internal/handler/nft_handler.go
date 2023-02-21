@@ -14,6 +14,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/project-nova/backend/api/internal/abi/erc721"
+	"github.com/project-nova/backend/api/internal/constant"
 	"github.com/project-nova/backend/api/internal/repository"
 	"github.com/project-nova/backend/pkg/auth"
 	"github.com/project-nova/backend/pkg/logger"
@@ -132,6 +133,11 @@ func NewGetNftsHandler(nftTokenRepository repository.NftTokenRepository, franchi
 				c.String(http.StatusBadRequest, "limit is invalid")
 				return
 			}
+			if limitInt < 0 || limitInt > constant.NftMaxLimit {
+				logger.Errorf("Invalid input limit: %d", limitInt)
+				c.JSON(http.StatusBadRequest, gin.H{"message": "limit is invalid. limit should be <= 500"})
+				return
+			}
 			limit = &limitInt
 		}
 
@@ -140,6 +146,11 @@ func NewGetNftsHandler(nftTokenRepository repository.NftTokenRepository, franchi
 			if err != nil {
 				logger.Errorf("Failed to convert offset string to integer : %v", err)
 				c.String(http.StatusBadRequest, "offset is invalid")
+				return
+			}
+			if offsetInt < 0 {
+				logger.Errorf("Invalid input offset: %d", offsetInt)
+				c.JSON(http.StatusBadRequest, gin.H{"message": "offset is invalid. offset should be >= 0"})
 				return
 			}
 			offset = &offsetInt
