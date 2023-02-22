@@ -52,8 +52,13 @@ func main() {
 		logger.Fatalf("Failed to connect to blockchain provider: %v", err)
 	}
 
+	monitorAddresses, err := apiGateway.GetCollectionAddresses()
+	if err != nil {
+		logger.Fatalf("Failed to get monitor addresses: %v", err)
+	}
+
 	contractAddresses := []common.Address{}
-	for _, address := range cfg.MonitorAddresses {
+	for _, address := range monitorAddresses {
 		contractAddresses = append(contractAddresses, common.HexToAddress(address))
 	}
 
