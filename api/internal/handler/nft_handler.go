@@ -167,7 +167,21 @@ func NewGetNftsHandler(nftTokenRepository repository.NftTokenRepository, franchi
 	}
 }
 
-func NewCreateOrUpdateNftHandler(nftTokenRepository repository.NftTokenRepository, client *ethclient.Client) func(c *gin.Context) {
+func NewAdminGetCollectionsHandler(nftCollectionRepository repository.NftCollectionRepository, client *ethclient.Client) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		// Get all collections here should be fine as we won't have even more than 100 collections for a while
+		results, err := nftCollectionRepository.GetAllCollections()
+		if err != nil {
+			logger.Errorf("Failed to get collections: %v", err)
+			c.String(http.StatusInternalServerError, "Internal server error")
+			return
+		}
+
+		c.JSON(http.StatusOK, results)
+	}
+}
+
+func NewAdminCreateOrUpdateNftHandler(nftTokenRepository repository.NftTokenRepository, client *ethclient.Client) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		tokenId, err := strconv.ParseInt(c.Param("id"), 10, 64)
 		if err != nil {
@@ -296,7 +310,7 @@ func createNftRecord(uri string, tokenId int, ownerAddress string, collectionAdd
 	return nft, nil
 }
 
-func NewUpdateNftOwnerHandler(nftTokenRepository repository.NftTokenRepository, client *ethclient.Client) func(c *gin.Context) {
+func NewAdminUpdateNftOwnerHandler(nftTokenRepository repository.NftTokenRepository, client *ethclient.Client) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		tokenId, err := strconv.ParseInt(c.Param("id"), 10, 64)
 		if err != nil {
@@ -337,7 +351,7 @@ func NewUpdateNftOwnerHandler(nftTokenRepository repository.NftTokenRepository, 
 	}
 }
 
-func NewDeleteNftHandler(nftTokenRepository repository.NftTokenRepository) func(c *gin.Context) {
+func NewAdminDeleteNftHandler(nftTokenRepository repository.NftTokenRepository) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		tokenId, err := strconv.ParseInt(c.Param("id"), 10, 64)
 		if err != nil {

@@ -146,14 +146,17 @@ func main() {
 	adminV1 := r.Group("/admin/v1")
 	adminV1.Use(middleware.AuthAdmin(kmsClient, []byte(cfg.AdminAuthMessage), cfg.AuthKeyId))
 	{
+		// Admin Endpoint to get collection data
+		adminV1.GET("/nft/collections", handler.NewAdminGetCollectionsHandler(nftCollectionRepository, ethClient))
+
 		// Admin Endpoint to fetch and create nft metadata
-		adminV1.POST("/nft/:id", handler.NewCreateOrUpdateNftHandler(nftTokenRepository, ethClient))
+		adminV1.POST("/nft/:id", handler.NewAdminCreateOrUpdateNftHandler(nftTokenRepository, ethClient))
 
 		// Admin Endpoint to update nft owner address
-		adminV1.POST("/nft/:id/owner", handler.NewUpdateNftOwnerHandler(nftTokenRepository, ethClient))
+		adminV1.POST("/nft/:id/owner", handler.NewAdminUpdateNftOwnerHandler(nftTokenRepository, ethClient))
 
 		// Admin Endpoint to delete nft
-		adminV1.DELETE("/nft/:id", handler.NewDeleteNftHandler(nftTokenRepository))
+		adminV1.DELETE("/nft/:id", handler.NewAdminDeleteNftHandler(nftTokenRepository))
 	}
 
 	port := fmt.Sprintf(":%d", cfg.Server.Port)

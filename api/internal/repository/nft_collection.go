@@ -11,6 +11,7 @@ import (
 
 type NftCollectionRepository interface {
 	GetCollections(collectionAddresses []string) ([]*NftCollectionModel, error)
+	GetAllCollections() ([]*NftCollectionModel, error)
 }
 
 type NftCollectionModel struct {
@@ -44,6 +45,19 @@ func (s *nftCollectionDbImpl) GetCollections(collectionAddresses []string) ([]*N
 
 	results := []*NftCollectionModel{}
 	r := s.db.Where("collection_address IN ?", collectionAddresses).Find(&results)
+	if errors.Is(r.Error, gorm.ErrRecordNotFound) {
+		return nil, r.Error
+	}
+	if r.Error != nil {
+		return nil, fmt.Errorf("failed to query db: %v", r.Error)
+	}
+
+	return results, nil
+}
+
+func (s *nftCollectionDbImpl) GetAllCollections() ([]*NftCollectionModel, error) {
+	results := []*NftCollectionModel{}
+	r := s.db.Find(&results)
 	if errors.Is(r.Error, gorm.ErrRecordNotFound) {
 		return nil, r.Error
 	}

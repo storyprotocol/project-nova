@@ -22,13 +22,12 @@ type AppConfig struct {
 }
 
 type StreamerConfig struct {
-	AppID             string   `yaml:"app_id"`
-	Region            string   `yaml:"region"`
-	ProviderWebsocket string   `yaml:"provider_websocket"`
-	ApiGatewayUrl     string   `yaml:"api_gateway_url"`
-	MonitorAddresses  []string `yaml:"monitor_addresses"`
-	AdminAuthMessage  string   `yaml:"admin_auth_message"`
-	AuthKeyId         string   `yaml:"auth_key_id"`
+	AppID             string `yaml:"app_id"`
+	Region            string `yaml:"region"`
+	ProviderWebsocket string `yaml:"provider_websocket"`
+	ApiGatewayUrl     string `yaml:"api_gateway_url"`
+	AdminAuthMessage  string `yaml:"admin_auth_message"`
+	AuthKeyId         string `yaml:"auth_key_id"`
 }
 
 type Server struct {

@@ -9,6 +9,7 @@ import (
 )
 
 type ApiGateway interface {
+	GetCollectionAddresses(authMessage string) ([]string, error)
 	UpdateNftOwner(tokenId int, collectionAddress string, authMessage string) error
 	CreateNftRecord(tokenId int, collectionAddress string, authMessage string) error
 	DeleteNftRecord(tokenId int, collectionAddress string, authMessage string) error
@@ -24,6 +25,27 @@ func NewApiHttpGateway(url string) ApiGateway {
 
 type apiHttpGateway struct {
 	client http.Client
+}
+
+func (s *apiHttpGateway) GetCollectionAddresses(authMessage string) ([]string, error) {
+	requestURL := "/admin/v1/nft/collections"
+	results := []struct {
+		CollectionAddress string `json:"collection_address"`
+	}{}
+	headers := &map[string]string{
+		middleware.AuthMessageHeaderKey: authMessage,
+	}
+	_, err := s.client.RequestAddHeaders("GET", requestURL, headers, nil, &results)
+	if err != nil {
+		return nil, fmt.Errorf("http request to get collections failed. error %v ", err)
+	}
+
+	addresses := []string{}
+	for _, result := range results {
+		addresses = append(addresses, result.CollectionAddress)
+	}
+
+	return addresses, nil
 }
 
 func (s *apiHttpGateway) UpdateNftOwner(tokenId int, collectionAddress string, authMessage string) error {
