@@ -15,7 +15,6 @@ type AppConfig struct {
 	DatabaseURI      string `yaml:"database_uri"`
 	ProviderURL      string `yaml:"provider_url"`
 	Server           Server `yaml:"server"`
-	AbiPath          string `yaml:"abi_path"`
 	ContentPath      string `yaml:"content_path"`
 	AdminAuthMessage string `yaml:"admin_auth_message"`
 	AuthKeyId        string `yaml:"auth_key_id"`

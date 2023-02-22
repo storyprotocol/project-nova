@@ -52,7 +52,7 @@ func main() {
 		logger.Fatalf("Failed to connect to blockchain provider: %v", err)
 	}
 
-	monitorAddresses, err := apiGateway.GetCollectionAddresses()
+	monitorAddresses, err := apiGateway.GetCollectionAddresses(encryptedBase64)
 	if err != nil {
 		logger.Fatalf("Failed to get monitor addresses: %v", err)
 	}

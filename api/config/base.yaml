@@ -1,4 +1,3 @@
 app_id: api
 region: us-west-2
-abi_path: /app/api/resource/abi/
 content_path: api/resource/content
