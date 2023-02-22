@@ -13,11 +13,12 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"github.com/project-nova/backend/api/internal/abi/erc721"
 	"github.com/project-nova/backend/api/internal/constant"
 	"github.com/project-nova/backend/api/internal/repository"
+	"github.com/project-nova/backend/pkg/abi/erc721"
 	"github.com/project-nova/backend/pkg/auth"
 	"github.com/project-nova/backend/pkg/logger"
+	"gorm.io/gorm"
 )
 
 // NewGetNftCollectionsHandler create the handler to get nft collections data
@@ -167,18 +168,18 @@ func NewGetNftsHandler(nftTokenRepository repository.NftTokenRepository, franchi
 	}
 }
 
-func NewCreateNftHandler(nftTokenRepository repository.NftTokenRepository, client *ethclient.Client) func(c *gin.Context) {
+func NewCreateOrUpdateNftHandler(nftTokenRepository repository.NftTokenRepository, client *ethclient.Client) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		tokenId, err := strconv.ParseInt(c.Param("id"), 10, 64)
 		if err != nil {
 			logger.Errorf("Failed to convert token id: %v", err)
-			c.String(http.StatusBadRequest, "token id is invalid")
+			c.JSON(http.StatusBadRequest, gin.H{"message": "token id is invalid"})
 			return
 		}
 
 		collectionAddress := c.DefaultQuery("collectionAddress", "")
 		if collectionAddress == "" {
-			c.String(http.StatusBadRequest, fmt.Sprintf("input address is invalid, address: %s", collectionAddress))
+			c.JSON(http.StatusBadRequest, gin.H{"message": fmt.Sprintf("input address is invalid, address: %s", collectionAddress)})
 			return
 		}
 
@@ -186,36 +187,52 @@ func NewCreateNftHandler(nftTokenRepository repository.NftTokenRepository, clien
 		contract, err := erc721.NewErc721(address, client)
 		if err != nil {
 			logger.Errorf("Failed to instantiate the contract: %v", err)
-			c.String(http.StatusInternalServerError, "Internal server error")
+			c.JSON(http.StatusInternalServerError, gin.H{"message": "Internal server error"})
 			return
 		}
 
 		uri, err := contract.TokenURI(nil, big.NewInt(tokenId))
 		if err != nil {
 			logger.Errorf("Failed to query uri: %v", err)
-			c.String(http.StatusInternalServerError, "Internal server error")
+			c.JSON(http.StatusInternalServerError, gin.H{"message": "Internal server error"})
 			return
 		}
 
 		ownerAddress, err := contract.OwnerOf(nil, big.NewInt(tokenId))
 		if err != nil {
 			logger.Errorf("Failed to query uri: %v", err)
-			c.String(http.StatusInternalServerError, "Internal server error")
+			c.JSON(http.StatusInternalServerError, gin.H{"message": "Internal server error"})
 			return
 		}
 
 		nft, err := createNftRecord(uri, int(tokenId), ownerAddress.String(), collectionAddress)
 		if err != nil {
 			logger.Errorf("Failed to construct nft record: %v", err)
-			c.String(http.StatusInternalServerError, "Internal server error")
+			c.JSON(http.StatusInternalServerError, gin.H{"message": "Internal server error"})
 			return
 		}
 
-		nftToken, err := nftTokenRepository.CreateNft(nft)
+		_, err = nftTokenRepository.GetNftByTokenId(int(tokenId), collectionAddress)
 		if err != nil {
-			logger.Errorf("Failed to create nft token db record: %v", err)
-			c.String(http.StatusInternalServerError, "Internal server error")
+			if err == gorm.ErrRecordNotFound { // nft token doesn't exist in DB. Create the nft record
+				nftToken, err := nftTokenRepository.CreateNft(nft)
+				if err != nil {
+					logger.Errorf("Failed to create nft token db record: %v", err)
+					c.JSON(http.StatusInternalServerError, gin.H{"message": "Internal server error"})
+					return
+				}
+				c.JSON(http.StatusOK, nftToken)
+				return
+			}
+			logger.Errorf("Failed to get nft record: %v", err)
+			c.JSON(http.StatusInternalServerError, gin.H{"message": "Internal server error"})
 			return
+		}
+		// nft token exists. Update the record
+		nftToken, err := nftTokenRepository.UpdateNft(nft)
+		if err != nil {
+			logger.Errorf("Failed to update nft token db record: %v", err)
+			c.JSON(http.StatusInternalServerError, gin.H{"message": "Internal server error"})
 		}
 
 		c.JSON(http.StatusOK, nftToken)
@@ -228,7 +245,7 @@ func createNftRecord(uri string, tokenId int, ownerAddress string, collectionAdd
 		return nil, fmt.Errorf("failed to split uri string to 2 parts. uri: %v", uri)
 	}
 
-	decodedMetadata, err := base64.URLEncoding.DecodeString(splittedStr[1])
+	decodedMetadata, err := base64.StdEncoding.DecodeString(splittedStr[1])
 	if err != nil {
 		return nil, fmt.Errorf("failed to decode uri: %v", err)
 	}
