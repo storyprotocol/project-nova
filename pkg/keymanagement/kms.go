@@ -9,8 +9,8 @@ import (
 )
 
 type KeyManagementClient interface {
-	Encrypt(message []byte) ([]byte, error)
-	Decrypt(encryptedBytes []byte) ([]byte, error)
+	Encrypt(message []byte, keyId string) ([]byte, error)
+	Decrypt(encryptedBytes []byte, keyId string) ([]byte, error)
 }
 
 func NewKmsClient(region string) KeyManagementClient {
@@ -25,8 +25,11 @@ type kmsClient struct {
 	kms *kms.KMS
 }
 
-func (k *kmsClient) Encrypt(message []byte) ([]byte, error) {
-	output, err := k.kms.Encrypt(&kms.EncryptInput{Plaintext: message})
+func (k *kmsClient) Encrypt(message []byte, keyId string) ([]byte, error) {
+	output, err := k.kms.Encrypt(&kms.EncryptInput{
+		Plaintext: message,
+		KeyId:     &keyId,
+	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to encrypt the message from kms %v", err)
 	}
@@ -34,8 +37,11 @@ func (k *kmsClient) Encrypt(message []byte) ([]byte, error) {
 	return output.CiphertextBlob, nil
 }
 
-func (k *kmsClient) Decrypt(encryptedBytes []byte) ([]byte, error) {
-	output, err := k.kms.Decrypt(&kms.DecryptInput{CiphertextBlob: encryptedBytes})
+func (k *kmsClient) Decrypt(encryptedBytes []byte, keyId string) ([]byte, error) {
+	output, err := k.kms.Decrypt(&kms.DecryptInput{
+		CiphertextBlob: encryptedBytes,
+		KeyId:          &keyId,
+	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to decrypt the message from kms: %v", err)
 	}

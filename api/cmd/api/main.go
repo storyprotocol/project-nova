@@ -133,7 +133,7 @@ func main() {
 	}
 
 	adminV1 := r.Group("/admin/v1")
-	adminV1.Use(middleware.AuthAdmin(kmsClient, []byte(cfg.AdminAuthMessage)))
+	adminV1.Use(middleware.AuthAdmin(kmsClient, []byte(cfg.AdminAuthMessage), cfg.AuthKeyId))
 	{
 		// Admin Endpoint to fetch and create nft metadata
 		adminV1.POST("/nft/:id", handler.NewCreateOrUpdateNftHandler(nftTokenRepository, ethClient))
