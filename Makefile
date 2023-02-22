@@ -32,6 +32,7 @@ help:
 	@echo '  push-{service}:      - Push the current local image for the service to ECR'
 	@echo '  deploy-{service}:    - Deploy the specific service using the latest image in the ECR, need to specific environment with ENV'
 	@echo '                         For example: ENV=dev make deploy-bastion'
+	@echo '  restart-{service}    - Restart specific service deployment'
 	@echo '  restart-api          - Restart API server deployment'
 	@echo '  lint:                - Run linter'
 	@echo '  abigen:              - Create golang abi client for smart contracts based on the input json file.'
@@ -106,6 +107,9 @@ deploy-%:
 
 deploy-streamer:
 	cd api; ENV=${ENV} make deploy-streamer
+
+restart-%:
+	kubectl rollout restart deployment $* -n edge
 
 restart-api:
 	kubectl rollout restart deployment api-server -n edge
