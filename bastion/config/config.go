@@ -10,11 +10,13 @@ import (
 )
 
 type TaskConfig struct {
-	AppID         string `yaml:"app_id"`
-	Region        string `yaml:"region"`
-	DatabaseURI   string `yaml:"database_uri"`
-	ProviderURL   string `yaml:"provider_url"`
-	ApiGatewayUrl string `yaml:"api_gateway_url"`
+	AppID            string `yaml:"app_id"`
+	Region           string `yaml:"region"`
+	DatabaseURI      string `yaml:"database_uri"`
+	ProviderURL      string `yaml:"provider_url"`
+	ApiGatewayUrl    string `yaml:"api_gateway_url"`
+	AdminAuthMessage string `yaml:"admin_auth_message"`
+	AuthKeyId        string `yaml:"auth_key_id"`
 }
 
 const (

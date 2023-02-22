@@ -1,11 +1,14 @@
 package cmd
 
 import (
+	"encoding/base64"
+
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/project-nova/backend/bastion/config"
 	"github.com/project-nova/backend/pkg/abi/erc721"
 	"github.com/project-nova/backend/pkg/gateway"
+	"github.com/project-nova/backend/pkg/keymanagement"
 	"github.com/project-nova/backend/pkg/logger"
 	"github.com/spf13/cobra"
 )
@@ -38,6 +41,14 @@ var backfillCmd = &cobra.Command{
 
 		apiGateway := gateway.NewApiHttpGateway(cfg.ApiGatewayUrl)
 
+		kmsClient := keymanagement.NewKmsClient(cfg.Region)
+		encryptedBytes, err := kmsClient.Encrypt([]byte(cfg.AdminAuthMessage), cfg.AuthKeyId)
+		if err != nil {
+			logger.Fatalf("Failed to encrypt with kms: %v", err)
+		}
+
+		encryptedBase64 := base64.StdEncoding.EncodeToString(encryptedBytes)
+
 		ethClient, err := ethclient.Dial(cfg.ProviderURL)
 		if err != nil {
 			logger.Errorf("Failed to connect to the blockchain provider, error: %v", err)
@@ -67,7 +78,7 @@ var backfillCmd = &cobra.Command{
 
 		logger.Infof("Starting backfills from id %d to id %d\n\n", startId, endId)
 		for i := startId; i <= endId; i++ {
-			err = apiGateway.CreateNftRecord(i, collectionAddress)
+			err = apiGateway.CreateNftRecord(i, collectionAddress, encryptedBase64)
 			logger.Infof("Created nft record for id %d\n", i)
 			if err != nil {
 				logger.Errorf("Failed to create nft record for id %d: %v\n", i, err)

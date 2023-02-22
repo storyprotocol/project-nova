@@ -18,6 +18,7 @@ type AppConfig struct {
 	AbiPath          string `yaml:"abi_path"`
 	ContentPath      string `yaml:"content_path"`
 	AdminAuthMessage string `yaml:"admin_auth_message"`
+	AuthKeyId        string `yaml:"auth_key_id"`
 }
 
 type StreamerConfig struct {
@@ -27,6 +28,7 @@ type StreamerConfig struct {
 	ApiGatewayUrl     string   `yaml:"api_gateway_url"`
 	MonitorAddresses  []string `yaml:"monitor_addresses"`
 	AdminAuthMessage  string   `yaml:"admin_auth_message"`
+	AuthKeyId         string   `yaml:"auth_key_id"`
 }
 
 type Server struct {

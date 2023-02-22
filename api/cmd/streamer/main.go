@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/base64"
 	"flag"
 
 	"github.com/ethereum/go-ethereum"
@@ -39,11 +40,16 @@ func main() {
 	apiGateway := gateway.NewApiHttpGateway(cfg.ApiGatewayUrl)
 
 	kmsClient := keymanagement.NewKmsClient(cfg.Region)
-	encryptedBytes, err := kmsClient.Encrypt([]byte(cfg.AdminAuthMessage))
+	encryptedBytes, err := kmsClient.Encrypt([]byte(cfg.AdminAuthMessage), cfg.AuthKeyId)
+	if err != nil {
+		logger.Fatalf("Failed to encrypt with kms: %v", err)
+	}
+
+	encryptedBase64 := base64.StdEncoding.EncodeToString(encryptedBytes)
 
 	client, err := ethclient.Dial(cfg.ProviderWebsocket)
 	if err != nil {
-		logger.Fatal(err)
+		logger.Fatalf("Failed to connect to blockchain provider: %v", err)
 	}
 
 	contractAddresses := []common.Address{}
@@ -95,17 +101,17 @@ func main() {
 			tokenId := vlog.Topics[3].Big().Uint64()
 
 			if utils.IsZeroAddress(fromAddress) { // Mint
-				err = apiGateway.CreateNftRecord(int(tokenId), collectionAddress, string(encryptedBytes))
+				err = apiGateway.CreateNftRecord(int(tokenId), collectionAddress, encryptedBase64)
 				if err != nil {
 					logger.Errorf("Failed to create nft record: %v", err)
 				}
 			} else if utils.IsZeroAddress(toAddress) { // Burn
-				err = apiGateway.DeleteNftRecord(int(tokenId), collectionAddress, string(encryptedBytes))
+				err = apiGateway.DeleteNftRecord(int(tokenId), collectionAddress, encryptedBase64)
 				if err != nil {
 					logger.Errorf("Failed to delete nft record: %v", err)
 				}
 			} else { // Transfer
-				err = apiGateway.UpdateNftOwner(int(tokenId), collectionAddress, string(encryptedBytes))
+				err = apiGateway.UpdateNftOwner(int(tokenId), collectionAddress, encryptedBase64)
 				if err != nil {
 					logger.Errorf("Failed to update nft owner: %v", err)
 				}
