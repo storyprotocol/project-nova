@@ -3,6 +3,7 @@ package s3
 import (
 	"fmt"
 	"io"
+	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -53,10 +54,8 @@ func (s *s3Client) ListObjectsNonRecursive(bucket string) ([]*string, error) {
 	var keys []*string
 	for _, prefix := range resp.CommonPrefixes {
 		if prefix.Prefix != nil {
-			prefixStr := *prefix.Prefix
-			// Remove the last character, which is '/'
-			prefixProcessed := aws.String(prefixStr[:len(prefixStr)-1])
-			keys = append(keys, prefixProcessed)
+			prefixProcessed := strings.TrimSuffix(*prefix.Prefix, "/")
+			keys = append(keys, &prefixProcessed)
 		}
 	}
 
