@@ -21,7 +21,8 @@ import (
 	"gorm.io/gorm"
 )
 
-// NewGetNftCollectionsHandler create the handler to get nft collections data
+// NewGetNftCollectionsHandler create the handler to get nft collections data.
+// Doc: (To Be Added)
 func NewGetNftCollectionsHandler(
 	nftCollectionRepository repository.NftCollectionRepository,
 	franchiseCollectionRepository repository.FranchiseCollectionRepository,
@@ -109,6 +110,8 @@ func NewUpdateNftBackstoryHandler(nftTokenRepository repository.NftTokenReposito
 	}
 }
 
+// NewGetNftsHandler creates the handler to handle POST /nft/list request.
+// Doc: (To be added)
 func NewGetNftsHandler(nftTokenRepository repository.NftTokenRepository, franchiseCollectionRepository repository.FranchiseCollectionRepository) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		walletAddress := c.DefaultQuery("walletAddress", "")

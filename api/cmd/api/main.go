@@ -121,26 +121,24 @@ func main() {
 	publicV1 := r.Group("/v1")
 	publicV1.Use(cors.Default())
 	{
-		// (DEPRECATED, use /v1/nfts instead) Endpoint to get the metadata of all story nfts owned by the wallet
-		publicV1.GET("/wallet/:walletAddress/nfts", handler.NewGetWalletNftsHandler(nftTokenRepository))
-
 		// Endpoint to get the merkle proof for the wallet address per allowlist
 		publicV1.GET("/wallet/:walletAddress/proof", handler.NewGetWalletProofHandler(walletMerkleProofRepository))
 
 		// Endpoint to get all story chapters' information
-		publicV1.GET("/story/:storyNum/chapters", handler.NewGetStoryChaptersHandler(storyChapterRepository, storyInfoRepository))
+		publicV1.GET("/story/:franchiseId/:storyNum", handler.NewGetStoryChaptersHandler(storyChapterRepository, storyInfoRepository))
 
 		// Endpoint to get story chapter contents
-		publicV1.GET("/story/:storyNum/chapter/:chapterNum/contents", handler.NewGetStoryChapterContentsHandler(storyContentRepository))
+		publicV1.GET("/story/:franchiseId/:storyNum/:chapterNum", handler.NewGetStoryChapterContentsHandler(storyContentRepository))
+
+		// Endpoint to get the metadata of story nfts
+		publicV1.POST("/nft/list", handler.NewGetNftsHandler(nftTokenRepository, franchiseCollectionRepository))
 
 		// Endpoint to update nft backstory for the nft owner
 		publicV1.POST("/nft/:id/backstory", handler.NewUpdateNftBackstoryHandler(nftTokenRepository, cfg.AdminAuthMessage))
 
-		// Endpoint to get the metadata of story nfts
-		publicV1.GET("/nfts", handler.NewGetNftsHandler(nftTokenRepository, franchiseCollectionRepository))
-
 		// Endpoint to get the metadata of nft collection
 		publicV1.GET("/nft/collections", handler.NewGetNftCollectionsHandler(nftCollectionRepository, franchiseCollectionRepository))
+
 	}
 
 	adminV1 := r.Group("/admin/v1")
