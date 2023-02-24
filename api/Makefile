@@ -3,8 +3,10 @@ OUTPUT ?= $(PWD)/_output
 LASTEST_COMMIT = $(shell git rev-parse --short HEAD)
 TAG ?= ${USER}-local-${LASTEST_COMMIT}
 
-ECR ?= 243963068353.dkr.ecr.us-west-2.amazonaws.com
-API_SERVER_IMAGE ?= api-server
+#ECR ?= 243963068353.dkr.ecr.us-west-2.amazonaws.com
+ECR ?= 243963068353.dkr.ecr.us-east-2.amazonaws.com
+#API_SERVER_IMAGE ?= api-server
+API_SERVER_IMAGE ?= api
 STREAMER_IMAGE ?= streamer
 
 .PHONY: deploy

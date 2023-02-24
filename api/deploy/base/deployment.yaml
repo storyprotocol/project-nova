@@ -23,9 +23,10 @@ spec:
         service: api-server
     spec:
       containers:
-      - image: 243963068353.dkr.ecr.us-west-2.amazonaws.com/api-server:latest
+      #- image: 243963068353.dkr.ecr.us-west-2.amazonaws.com/api-server:latest
+      - image: 243963068353.dkr.ecr.us-east-2.amazonaws.com/api:latest
         imagePullPolicy: "Always"
-        name: api-server
+        name: api
         ports:
         - containerPort: 8090
         args:

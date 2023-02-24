@@ -1,7 +1,10 @@
 LASTEST_COMMIT = $(shell git rev-parse --short HEAD)
 TAG ?= ${USER}-local-${LASTEST_COMMIT}
 
-ECR ?= 243963068353.dkr.ecr.us-west-2.amazonaws.com
+#ECR ?= 243963068353.dkr.ecr.us-west-2.amazonaws.com
+ECR ?= 243963068353.dkr.ecr.us-east-2.amazonaws.com
+#REGION ?= us-west-2 
+REGION ?= us-east-2 
 
 BUILDER_IMAGE ?= builder
 ECR_BUILDER_IMAGE ?= ${ECR}/${BUILDER_IMAGE}
@@ -39,7 +42,7 @@ help:
 	@echo '                         For example: make abigen package=erc721. package corresponding to the input json name and output package name'
 
 ecr-auth:
-	aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin ${ECR}
+	aws ecr get-login-password --region ${REGION} | docker login --username AWS --password-stdin ${ECR}
 
 buildserver:
 	cd api && CGO_ENABLED=0 go build --ldflags "-extldflags '-static -s'" -o build/server cmd/api/main.go
@@ -96,11 +99,11 @@ push-%: ecr-auth
 	docker push ${ECR}/$*:${TAG}
 	docker push ${ECR}/$*:latest	
 
-push-api: ecr-auth
-	docker tag ${API_SERVER_IMAGE} ${ECR}/${API_SERVER_IMAGE}:${TAG}
-	docker tag ${API_SERVER_IMAGE} ${ECR}/${API_SERVER_IMAGE}:latest
-	docker push ${ECR}/${API_SERVER_IMAGE}:${TAG}
-	docker push ${ECR}/${API_SERVER_IMAGE}:latest	
+#push-api: ecr-auth
+#	docker tag ${API_SERVER_IMAGE} ${ECR}/${API_SERVER_IMAGE}:${TAG}
+#	docker tag ${API_SERVER_IMAGE} ${ECR}/${API_SERVER_IMAGE}:latest
+#	docker push ${ECR}/${API_SERVER_IMAGE}:${TAG}
+#	docker push ${ECR}/${API_SERVER_IMAGE}:latest	
 
 deploy-%:
 	cd $*; ENV=${ENV} make deploy

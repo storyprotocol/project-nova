@@ -5,8 +5,10 @@ services:
       context: .
       dockerfile: dockerfile/api/Dockerfile
       args:
-        - DOCKERHUB_URL=243963068353.dkr.ecr.us-west-2.amazonaws.com/
-    image: api-server:latest
+        - DOCKERHUB_URL=243963068353.dkr.ecr.us-east-2.amazonaws.com/
+        #- DOCKERHUB_URL=243963068353.dkr.ecr.us-west-2.amazonaws.com/
+    #image: api-server:latest
+    image: api:latest
     command: [
       "/app/api/build/server",
       "--config=/app/api/config/base.yaml,/app/api/config/local-docker.yaml,/app/api/config/secrets.yaml"
@@ -20,7 +22,8 @@ services:
       context: .
       dockerfile: dockerfile/api/streamer/Dockerfile
       args:
-        - DOCKERHUB_URL=243963068353.dkr.ecr.us-west-2.amazonaws.com/
+        - DOCKERHUB_URL=243963068353.dkr.ecr.us-east-2.amazonaws.com/
+        #- DOCKERHUB_URL=243963068353.dkr.ecr.us-west-2.amazonaws.com/
     image: streamer:latest
     command: [
       "/app/api/build/streamer",
