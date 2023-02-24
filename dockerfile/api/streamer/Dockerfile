@@ -21,4 +21,4 @@ RUN mkdir -p /var/log/storyprotocol
 
 WORKDIR /app
 COPY --from=build /build/api /app/api
-CMD ["/app/api/build/streamer", "--config=/app/api/config/prod.yaml"]
+CMD ["/app/api/build/streamer", "--config=/app/api/config/streamer/base.yaml,/app/api/config/prod.yaml"]

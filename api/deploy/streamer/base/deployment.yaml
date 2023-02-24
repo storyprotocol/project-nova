@@ -23,7 +23,8 @@ spec:
         service: streamer 
     spec:
       containers:
-      - image: 243963068353.dkr.ecr.us-west-2.amazonaws.com/streamer:latest
+      #- image: 243963068353.dkr.ecr.us-west-2.amazonaws.com/streamer:latest
+      - image: 243963068353.dkr.ecr.us-east-2.amazonaws.com/streamer:latest
         imagePullPolicy: "Always"
         name: streamer 
         ports:

@@ -3,7 +3,8 @@ OUTPUT ?= $(PWD)/_output
 LASTEST_COMMIT = $(shell git rev-parse --short HEAD)
 TAG ?= ${USER}-local-${LASTEST_COMMIT}
 
-ECR ?= 243963068353.dkr.ecr.us-west-2.amazonaws.com
+#ECR ?= 243963068353.dkr.ecr.us-west-2.amazonaws.com
+ECR ?= 243963068353.dkr.ecr.us-east-2.amazonaws.com
 BASTION_IMAGE ?= bastion
 
 .PHONY: deploy

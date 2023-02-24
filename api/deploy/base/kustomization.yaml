@@ -5,7 +5,9 @@ resources:
 - namespace.yaml
 - service.yaml
 - deployment.yaml
+#- name: 243963068353.dkr.ecr.us-west-2.amazonaws.com/api-server
+#  newName: 243963068353.dkr.ecr.us-west-2.amazonaws.com/api-server
 images:
-- name: 243963068353.dkr.ecr.us-west-2.amazonaws.com/api-server
-  newName: 243963068353.dkr.ecr.us-west-2.amazonaws.com/api-server
+- name: 243963068353.dkr.ecr.us-east-2.amazonaws.com/api
+  newName: 243963068353.dkr.ecr.us-east-2.amazonaws.com/api
   newTag: latest

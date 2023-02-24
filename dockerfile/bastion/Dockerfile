@@ -1,4 +1,5 @@
-FROM 243963068353.dkr.ecr.us-west-2.amazonaws.com/builder:latest as build
+#FROM 243963068353.dkr.ecr.us-west-2.amazonaws.com/builder:latest as build
+FROM 243963068353.dkr.ecr.us-east-2.amazonaws.com/builder:latest as build
 
 WORKDIR /build/
 

@@ -1,3 +1,4 @@
 app_id: api
-region: us-west-2
+#region: us-west-2
+region: us-east-2
 content_path: api/resource/content
