@@ -16,13 +16,14 @@ type GetStoryChaptersResp struct {
 	CoverUrl   string `json:"coverUrl"`
 }
 
-// NewGetStoryChaptersHandler: https://documenter.getpostman.com/view/25015244/2s935ppNga#d41d5285-1dce-42dd-aac1-1ef49cb0c427
+// NewGetStoryChaptersHandler creates a handler to handle GET /story/:franchiseId/:storyNum request.
+// Doc: (To Be Added)
 func NewGetStoryChaptersHandler(
 	storyChapterRepo repository.StoryChapterRepository,
 	storyInfoRepo repository.StoryInfoRepository,
 ) func(c *gin.Context) {
 	return func(c *gin.Context) {
-		franchiseId, err := strconv.ParseInt(c.DefaultQuery("franchiseId", ""), 10, 64)
+		franchiseId, err := strconv.ParseInt(c.Param("franchiseId"), 10, 64)
 		if err != nil {
 			logger.Errorf("Failed to convert franchise id: %v", err)
 			c.String(http.StatusBadRequest, "franchise id is invalid")
@@ -65,10 +66,11 @@ func NewGetStoryChaptersHandler(
 	}
 }
 
-// NewGetStoryChapterContentsHandler: https://documenter.getpostman.com/view/25015244/2s935ppNga#889d8e0e-4543-4708-b712-43445b0573e1
+// NewGetStoryChapterContentsHandler creates the handler to handle /story/:franchiseId/:storyNum/:chapterNum request.
+// Doc: (To Be Added)
 func NewGetStoryChapterContentsHandler(storyContentRepo repository.StoryContentRepository) func(c *gin.Context) {
 	return func(c *gin.Context) {
-		franchiseId, err := strconv.ParseInt(c.DefaultQuery("franchiseId", ""), 10, 64)
+		franchiseId, err := strconv.ParseInt(c.Param("franchiseId"), 10, 64)
 		if err != nil {
 			logger.Errorf("Failed to convert franchise id: %v", err)
 			c.String(http.StatusBadRequest, "franchise id is invalid")
