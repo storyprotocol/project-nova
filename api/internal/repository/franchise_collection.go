@@ -43,7 +43,7 @@ func (s *franchiseCollectionDbImpl) GetCollectionAddressesByFranchise(franchiseI
 		return val, nil
 	}
 
-	result := []string{}
+	result := []*FranchiseCollectionModel{}
 	r := s.db.Where("franchise_id = ?", franchiseId).Find(&result)
 	if errors.Is(r.Error, gorm.ErrRecordNotFound) {
 		return nil, r.Error
@@ -52,10 +52,15 @@ func (s *franchiseCollectionDbImpl) GetCollectionAddressesByFranchise(franchiseI
 		return nil, fmt.Errorf("failed to query db: %v", r.Error)
 	}
 
-	// Update cache
-	s.franchiseCollectionsMap[franchiseId] = result
+	var addresses []string
+	for _, record := range result {
+		addresses = append(addresses, record.CollectionAddress)
+	}
 
-	return result, nil
+	// Update cache
+	s.franchiseCollectionsMap[franchiseId] = addresses
+
+	return addresses, nil
 }
 
 func (s *franchiseCollectionDbImpl) GetAndLoadFranchiseCollections() error {
