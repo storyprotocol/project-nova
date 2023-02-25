@@ -12,7 +12,14 @@ import (
 )
 
 type StoryContentRepository interface {
-	GetContentByChapter(franchiseId int64, storyNum int, chapterNum int) ([]*StorySectionModel, error)
+	GetContentByChapter(franchiseId int64, storyNum int, chapterNum int) (*StoryContentModel, error)
+}
+
+type StoryContentModel struct {
+	Title      string               `json:"title"`
+	Heading    string               `json:"heading"`
+	CoverImage string               `json:"coverImage"`
+	Content    []*StorySectionModel `json:"content"`
 }
 
 type StorySectionModel struct {
@@ -28,7 +35,7 @@ type StoryMediaModel struct {
 }
 
 func NewStoryContentS3Impl(s3Client s3.S3Client) (StoryContentRepository, error) {
-	contentMap := make(map[string][]*StorySectionModel)
+	contentMap := make(map[string]*StoryContentModel)
 
 	keys, err := s3Client.ListObjectsNonRecursive(constant.S3ProjectNovaBucket)
 	if err != nil {
@@ -42,12 +49,12 @@ func NewStoryContentS3Impl(s3Client s3.S3Client) (StoryContentRepository, error)
 			return nil, fmt.Errorf("failed to download content from s3 for object %s: %v", *key, err)
 		}
 
-		var data []*StorySectionModel
+		var data StoryContentModel
 		err = json.Unmarshal(buf.Bytes(), &data)
 		if err != nil {
 			return nil, fmt.Errorf("failed to unmarshal story content file data, error: %v", err)
 		}
-		contentMap[*key] = data
+		contentMap[*key] = &data
 	}
 
 	return &storyContentS3Impl{
@@ -58,10 +65,10 @@ func NewStoryContentS3Impl(s3Client s3.S3Client) (StoryContentRepository, error)
 
 type storyContentS3Impl struct {
 	s3Client   s3.S3Client
-	contentMap map[string][]*StorySectionModel
+	contentMap map[string]*StoryContentModel
 }
 
-func (s *storyContentS3Impl) GetContentByChapter(franchiseId int64, storyNum int, chapterNum int) ([]*StorySectionModel, error) {
+func (s *storyContentS3Impl) GetContentByChapter(franchiseId int64, storyNum int, chapterNum int) (*StoryContentModel, error) {
 	key := fmt.Sprintf("%d:%d:%d", franchiseId, storyNum, chapterNum)
 	val, ok := s.contentMap[key]
 	if !ok {
@@ -72,7 +79,7 @@ func (s *storyContentS3Impl) GetContentByChapter(franchiseId int64, storyNum int
 }
 
 func NewStoryContentFsImpl(contentFilePath string) (StoryContentRepository, error) {
-	contentMap := make(map[string][]*StorySectionModel)
+	contentMap := make(map[string]*StoryContentModel)
 
 	dirs, err := os.ReadDir(contentFilePath)
 	if err != nil {
@@ -91,7 +98,7 @@ func NewStoryContentFsImpl(contentFilePath string) (StoryContentRepository, erro
 				return nil, fmt.Errorf("failed to read file %s, error: %v", file.Name(), err)
 			}
 
-			var data []*StorySectionModel
+			var data *StoryContentModel
 			err = json.Unmarshal([]byte(rawData), &data)
 			if err != nil {
 				return nil, fmt.Errorf("failed to unmarshal story content file data, error: %v", err)
@@ -109,10 +116,10 @@ func NewStoryContentFsImpl(contentFilePath string) (StoryContentRepository, erro
 }
 
 type storyContentFsImpl struct {
-	contentMap map[string][]*StorySectionModel
+	contentMap map[string]*StoryContentModel
 }
 
-func (s *storyContentFsImpl) GetContentByChapter(franchiseId int64, storyNum int, chapterNum int) ([]*StorySectionModel, error) {
+func (s *storyContentFsImpl) GetContentByChapter(franchiseId int64, storyNum int, chapterNum int) (*StoryContentModel, error) {
 	key := fmt.Sprintf("%d:%d:%d", franchiseId, storyNum, chapterNum)
 	val, ok := s.contentMap[key]
 	if !ok {
