@@ -12,6 +12,8 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 RUN curl -L https://github.com/golang-migrate/migrate/releases/download/v4.13.0/migrate.linux-amd64.tar.gz | tar xvz
 RUN mv ./migrate.linux-amd64 /usr/local/bin/migrate
 
+RUN apt-get install --no-install-recommends -y jq
+
 COPY go.mod go.sum ./
 RUN go mod download
 
