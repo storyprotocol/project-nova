@@ -14,6 +14,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/project-nova/backend/api/internal/constant"
+	"github.com/project-nova/backend/api/internal/entity"
 	"github.com/project-nova/backend/api/internal/repository"
 	"github.com/project-nova/backend/pkg/abi/erc721"
 	"github.com/project-nova/backend/pkg/auth"
@@ -159,14 +160,67 @@ func NewGetNftsHandler(nftTokenRepository repository.NftTokenRepository, franchi
 			offset = &offsetInt
 		}
 
-		result, err := nftTokenRepository.GetNfts(collectionAddresses, walletAddress, offset, limit)
+		nftResults, err := nftTokenRepository.GetNfts(collectionAddresses, walletAddress, offset, limit)
 		if err != nil {
 			logger.Errorf("Failed to get nfts: %v", err)
 			c.String(http.StatusInternalServerError, "Internal server error")
 			return
 		}
 
-		c.JSON(http.StatusOK, result)
+		var response []*entity.NftTokenResponse
+		for _, nftModel := range nftResults {
+			nftResponse, err := entity.NewNftTokenResponseFrom(nftModel)
+			if err != nil {
+				logger.Errorf("Failed to convert nft model to nft response: %v", err)
+				c.String(http.StatusInternalServerError, "Internal server error")
+				return
+			}
+			response = append(response, nftResponse)
+		}
+
+		var filter entity.Filter
+		err = c.ShouldBindJSON(&filter)
+		if err == nil && filter.Validate() { // Valid filter options. Apply filter
+			var filteredResponse []*entity.NftTokenResponse
+			for _, nftResponse := range response {
+				if nftResponse.Traits == nil {
+					continue
+				}
+
+				// Check the nft against all operands(criterias) and see if it matches all.
+				// If so, add it to the filtered response list
+				matchedCount := 0
+				for _, operand := range filter.Operands {
+					matched := false
+					for _, trait := range nftResponse.Traits {
+						if operand.Field == trait.TraitType {
+							passed, err := operand.Eval(trait.Value)
+							if err != nil {
+								logger.Errorf("Failed to evaluate the operand: %v", err)
+								c.String(http.StatusBadRequest, "Operator %s is not supported", operand.Operator)
+								return
+							}
+							if passed {
+								matched = true
+								break
+							}
+						}
+					}
+					if !matched {
+						break
+					}
+					matchedCount++
+				}
+
+				if matchedCount == len(filter.Operands) {
+					filteredResponse = append(filteredResponse, nftResponse)
+				}
+			}
+			// Apply filtered response back to response for final return
+			response = filteredResponse
+		}
+
+		c.JSON(http.StatusOK, response)
 	}
 }
 
@@ -266,17 +320,7 @@ func createNftRecord(uri string, tokenId int, ownerAddress string, collectionAdd
 		return nil, fmt.Errorf("failed to decode uri: %v", err)
 	}
 
-	result := struct {
-		Name         *string
-		Description  *string
-		Image        *string
-		AnimationUrl *string
-		Attributes   []struct {
-			TraitType string
-			Value     string
-		}
-	}{}
-
+	var result entity.NftOnchainMeta
 	err = json.Unmarshal(decodedMetadata, &result)
 	if err != nil {
 		return nil, fmt.Errorf("failed to unmarshal metadata: %v", err)
@@ -391,14 +435,14 @@ func getCollectionAddresses(
 	} else if franchiseId != "" {
 		franchiseIdInt, err := strconv.ParseInt(franchiseId, 10, 64)
 		if err != nil {
-			return nil, fmt.Errorf("Failed to convert franchise id: %v", err)
+			return nil, fmt.Errorf("failed to convert franchise id: %v", err)
 		}
 		collectionAddresses, err = franchiseCollectionRepository.GetCollectionAddressesByFranchise(franchiseIdInt)
 		if err != nil {
-			return nil, fmt.Errorf("Failed to get collection addresses by franchise id: %v", err)
+			return nil, fmt.Errorf("failed to get collection addresses by franchise id: %v", err)
 		}
 	} else {
-		return nil, fmt.Errorf("Neither collection address or franchise id is passed")
+		return nil, fmt.Errorf("neither collection address or franchise id is passed")
 	}
 
 	return collectionAddresses, nil
