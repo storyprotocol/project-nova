@@ -178,41 +178,33 @@ func NewGetNftsHandler(nftTokenRepository repository.NftTokenRepository, franchi
 			response = append(response, nftResponse)
 		}
 
-		var filter entity.Filter
-		err = c.ShouldBindJSON(&filter)
-		if err == nil && filter.Validate() { // Valid filter options. Apply filter
+		// listOption includes options for filtering, ordering and pagination.
+		// Currently only it implements filtering.
+		// Example:
+		// {
+		//   "filter":{
+		//	   "operator":"and",
+		//	   "operands":[
+		//	   	 {
+		//		   "operator":"eq",
+		//		   "field":"character",
+		//		   "value":"Human"
+		//	   	 }
+		//	   ]
+		//   }
+		// }
+		var listOption entity.ListOption
+		err = c.ShouldBindJSON(&listOption)
+		filter := listOption.Filter
+		if err == nil && filter != nil && filter.Validate() { // Valid filter options. Apply filter
 			var filteredResponse []*entity.NftTokenResponse
 			for _, nftResponse := range response {
 				if nftResponse.Traits == nil {
 					continue
 				}
-
-				// Check the nft against all operands(criterias) and see if it matches all.
-				// If so, add it to the filtered response list
-				matchedCount := 0
-				for _, operand := range filter.Operands {
-					matched := false
-					for _, trait := range nftResponse.Traits {
-						if operand.Field == trait.TraitType {
-							passed, err := operand.Eval(trait.Value)
-							if err != nil {
-								logger.Errorf("Failed to evaluate the operand: %v", err)
-								c.String(http.StatusBadRequest, "Operator %s is not supported", operand.Operator)
-								return
-							}
-							if passed {
-								matched = true
-								break
-							}
-						}
-					}
-					if !matched {
-						break
-					}
-					matchedCount++
-				}
-
-				if matchedCount == len(filter.Operands) {
+				// Evaluate the nft based on the filter and add it to the final output if it matches
+				matched := filter.Eval(nftResponse.GetKeyValuesFromTraits())
+				if matched {
 					filteredResponse = append(filteredResponse, nftResponse)
 				}
 			}

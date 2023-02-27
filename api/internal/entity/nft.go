@@ -52,6 +52,14 @@ func NewNftTokenResponseFrom(nftModel *repository.NftTokenModel) (*NftTokenRespo
 	return nftResponse, nil
 }
 
+func (n *NftTokenResponse) GetKeyValuesFromTraits() []KeyValue {
+	var keyValues []KeyValue
+	for _, trait := range n.Traits {
+		keyValues = append(keyValues, KeyValue(trait))
+	}
+	return keyValues
+}
+
 type NftOnchainMeta struct {
 	Name         *string     `json:"name"`
 	Description  *string     `json:"decription"`
@@ -70,4 +78,12 @@ type NftTrait struct {
 type NftTraitResponse struct {
 	TraitType string      `json:"traitType"`
 	Value     interface{} `json:"value"`
+}
+
+func (n *NftTraitResponse) GetKey() string {
+	return n.TraitType
+}
+
+func (n *NftTraitResponse) GetValue() interface{} {
+	return n.Value
 }
