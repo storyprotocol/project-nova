@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: edge
+  name: streamer
+spec:
+  replicas: 1
+  template:
+    spec:
+      containers:
+      - name: streamer
+        args:
+          - "/app/api/build/streamer"
+          - "--config=/app/api/config/streamer/base.yaml,/app/api/config/streamer/prod.yaml"
+        env:
+          - name: SERVER_ENV
+            value: "prod"
+        resources:
+          requests:
+            cpu: "300m"
+            memory: "800Mi"
+          limits:
+            cpu: "500m"
+            memory: "1000Mi"
