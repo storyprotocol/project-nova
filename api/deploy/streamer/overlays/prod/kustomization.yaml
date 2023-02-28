@@ -6,6 +6,6 @@ patchesStrategicMerge:
 resources:
 - ../../base
 images:
-- name: 243963068353.dkr.ecr.us-east-1.amazonaws.com/bastion
-  newName: 243963068353.dkr.ecr.us-east-1.amazonaws.com/bastion
+- name: 243963068353.dkr.ecr.us-east-1.amazonaws.com/streamer
+  newName: 243963068353.dkr.ecr.us-east-1.amazonaws.com/streamer
   newTag: latest

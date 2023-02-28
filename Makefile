@@ -1,15 +1,11 @@
 LASTEST_COMMIT = $(shell git rev-parse --short HEAD)
 TAG ?= ${USER}-local-${LASTEST_COMMIT}
 
-#ECR ?= 243963068353.dkr.ecr.us-west-2.amazonaws.com
-ECR ?= 243963068353.dkr.ecr.us-east-2.amazonaws.com
-#REGION ?= us-west-2 
-REGION ?= us-east-2 
+REGION ?= us-east-2
+ECR ?= 243963068353.dkr.ecr.${REGION}.amazonaws.com
 
 BUILDER_IMAGE ?= builder
 ECR_BUILDER_IMAGE ?= ${ECR}/${BUILDER_IMAGE}
-
-API_SERVER_IMAGE ?= api-server
 
 DOCKER_BUILD=docker build --cache-from
 
@@ -24,7 +20,6 @@ help:
 	@echo '  buildstreamer:       - Build streamer locally'
 	@echo '  runstreamer:         - Run streamer locally'
 	@echo '  streamer:            - Build and then run streamer locally'
-	@echo '  push-api:            - Push local api server image to ECR'
 	@echo ''
 	@echo '  db_new:              - Create new DB migration script for api server'
 	@echo '  db_up:               - Apply new DB migration script to local Postgres DB for testing'
@@ -36,7 +31,6 @@ help:
 	@echo '  deploy-{service}:    - Deploy the specific service using the latest image in the ECR, need to specific environment with ENV'
 	@echo '                         For example: ENV=dev make deploy-bastion'
 	@echo '  restart-{service}    - Restart specific service deployment'
-	@echo '  restart-api          - Restart API server deployment'
 	@echo '  lint:                - Run linter'
 	@echo '  abigen:              - Create golang abi client for smart contracts based on the input json file.'
 	@echo '                         For example: make abigen package=erc721. package corresponding to the input json name and output package name'
@@ -99,12 +93,6 @@ push-%: ecr-auth
 	docker push ${ECR}/$*:${TAG}
 	docker push ${ECR}/$*:latest	
 
-#push-api: ecr-auth
-#	docker tag ${API_SERVER_IMAGE} ${ECR}/${API_SERVER_IMAGE}:${TAG}
-#	docker tag ${API_SERVER_IMAGE} ${ECR}/${API_SERVER_IMAGE}:latest
-#	docker push ${ECR}/${API_SERVER_IMAGE}:${TAG}
-#	docker push ${ECR}/${API_SERVER_IMAGE}:latest	
-
 deploy-%:
 	cd $*; ENV=${ENV} make deploy
 
@@ -113,9 +101,6 @@ deploy-streamer:
 
 restart-%:
 	kubectl rollout restart deployment $* -n edge
-
-restart-api:
-	kubectl rollout restart deployment api-server -n edge
 
 lint:
 	golangci-lint run

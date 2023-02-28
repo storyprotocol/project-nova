@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+  namespace: edge
+spec:
+  replicas: 1
+  template:
+    spec:
+      containers:
+      - name: api
+        args:
+          - "/app/api/build/server"
+          - "--config=/app/api/config/base.yaml,/app/api/config/dev.yaml"
+        env:
+          - name: SERVER_ENV
+            value: "dev"
+        resources:
+          requests:
+            cpu: "300m"
+            memory: "800Mi"
+          limits:
+            cpu: "500m"
+            memory: "1000Mi"

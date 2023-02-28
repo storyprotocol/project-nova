@@ -1,3 +1,2 @@
-server:
-  port: 8090 
-  env: prod
+env: prod
+region: us-east-1

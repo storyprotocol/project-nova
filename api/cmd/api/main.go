@@ -157,6 +157,6 @@ func main() {
 		adminV1.DELETE("/nft/:id", handler.NewAdminDeleteNftHandler(nftTokenRepository))
 	}
 
-	port := fmt.Sprintf(":%d", cfg.Server.Port)
+	port := fmt.Sprintf(":%d", cfg.Port)
 	_ = r.Run(port)
 }

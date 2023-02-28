@@ -6,8 +6,6 @@ services:
       dockerfile: dockerfile/api/Dockerfile
       args:
         - DOCKERHUB_URL=243963068353.dkr.ecr.us-east-2.amazonaws.com/
-        #- DOCKERHUB_URL=243963068353.dkr.ecr.us-west-2.amazonaws.com/
-    #image: api-server:latest
     image: api:latest
     command: [
       "/app/api/build/server",
@@ -23,7 +21,6 @@ services:
       dockerfile: dockerfile/api/streamer/Dockerfile
       args:
         - DOCKERHUB_URL=243963068353.dkr.ecr.us-east-2.amazonaws.com/
-        #- DOCKERHUB_URL=243963068353.dkr.ecr.us-west-2.amazonaws.com/
     image: streamer:latest
     command: [
       "/app/api/build/streamer",
@@ -35,6 +32,8 @@ services:
     build:
       context: .
       dockerfile: dockerfile/bastion/Dockerfile
+      args:
+        - DOCKERHUB_URL=243963068353.dkr.ecr.us-east-2.amazonaws.com/
     image: bastion:latest
   api-database:
     image: "postgres:12.4"

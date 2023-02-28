@@ -12,9 +12,10 @@ import (
 type AppConfig struct {
 	AppID            string `yaml:"app_id"`
 	Region           string `yaml:"region"`
+	Port             int64  `yaml:"port"`
+	Env              string `yaml:"env"`
 	DatabaseURI      string `yaml:"database_uri"`
 	ProviderURL      string `yaml:"provider_url"`
-	Server           Server `yaml:"server"`
 	ContentPath      string `yaml:"content_path"`
 	AdminAuthMessage string `yaml:"admin_auth_message"`
 	AuthKeyId        string `yaml:"auth_key_id"`
@@ -27,11 +28,6 @@ type StreamerConfig struct {
 	ApiGatewayUrl     string `yaml:"api_gateway_url"`
 	AdminAuthMessage  string `yaml:"admin_auth_message"`
 	AuthKeyId         string `yaml:"auth_key_id"`
-}
-
-type Server struct {
-	Port int64  `yaml:"port"`
-	Env  string `yaml:"env"`
 }
 
 var (
