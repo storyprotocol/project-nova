@@ -4,7 +4,3 @@ kind: Kustomization
 resources:
 - namespace.yaml
 - deployment.yaml
-images:
-- name: 243963068353.dkr.ecr.us-east-2.amazonaws.com/streamer
-  newName: 243963068353.dkr.ecr.us-east-2.amazonaws.com/streamer
-  newTag: latest
