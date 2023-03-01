@@ -1,11 +1,9 @@
 package entity
 
-import (
-	"encoding/json"
-	"fmt"
-
-	"github.com/project-nova/backend/api/internal/repository"
-)
+type NftTokensResponse struct {
+	Total int                 `json:"total"`
+	Data  []*NftTokenResponse `json:"data"`
+}
 
 type NftTokenResponse struct {
 	CollectionAddress string              `json:"collectionAddress"`
@@ -18,38 +16,6 @@ type NftTokenResponse struct {
 	AnimationUrl      *string             `json:"animationUrl"`
 	Traits            []*NftTraitResponse `json:"traits"`
 	Backstory         *string             `json:"backstory"`
-}
-
-func NewNftTokenResponseFrom(nftModel *repository.NftTokenModel) (*NftTokenResponse, error) {
-	if nftModel == nil {
-		return nil, fmt.Errorf("input nft token model is nil")
-	}
-
-	nftResponse := &NftTokenResponse{
-		CollectionAddress: nftModel.CollectionAddress,
-		TokenId:           nftModel.TokenId,
-		OwnerAddress:      nftModel.OwnerAddress,
-		Name:              nftModel.Name,
-		Description:       nftModel.Description,
-		ImageUrl:          nftModel.ImageUrl,
-		Image:             nftModel.Image,
-		AnimationUrl:      nftModel.AnimationUrl,
-		Backstory:         nftModel.Backstory,
-	}
-
-	if nftModel.Traits != nil {
-		var traits []*NftTrait
-		err := json.Unmarshal([]byte(*nftModel.Traits), &traits)
-		if err != nil {
-			return nil, fmt.Errorf("failed to unmarshal traits: %v", err)
-		}
-		for _, trait := range traits {
-			nftTraitResponse := NftTraitResponse(*trait)
-			nftResponse.Traits = append(nftResponse.Traits, &nftTraitResponse)
-		}
-	}
-
-	return nftResponse, nil
 }
 
 func (n *NftTokenResponse) GetKeyValuesFromTraits() []KeyValue {

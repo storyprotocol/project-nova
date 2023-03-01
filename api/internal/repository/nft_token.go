@@ -1,18 +1,21 @@
 package repository
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"strings"
 	"time"
 
+	"github.com/project-nova/backend/api/internal/entity"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
 
 type NftTokenRepository interface {
 	GetNftByTokenId(tokenId int, collectionAddress string) (*NftTokenModel, error)
-	GetNfts(collectionAddresses []string, walletAddress string, offset *int, limit *int) ([]*NftTokenModel, error)
+	GetNfts(collectionAddresses []string, walletAddress string, offset *int, limit *int) ([]*entity.NftTokenResponse, error)
+	GetFilteredNfts(collectionAddresses []string, walletAddress string, filter *entity.Filter, offset *int, limit *int) ([]*entity.NftTokenResponse, int, error)
 	GetNftsByOwner(franchiseId int64, walletAddress string) ([]*NftTokenModel, error)
 	UpdateNftBackstory(tokenId int, collectionAddress string, backstory *string) (*NftTokenModel, error)
 	UpdateNftOwner(tokenId int, collectionAddress string, ownerAddress string) (*NftTokenModel, error)
@@ -47,6 +50,38 @@ func NewNftTokenDbImpl(db *gorm.DB) NftTokenRepository {
 	}
 }
 
+func (n *NftTokenModel) ToNftTokenResponse() (*entity.NftTokenResponse, error) {
+	if n == nil {
+		return nil, fmt.Errorf("input nft token model is nil")
+	}
+
+	nftResponse := &entity.NftTokenResponse{
+		CollectionAddress: n.CollectionAddress,
+		TokenId:           n.TokenId,
+		OwnerAddress:      n.OwnerAddress,
+		Name:              n.Name,
+		Description:       n.Description,
+		ImageUrl:          n.ImageUrl,
+		Image:             n.Image,
+		AnimationUrl:      n.AnimationUrl,
+		Backstory:         n.Backstory,
+	}
+
+	if n.Traits != nil {
+		var traits []*entity.NftTrait
+		err := json.Unmarshal([]byte(*n.Traits), &traits)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal traits: %v", err)
+		}
+		for _, trait := range traits {
+			nftTraitResponse := entity.NftTraitResponse(*trait)
+			nftResponse.Traits = append(nftResponse.Traits, &nftTraitResponse)
+		}
+	}
+
+	return nftResponse, nil
+}
+
 type nftTokenDbImpl struct {
 	db *gorm.DB
 }
@@ -65,7 +100,7 @@ func (n *nftTokenDbImpl) GetNftByTokenId(tokenId int, collectionAddress string) 
 	return results, nil
 }
 
-func (n *nftTokenDbImpl) GetNfts(collectionAddresses []string, walletAddress string, offset *int, limit *int) ([]*NftTokenModel, error) {
+func (n *nftTokenDbImpl) GetNfts(collectionAddresses []string, walletAddress string, offset *int, limit *int) ([]*entity.NftTokenResponse, error) {
 	for idx, address := range collectionAddresses {
 		collectionAddresses[idx] = strings.ToLower(address)
 	}
@@ -86,14 +121,62 @@ func (n *nftTokenDbImpl) GetNfts(collectionAddresses []string, walletAddress str
 
 	results := []*NftTokenModel{}
 	r := query.Order("collection_address").Order("token_id").Find(&results)
-	if errors.Is(r.Error, gorm.ErrRecordNotFound) {
-		return nil, r.Error
+	if errors.Is(r.Error, gorm.ErrRecordNotFound) || len(results) == 0 {
+		return []*entity.NftTokenResponse{}, nil
 	}
 	if r.Error != nil {
 		return nil, fmt.Errorf("failed to query db: %v", r.Error)
 	}
 
-	return results, nil
+	var response []*entity.NftTokenResponse
+	for _, nftModel := range results {
+		nftResponse, err := nftModel.ToNftTokenResponse()
+		if err != nil {
+			return nil, fmt.Errorf("failed to convert nft model to nft response: %v", err)
+		}
+		response = append(response, nftResponse)
+	}
+
+	return response, nil
+}
+
+func (n *nftTokenDbImpl) GetFilteredNfts(collectionAddresses []string, walletAddress string, filter *entity.Filter, offset *int, limit *int) ([]*entity.NftTokenResponse, int, error) {
+	nftTokens, err := n.GetNfts(collectionAddresses, walletAddress, nil, nil)
+	if err != nil {
+		return nil, 0, fmt.Errorf("failed to get all nfts: %v", err)
+	}
+
+	total := len(nftTokens)
+	if total == 0 {
+		return []*entity.NftTokenResponse{}, 0, nil
+	}
+
+	var filteredResults []*entity.NftTokenResponse
+	for _, nft := range nftTokens {
+		if nft.Traits == nil {
+			continue
+		}
+		matched := filter.Eval(nft.GetKeyValuesFromTraits())
+		if matched {
+			filteredResults = append(filteredResults, nft)
+		}
+	}
+
+	totalFiltered := len(filteredResults)
+	if totalFiltered == 0 {
+		return []*entity.NftTokenResponse{}, 0, nil
+	}
+
+	var start int = 0
+	var end int = totalFiltered
+	if offset != nil {
+		start = *offset
+	}
+	if limit != nil {
+		end = start + *limit
+	}
+
+	return filteredResults[start:end], totalFiltered, nil
 }
 
 func (n *nftTokenDbImpl) GetNftsByOwner(franchiseId int64, walletAddress string) ([]*NftTokenModel, error) {
