@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"encoding/base64"
+	"time"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -83,6 +84,7 @@ var backfillCmd = &cobra.Command{
 			if err != nil {
 				logger.Errorf("Failed to create nft record for id %d: %v\n", i, err)
 			}
+			time.Sleep(500 * time.Millisecond)
 		}
 
 		logger.Infof("\nBackfill for collection %s completed\n", collectionAddress)
