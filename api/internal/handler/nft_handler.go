@@ -160,24 +160,6 @@ func NewGetNftsHandler(nftTokenRepository repository.NftTokenRepository, franchi
 			offset = &offsetInt
 		}
 
-		nftResults, err := nftTokenRepository.GetNfts(collectionAddresses, walletAddress, offset, limit)
-		if err != nil {
-			logger.Errorf("Failed to get nfts: %v", err)
-			c.String(http.StatusInternalServerError, "Internal server error")
-			return
-		}
-
-		var response []*entity.NftTokenResponse
-		for _, nftModel := range nftResults {
-			nftResponse, err := entity.NewNftTokenResponseFrom(nftModel)
-			if err != nil {
-				logger.Errorf("Failed to convert nft model to nft response: %v", err)
-				c.String(http.StatusInternalServerError, "Internal server error")
-				return
-			}
-			response = append(response, nftResponse)
-		}
-
 		// listOption includes options for filtering, ordering and pagination.
 		// Currently only it implements filtering.
 		// Example:
@@ -196,23 +178,37 @@ func NewGetNftsHandler(nftTokenRepository repository.NftTokenRepository, franchi
 		var listOption entity.ListOption
 		err = c.ShouldBindJSON(&listOption)
 		filter := listOption.Filter
-		if err == nil && filter != nil && filter.Validate() { // Valid filter options. Apply filter
-			var filteredResponse []*entity.NftTokenResponse
-			for _, nftResponse := range response {
-				if nftResponse.Traits == nil {
-					continue
-				}
-				// Evaluate the nft based on the filter and add it to the final output if it matches
-				matched := filter.Eval(nftResponse.GetKeyValuesFromTraits())
-				if matched {
-					filteredResponse = append(filteredResponse, nftResponse)
-				}
+
+		var nfts []*entity.NftTokenResponse
+		var totalUnfiltered int
+		if err == nil && filter != nil && filter.Validate() {
+			nfts, totalUnfiltered, err = nftTokenRepository.GetFilteredNfts(collectionAddresses, walletAddress, filter, offset, limit)
+			if err != nil {
+				logger.Errorf("Failed to get filtered nfts: %v", err)
+				c.String(http.StatusInternalServerError, "Internal server error")
+				return
 			}
-			// Apply filtered response back to response for final return
-			response = filteredResponse
+		} else {
+			nfts, err = nftTokenRepository.GetNfts(collectionAddresses, walletAddress, offset, limit)
+			if err != nil {
+				logger.Errorf("Failed to get nfts: %v", err)
+				c.String(http.StatusInternalServerError, "Internal server error")
+				return
+			}
+
+			totalNfts, err := nftTokenRepository.GetNfts(collectionAddresses, walletAddress, nil, nil)
+			if err != nil {
+				logger.Errorf("Failed to get total nfts: %v", err)
+				c.String(http.StatusInternalServerError, "Internal server error")
+				return
+			}
+			totalUnfiltered = len(totalNfts)
 		}
 
-		c.JSON(http.StatusOK, response)
+		c.JSON(http.StatusOK, &entity.NftTokensResponse{
+			Total: totalUnfiltered,
+			Data:  nfts,
+		})
 	}
 }
 
