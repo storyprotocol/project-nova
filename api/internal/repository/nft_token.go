@@ -130,6 +130,9 @@ func (n *nftTokenDbImpl) GetNfts(collectionAddresses []string, walletAddress str
 
 	var response []*entity.NftTokenResponse
 	for _, nftModel := range results {
+		if nftModel.Name == nil { // When name is not present, it means the nft is not revealed yet.
+			continue
+		}
 		nftResponse, err := nftModel.ToNftTokenResponse()
 		if err != nil {
 			return nil, fmt.Errorf("failed to convert nft model to nft response: %v", err)

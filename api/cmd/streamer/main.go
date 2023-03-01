@@ -106,7 +106,7 @@ func main() {
 			tokenId := vlog.Topics[3].Big().Uint64()
 
 			if utils.IsZeroAddress(fromAddress) { // Mint
-				err = apiGateway.CreateNftRecord(int(tokenId), collectionAddress, encryptedBase64)
+				err = apiGateway.CreateOrUpdateNftRecord(int(tokenId), collectionAddress, encryptedBase64)
 				if err != nil {
 					logger.Errorf("Failed to create nft record: %v", err)
 				}
@@ -116,7 +116,7 @@ func main() {
 					logger.Errorf("Failed to delete nft record: %v", err)
 				}
 			} else { // Transfer
-				err = apiGateway.UpdateNftOwner(int(tokenId), collectionAddress, encryptedBase64)
+				err = apiGateway.CreateOrUpdateNftRecord(int(tokenId), collectionAddress, encryptedBase64)
 				if err != nil {
 					logger.Errorf("Failed to update nft owner: %v", err)
 				}
