@@ -34,17 +34,17 @@ type StoryMediaModel struct {
 	Description string `json:"description,omitempty"`
 }
 
-func NewStoryContentS3Impl(s3Client s3.S3Client) (StoryContentRepository, error) {
+func NewStoryContentS3Impl(s3Client s3.S3Client, bucket string) (StoryContentRepository, error) {
 	contentMap := make(map[string]*StoryContentModel)
 
-	keys, err := s3Client.ListObjectsNonRecursive(constant.S3ProjectNovaBucket)
+	keys, err := s3Client.ListObjectsNonRecursive(bucket)
 	if err != nil {
-		return nil, fmt.Errorf("failed to list objects for %s: %v", constant.S3ProjectNovaBucket, err)
+		return nil, fmt.Errorf("failed to list objects for %s: %v", bucket, err)
 	}
 
 	for _, key := range keys {
 		buf := aws.NewWriteAtBuffer([]byte{})
-		_, err := s3Client.DownloadObject(buf, constant.S3ProjectNovaBucket, *key+"/"+constant.S3ContentObject)
+		_, err := s3Client.DownloadObject(buf, bucket, *key+"/"+constant.S3ContentObject)
 		if err != nil {
 			return nil, fmt.Errorf("failed to download content from s3 for object %s: %v", *key, err)
 		}

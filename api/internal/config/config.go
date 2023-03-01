@@ -10,15 +10,16 @@ import (
 )
 
 type AppConfig struct {
-	AppID            string `yaml:"app_id"`
-	Region           string `yaml:"region"`
-	Port             int64  `yaml:"port"`
-	Env              string `yaml:"env"`
-	DatabaseURI      string `yaml:"database_uri"`
-	ProviderURL      string `yaml:"provider_url"`
-	ContentPath      string `yaml:"content_path"`
-	AdminAuthMessage string `yaml:"admin_auth_message"`
-	AuthKeyId        string `yaml:"auth_key_id"`
+	AppID               string `yaml:"app_id"`
+	Region              string `yaml:"region"`
+	Port                int64  `yaml:"port"`
+	Env                 string `yaml:"env"`
+	DatabaseURI         string `yaml:"database_uri"`
+	ProviderURL         string `yaml:"provider_url"`
+	ContentPath         string `yaml:"content_path"`
+	AdminAuthMessage    string `yaml:"admin_auth_message"`
+	AuthKeyId           string `yaml:"auth_key_id"`
+	S3ContentBucketName string `yaml:"s3_content_bucket_name"`
 }
 
 type StreamerConfig struct {

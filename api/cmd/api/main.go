@@ -99,7 +99,7 @@ func main() {
 	storyChapterRepository := repository.NewStoryChapterDbImpl(db)
 	storyInfoRepository := repository.NewStoryInfoDbImpl(db)
 
-	storyContentRepository, err := repository.NewStoryContentS3Impl(s3Client)
+	storyContentRepository, err := repository.NewStoryContentS3Impl(s3Client, cfg.S3ContentBucketName)
 	if err != nil {
 		logger.Fatalf("Failed to init story content s3 implementation: %v", err)
 	}
