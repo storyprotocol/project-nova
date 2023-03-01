@@ -76,7 +76,7 @@ var backfillCmd = &cobra.Command{
 
 		logger.Infof("Starting backfills from id %d to id %d\n\n", startId, endId)
 		for i := startId; i <= endId; i++ {
-			err = apiGateway.CreateNftRecord(i, collectionAddress, encryptedBase64)
+			err = apiGateway.CreateOrUpdateNftRecord(i, collectionAddress, encryptedBase64)
 			if err != nil {
 				logger.Errorf("Failed to create nft record for id %d: %v\n", i, err)
 			}

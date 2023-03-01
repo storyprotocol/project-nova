@@ -298,6 +298,17 @@ func NewAdminCreateOrUpdateNftHandler(nftTokenRepository repository.NftTokenRepo
 }
 
 func createNftRecord(uri string, tokenId int, ownerAddress string, collectionAddress string) (*repository.NftTokenModel, error) {
+	nft := &repository.NftTokenModel{
+		ID:                uuid.New().String(),
+		TokenId:           tokenId,
+		OwnerAddress:      &ownerAddress,
+		CollectionAddress: collectionAddress,
+	}
+
+	if uri == "" {
+		return nft, nil
+	}
+
 	splittedStr := strings.Split(uri, ",")
 	if len(splittedStr) != 2 {
 		return nil, fmt.Errorf("failed to split uri string to 2 parts. uri: %v", uri)
@@ -312,13 +323,6 @@ func createNftRecord(uri string, tokenId int, ownerAddress string, collectionAdd
 	err = json.Unmarshal(decodedMetadata, &result)
 	if err != nil {
 		return nil, fmt.Errorf("failed to unmarshal metadata: %v", err)
-	}
-
-	nft := &repository.NftTokenModel{
-		ID:                uuid.New().String(),
-		TokenId:           tokenId,
-		OwnerAddress:      &ownerAddress,
-		CollectionAddress: collectionAddress,
 	}
 
 	if result.Name != nil {

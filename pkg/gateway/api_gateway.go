@@ -11,7 +11,7 @@ import (
 type ApiGateway interface {
 	GetCollectionAddresses(authMessage string) ([]string, error)
 	UpdateNftOwner(tokenId int, collectionAddress string, authMessage string) error
-	CreateNftRecord(tokenId int, collectionAddress string, authMessage string) error
+	CreateOrUpdateNftRecord(tokenId int, collectionAddress string, authMessage string) error
 	DeleteNftRecord(tokenId int, collectionAddress string, authMessage string) error
 	CreateProof(address *string, proof *string, allowlistId *string, authMessage string) error
 }
@@ -61,7 +61,7 @@ func (s *apiHttpGateway) UpdateNftOwner(tokenId int, collectionAddress string, a
 	return nil
 }
 
-func (s *apiHttpGateway) CreateNftRecord(tokenId int, collectionAddress string, authMessage string) error {
+func (s *apiHttpGateway) CreateOrUpdateNftRecord(tokenId int, collectionAddress string, authMessage string) error {
 	requestURL := fmt.Sprintf("/admin/v1/nft/%s?collectionAddress=%s", strconv.Itoa(tokenId), collectionAddress)
 	headers := &map[string]string{
 		middleware.AuthMessageHeaderKey: authMessage,
