@@ -144,6 +144,9 @@ func main() {
 	adminV1 := r.Group("/admin/v1")
 	adminV1.Use(middleware.AuthAdmin(kmsClient, []byte(cfg.AdminAuthMessage), cfg.AuthKeyId))
 	{
+		// Admin Endpoint to create wallet proof
+		adminV1.POST("/wallet/:walletAddress/proof", handler.NewAdminCreateWalletProofHandler(walletMerkleProofRepository))
+
 		// Admin Endpoint to get collection data
 		adminV1.GET("/nft/collections", handler.NewAdminGetCollectionsHandler(nftCollectionRepository, ethClient))
 

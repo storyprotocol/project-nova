@@ -6,11 +6,13 @@ import (
 	"strings"
 	"time"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
 type WalletMerkleProofRepository interface {
 	GetMerkleProof(walletAddress string, allowlistId string) (*WalletMerkleProofModel, error)
+	CreateMerkleProof(walletAddress string, allowlistId string, proof string) (*WalletMerkleProofModel, error)
 }
 
 type WalletMerkleProofModel struct {
@@ -49,4 +51,23 @@ func (s *walletMerkleProofDbImpl) GetMerkleProof(walletAddress string, allowlist
 	}
 
 	return result, nil
+}
+
+func (s *walletMerkleProofDbImpl) CreateMerkleProof(walletAddress string, allowlistId string, proof string) (*WalletMerkleProofModel, error) {
+	walletAddress = strings.ToLower(walletAddress)
+	model := &WalletMerkleProofModel{
+		ID:            uuid.New().String(),
+		WalletAddress: walletAddress,
+		AllowlistId:   allowlistId,
+		Proof:         proof,
+	}
+	r := s.db.Create(model)
+	if r.RowsAffected == 0 {
+		return nil, gorm.ErrRecordNotFound
+	}
+	if r.Error != nil {
+		return nil, fmt.Errorf("failed to insert into db: %v", r.Error)
+	}
+
+	return model, nil
 }
