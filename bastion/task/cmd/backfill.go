@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"encoding/base64"
+	"time"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -29,14 +30,12 @@ var backfillCmd = &cobra.Command{
 	`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if collectionAddress == "" {
-			logger.Error("Collection address required. pass it with the flag --collection")
-			return
+			logger.Fatal("Collection address required. pass it with the flag --collection")
 		}
 
 		cfg, err := config.GetConfig()
 		if err != nil {
-			logger.Errorf("Failed to get configs: %v", err)
-			return
+			logger.Fatalf("Failed to get configs: %v", err)
 		}
 
 		apiGateway := gateway.NewApiHttpGateway(cfg.ApiGatewayUrl)
@@ -51,8 +50,7 @@ var backfillCmd = &cobra.Command{
 
 		ethClient, err := ethclient.Dial(cfg.ProviderURL)
 		if err != nil {
-			logger.Errorf("Failed to connect to the blockchain provider, error: %v", err)
-			return
+			logger.Fatalf("Failed to connect to the blockchain provider, error: %v", err)
 		}
 
 		if startId == -1 {
@@ -63,13 +61,13 @@ var backfillCmd = &cobra.Command{
 			address := common.HexToAddress(collectionAddress)
 			contract, err := erc721.NewErc721(address, ethClient)
 			if err != nil {
-				logger.Errorf("Failed to instantiate the contract: %v", err)
+				logger.Fatalf("Failed to instantiate the contract: %v", err)
 				return
 			}
 
 			totalSold, err := contract.TotalSold(nil)
 			if err != nil {
-				logger.Errorf("Failed to query uri: %v", err)
+				logger.Fatalf("Failed to query uri: %v", err)
 				return
 			}
 
@@ -79,10 +77,11 @@ var backfillCmd = &cobra.Command{
 		logger.Infof("Starting backfills from id %d to id %d\n\n", startId, endId)
 		for i := startId; i <= endId; i++ {
 			err = apiGateway.CreateNftRecord(i, collectionAddress, encryptedBase64)
-			logger.Infof("Created nft record for id %d\n", i)
 			if err != nil {
 				logger.Errorf("Failed to create nft record for id %d: %v\n", i, err)
 			}
+			logger.Infof("Created nft record for id %d\n", i)
+			time.Sleep(500 * time.Millisecond)
 		}
 
 		logger.Infof("\nBackfill for collection %s completed\n", collectionAddress)

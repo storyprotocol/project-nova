@@ -1,6 +1,7 @@
 package constant
 
 const (
-	NftMaxLimit     = 500
-	S3ContentObject = "content.json"
+	NftMaxLimit         = 500
+	S3ContentObject     = "content.json"
+	ErrorNotOnWhitelist = "You must be on the whitelist to mint. Please come back on the public mint."
 )

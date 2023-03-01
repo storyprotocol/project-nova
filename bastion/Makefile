@@ -12,7 +12,7 @@ deploy:
 	mkdir -p ${OUTPUT}
 	kustomize build deploy/overlays/${ENV} -o ${OUTPUT}/deploy.yaml
 
-	cd deploy/overlays/${ENV}; kustomize edit set image ${ECR}/${BASTION_IMAGE}=${ECR}/${BASTION_IMAGE}:latest	
+	cd deploy/overlays/${ENV}; kustomize edit set image ${ECR}/${BASTION_IMAGE}=${ECR}/${BASTION_IMAGE}:latest
 	kubectl apply -f ${OUTPUT}/deploy.yaml
 
 .PHONY: build-task

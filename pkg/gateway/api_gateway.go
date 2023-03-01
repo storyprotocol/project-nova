@@ -13,6 +13,7 @@ type ApiGateway interface {
 	UpdateNftOwner(tokenId int, collectionAddress string, authMessage string) error
 	CreateNftRecord(tokenId int, collectionAddress string, authMessage string) error
 	DeleteNftRecord(tokenId int, collectionAddress string, authMessage string) error
+	CreateProof(address *string, proof *string, allowlistId *string, authMessage string) error
 }
 
 func NewApiHttpGateway(url string) ApiGateway {
@@ -80,6 +81,19 @@ func (s *apiHttpGateway) DeleteNftRecord(tokenId int, collectionAddress string, 
 	_, err := s.client.RequestAddHeaders("DELETE", requestURL, headers, nil, nil)
 	if err != nil {
 		return fmt.Errorf("http request to delete nft record failed. error %v ", err)
+	}
+	return nil
+}
+
+func (s *apiHttpGateway) CreateProof(address *string, proof *string, allowlistId *string, authMessage string) error {
+	requestURL := fmt.Sprintf("/admin/v1/wallet/%s/proof?allowlistId=%s&proof=%s", *address, *allowlistId, *proof)
+	headers := &map[string]string{
+		middleware.AuthMessageHeaderKey: authMessage,
+	}
+
+	_, err := s.client.RequestAddHeaders("POST", requestURL, headers, nil, nil)
+	if err != nil {
+		return fmt.Errorf("http request to create proof failed. error %v ", err)
 	}
 	return nil
 }
