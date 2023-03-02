@@ -270,7 +270,7 @@ func NewAdminCreateOrUpdateNftHandler(nftTokenRepository repository.NftTokenRepo
 			return
 		}
 
-		_, err = nftTokenRepository.GetNftByTokenId(int(tokenId), collectionAddress)
+		currentNft, err := nftTokenRepository.GetNftByTokenId(int(tokenId), collectionAddress)
 		if err != nil {
 			if err == gorm.ErrRecordNotFound { // nft token doesn't exist in DB. Create the nft record
 				nftToken, err := nftTokenRepository.CreateNft(nft)
@@ -286,6 +286,8 @@ func NewAdminCreateOrUpdateNftHandler(nftTokenRepository repository.NftTokenRepo
 			c.JSON(http.StatusInternalServerError, gin.H{"message": "Internal server error"})
 			return
 		}
+
+		logger.Infof("old address: %s, new address: %s", *currentNft.OwnerAddress, ownerAddress.String())
 
 		// nft token exists. Update the record
 		nftToken, err := nftTokenRepository.UpdateNft(nft)
