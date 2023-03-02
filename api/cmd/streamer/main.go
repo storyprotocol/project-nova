@@ -122,7 +122,7 @@ func main() {
 				logger.Infof("Transfer event from %s to %s", fromAddress, toAddress)
 				err = apiGateway.CreateOrUpdateNftRecord(int(tokenId), collectionAddress, encryptedBase64)
 				if err != nil {
-					logger.Errorf("Failed to update nft owner: %v", err)
+					logger.Errorf("Failed to update nft record: %v", err)
 				}
 			}
 
