@@ -286,11 +286,18 @@ func NewAdminCreateOrUpdateNftHandler(nftTokenRepository repository.NftTokenRepo
 			c.JSON(http.StatusInternalServerError, gin.H{"message": "Internal server error"})
 			return
 		}
+
 		// nft token exists. Update the record
 		nftToken, err := nftTokenRepository.UpdateNft(nft)
+		if err == gorm.ErrRecordNotFound {
+			logger.Errorf("Failed to update nft token db record: %v", err)
+			c.JSON(http.StatusAlreadyReported, gin.H{"message": "Same record exists"})
+			return
+		}
 		if err != nil {
 			logger.Errorf("Failed to update nft token db record: %v", err)
 			c.JSON(http.StatusInternalServerError, gin.H{"message": "Internal server error"})
+			return
 		}
 
 		c.JSON(http.StatusOK, nftToken)

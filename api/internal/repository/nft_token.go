@@ -175,7 +175,7 @@ func (n *nftTokenDbImpl) GetFilteredNfts(collectionAddresses []string, walletAdd
 	if offset != nil {
 		start = *offset
 	}
-	if limit != nil {
+	if limit != nil && (start+*limit) < end {
 		end = start + *limit
 	}
 
