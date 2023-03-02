@@ -31,7 +31,7 @@ type apiHttpGateway struct {
 func (s *apiHttpGateway) GetCollectionAddresses(authMessage string) ([]string, error) {
 	requestURL := "/admin/v1/nft/collections"
 	results := []struct {
-		CollectionAddress string `json:"collection_address"`
+		CollectionAddress string `json:"collectionAddress"`
 	}{}
 	headers := &map[string]string{
 		middleware.AuthMessageHeaderKey: authMessage,

@@ -100,22 +100,26 @@ func main() {
 			  "removed": false
 			}
 			*/
+			logger.Infof("vlog: %v", vlog)
 			collectionAddress := vlog.Address.String()
 			fromAddress := vlog.Topics[1].String()
 			toAddress := vlog.Topics[2].String()
 			tokenId := vlog.Topics[3].Big().Uint64()
 
 			if utils.IsZeroAddress(fromAddress) { // Mint
+				logger.Infof("Mint event from zero address to %s", toAddress)
 				err = apiGateway.CreateOrUpdateNftRecord(int(tokenId), collectionAddress, encryptedBase64)
 				if err != nil {
 					logger.Errorf("Failed to create nft record: %v", err)
 				}
 			} else if utils.IsZeroAddress(toAddress) { // Burn
+				logger.Infof("Burn event from %s", fromAddress)
 				err = apiGateway.DeleteNftRecord(int(tokenId), collectionAddress, encryptedBase64)
 				if err != nil {
 					logger.Errorf("Failed to delete nft record: %v", err)
 				}
 			} else { // Transfer
+				logger.Infof("Transfer event from %s to %s", fromAddress, toAddress)
 				err = apiGateway.CreateOrUpdateNftRecord(int(tokenId), collectionAddress, encryptedBase64)
 				if err != nil {
 					logger.Errorf("Failed to update nft owner: %v", err)

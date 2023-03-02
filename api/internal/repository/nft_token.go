@@ -128,9 +128,9 @@ func (n *nftTokenDbImpl) GetNfts(collectionAddresses []string, walletAddress str
 		return nil, fmt.Errorf("failed to query db: %v", r.Error)
 	}
 
-	var response []*entity.NftTokenResponse
+	response := []*entity.NftTokenResponse{}
 	for _, nftModel := range results {
-		if nftModel.Name == nil { // When name is not present, it means the nft is not revealed yet.
+		if nftModel.Image == nil { // When image is not present, it means the nft is not revealed yet.
 			continue
 		}
 		nftResponse, err := nftModel.ToNftTokenResponse()
