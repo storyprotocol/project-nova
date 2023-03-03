@@ -253,7 +253,7 @@ func (n *nftTokenDbImpl) UpdateNft(nftToken *NftTokenModel) (*NftTokenModel, err
 		nftToken.OwnerAddress = &ownerAddress
 	}
 
-	r := n.db.Model(&NftTokenModel{}).Where("token_id = ?", nftToken.TokenId).Updates(nftToken)
+	r := n.db.Model(&nftToken).Updates(nftToken)
 	if r.RowsAffected == 0 {
 		return nil, gorm.ErrRecordNotFound
 	}
