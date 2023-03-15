@@ -1,0 +1,6 @@
+BEGIN;
+
+ALTER TABLE story_chapter
+ADD COLUMN release_at TIMESTAMPTZ NOT NULL DEFAULT NOW();
+
+END
