@@ -1,15 +1,25 @@
 package utils
 
 import (
+	"fmt"
 	"math/big"
 	"reflect"
 	"regexp"
+	"strings"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/shopspring/decimal"
 )
 
-// The code is from https://goethereumbook.org/en/util-go/
+// Some of the code is from https://goethereumbook.org/en/util-go/
+
+// SanitizeAddress validate the address and convert it to lower case
+func SanitizeAddress(address string) (string, error) {
+	if !IsValidAddress(address) {
+		return "", fmt.Errorf("invalid address %s", address)
+	}
+	return strings.ToLower(address), nil
+}
 
 // IsValidAddress validate hex address
 func IsValidAddress(iaddress interface{}) bool {

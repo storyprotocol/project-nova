@@ -19,6 +19,7 @@ import (
 	"github.com/project-nova/backend/pkg/abi/erc721"
 	"github.com/project-nova/backend/pkg/auth"
 	"github.com/project-nova/backend/pkg/logger"
+	"github.com/project-nova/backend/pkg/utils"
 	"gorm.io/gorm"
 )
 
@@ -68,14 +69,35 @@ func NewUpdateNftBackstoryHandler(nftTokenRepository repository.NftTokenReposito
 			return
 		}
 
-		recoveredAddress, err := auth.RecoverAddress(authMessage, requestBody.Signature)
+		collectionAddress, err := utils.SanitizeAddress(requestBody.CollectionAddress)
 		if err != nil {
-			logger.Errorf("failed to recover address: %v", err)
+			logger.Errorf("Invalid collection address: %s", requestBody.CollectionAddress)
+			c.String(http.StatusBadRequest, "Invalid collection address")
 			return
 		}
 
-		if recoveredAddress != requestBody.WalletAddress {
-			logger.Errorf("wallet verification failed, recovered address: %s, wallet address: %s", recoveredAddress, requestBody.WalletAddress)
+		walletAddress, err := utils.SanitizeAddress(requestBody.WalletAddress)
+		if err != nil {
+			logger.Errorf("Invalid wallet address: %s", requestBody.WalletAddress)
+			c.String(http.StatusBadRequest, "Invalid wallet address")
+			return
+		}
+
+		recoveredAddress, err := auth.RecoverAddress(authMessage, requestBody.Signature)
+		if err != nil {
+			logger.Errorf("Failed to recover address: %v", err)
+			return
+		}
+
+		recoveredAddress, err = utils.SanitizeAddress(recoveredAddress)
+		if err != nil {
+			logger.Errorf("Wallet verification failed, invalid recovered address: %s", recoveredAddress)
+			c.String(http.StatusForbidden, "The wallet doesn't have permission for this operation")
+			return
+		}
+
+		if recoveredAddress != walletAddress {
+			logger.Errorf("Wallet verification failed, recovered address: %s, wallet address: %s", recoveredAddress, walletAddress)
 			c.String(http.StatusForbidden, "The wallet doesn't have permission for this operation")
 			return
 		}
@@ -87,20 +109,20 @@ func NewUpdateNftBackstoryHandler(nftTokenRepository repository.NftTokenReposito
 			return
 		}
 
-		nftToken, err := nftTokenRepository.GetNftByTokenId(tokenId, requestBody.CollectionAddress)
+		nftToken, err := nftTokenRepository.GetNftByTokenId(tokenId, collectionAddress)
 		if err != nil {
 			logger.Errorf("Failed to get nft by token id: %v", err)
 			c.String(http.StatusInternalServerError, "Internal server error")
 			return
 		}
 
-		if nftToken.OwnerAddress == nil || *nftToken.OwnerAddress != requestBody.WalletAddress {
-			logger.Errorf("The request wallet is not the owner of the nft, owner address: %s, wallet address: %s", nftToken.OwnerAddress, requestBody.WalletAddress)
+		if nftToken.OwnerAddress == nil || *nftToken.OwnerAddress != walletAddress {
+			logger.Errorf("The request wallet is not the owner of the nft, owner address: %s, wallet address: %s", *nftToken.OwnerAddress, walletAddress)
 			c.String(http.StatusForbidden, "The wallet doesn't have permission for this operation")
 			return
 		}
 
-		nftToken, err = nftTokenRepository.UpdateNftBackstory(tokenId, requestBody.CollectionAddress, &requestBody.Backstory)
+		nftToken, err = nftTokenRepository.UpdateNftBackstory(tokenId, collectionAddress, &requestBody.Backstory)
 		if err != nil {
 			logger.Errorf("Failed to update nft backstory: %v", err)
 			c.String(http.StatusInternalServerError, "Internal server error")
