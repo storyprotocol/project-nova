@@ -27,18 +27,18 @@ func RecoverAddress(message string, signature string) (string, error) {
 }
 
 // For Testing
-func SignMessage(message string) ([]byte, error) {
+func SignMessage(message string) (string, error) {
 	messageByte := []byte(message)
 	messageHash := crypto.Keccak256Hash(messageByte)
 
-	privateKey, err := crypto.HexToECDSA("add your private key")
+	privateKey, err := crypto.HexToECDSA("private key here")
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	signatureHash, err := crypto.Sign(messageHash.Bytes(), privateKey)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
-	return signatureHash, nil
+	return hexutil.Encode(signatureHash), nil
 }
