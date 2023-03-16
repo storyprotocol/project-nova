@@ -3,18 +3,13 @@ package handler
 import (
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/project-nova/backend/api/internal/entity"
 	"github.com/project-nova/backend/api/internal/repository"
 	"github.com/project-nova/backend/pkg/logger"
 )
-
-type GetStoryChaptersResp struct {
-	ChapterNum int    `json:"chapterNum"`
-	Title      string `json:"title"`
-	Subtitle   string `json:"subtitle"`
-	CoverUrl   string `json:"coverUrl"`
-}
 
 // NewGetStoryChaptersHandler creates a handler to handle GET /story/:franchiseId/:storyNum request.
 // Doc: (To Be Added)
@@ -46,20 +41,19 @@ func NewGetStoryChaptersHandler(
 
 		storyId := storyInfoResult.ID
 
-		storyChapterResults, err := storyChapterRepo.GetChaptersByID(storyId)
+		storyChapters, err := storyChapterRepo.GetChaptersByID(storyId)
 		if err != nil {
 			logger.Errorf("Failed to get story chapters: %v", err)
 			c.String(http.StatusInternalServerError, "Internal server error")
 			return
 		}
 
-		var resp []*GetStoryChaptersResp
-		for _, v := range storyChapterResults {
-			resp = append(resp, &GetStoryChaptersResp{
-				ChapterNum: v.SeqNum,
-				Title:      v.Title,
-				CoverUrl:   v.CoverUrl,
-			})
+		var resp []*entity.StoryChapterResp
+		for _, v := range storyChapters {
+			if v.ReleaseAt.Before(time.Now()) {
+				resp = append(resp, v.ToStoryChapterResp())
+			}
+
 		}
 
 		c.JSON(http.StatusOK, resp)
@@ -68,7 +62,11 @@ func NewGetStoryChaptersHandler(
 
 // NewGetStoryChapterContentsHandler creates the handler to handle /story/:franchiseId/:storyNum/:chapterNum request.
 // Doc: (To Be Added)
-func NewGetStoryChapterContentsHandler(storyContentRepo repository.StoryContentRepository) func(c *gin.Context) {
+func NewGetStoryChapterContentsHandler(
+	storyContentRepo repository.StoryContentRepository,
+	storyChapterRepo repository.StoryChapterRepository,
+	storyInfoRepo repository.StoryInfoRepository,
+) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		franchiseId, err := strconv.ParseInt(c.Param("franchiseId"), 10, 64)
 		if err != nil {
@@ -88,6 +86,28 @@ func NewGetStoryChapterContentsHandler(storyContentRepo repository.StoryContentR
 		if err != nil {
 			logger.Errorf("Failed to convert chapter num: %v", err)
 			c.String(http.StatusBadRequest, "chapter num is invalid")
+			return
+		}
+
+		storyInfoResult, err := storyInfoRepo.GetStoryByFranchise(franchiseId, storyNum)
+		if err != nil {
+			logger.Errorf("Failed to get story info: %v", err)
+			c.String(http.StatusInternalServerError, "Internal server error")
+			return
+		}
+
+		storyId := storyInfoResult.ID
+
+		storyChapter, err := storyChapterRepo.GetChapter(storyId, chapterNum)
+		if err != nil {
+			logger.Errorf("Failed to get story chapter: %v", err)
+			c.String(http.StatusInternalServerError, "Internal server error")
+			return
+		}
+
+		if storyChapter.ReleaseAt.After(time.Now()) {
+			logger.Error("Denied chapter request, chapter content is not released yet")
+			c.String(http.StatusInternalServerError, "Internal server error")
 			return
 		}
 

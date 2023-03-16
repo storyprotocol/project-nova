@@ -1,11 +1,9 @@
 package repository
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"strings"
-	"time"
 
 	"github.com/project-nova/backend/api/internal/entity"
 	"gorm.io/gorm"
@@ -13,35 +11,15 @@ import (
 )
 
 type NftTokenRepository interface {
-	GetNftByTokenId(tokenId int, collectionAddress string) (*NftTokenModel, error)
+	GetNftByTokenId(tokenId int, collectionAddress string) (*entity.NftTokenModel, error)
 	GetNfts(collectionAddresses []string, walletAddress string, offset *int, limit *int) ([]*entity.NftTokenResponse, error)
 	GetFilteredNfts(collectionAddresses []string, walletAddress string, filter *entity.Filter, offset *int, limit *int) ([]*entity.NftTokenResponse, int, error)
-	GetNftsByOwner(franchiseId int64, walletAddress string) ([]*NftTokenModel, error)
-	UpdateNftBackstory(tokenId int, collectionAddress string, backstory *string) (*NftTokenModel, error)
-	UpdateNftOwner(tokenId int, collectionAddress string, ownerAddress string) (*NftTokenModel, error)
-	CreateNft(nftToken *NftTokenModel) (*NftTokenModel, error)
-	UpdateNft(nftToken *NftTokenModel) (*NftTokenModel, error)
+	GetNftsByOwner(franchiseId int64, walletAddress string) ([]*entity.NftTokenModel, error)
+	UpdateNftBackstory(tokenId int, collectionAddress string, backstory *string) (*entity.NftTokenModel, error)
+	UpdateNftOwner(tokenId int, collectionAddress string, ownerAddress string) (*entity.NftTokenModel, error)
+	CreateNft(nftToken *entity.NftTokenModel) (*entity.NftTokenModel, error)
+	UpdateNft(nftToken *entity.NftTokenModel) (*entity.NftTokenModel, error)
 	DeleteNft(tokenId int, collectionAddress string) error
-}
-
-type NftTokenModel struct {
-	ID                string     `gorm:"primaryKey;column:id" json:"id"`
-	CollectionAddress string     `json:"collectionAddress"`
-	TokenId           int        `json:"tokenId"`
-	OwnerAddress      *string    `json:"ownerAddress"`
-	Name              *string    `json:"name"`
-	Description       *string    `json:"description"`
-	ImageUrl          *string    `json:"imageUrl"`
-	Image             *string    `json:"image"`
-	AnimationUrl      *string    `json:"animationUrl"`
-	Traits            *string    `json:"traits"`
-	Backstory         *string    `json:"backstory"`
-	OwnerUpdatedAt    *time.Time `json:"ownerUpdatedAt"`
-	StoryUpdatedAt    *time.Time `json:"storyUpdatedAt"`
-}
-
-func (NftTokenModel) TableName() string {
-	return "nft_token"
 }
 
 func NewNftTokenDbImpl(db *gorm.DB) NftTokenRepository {
@@ -50,45 +28,13 @@ func NewNftTokenDbImpl(db *gorm.DB) NftTokenRepository {
 	}
 }
 
-func (n *NftTokenModel) ToNftTokenResponse() (*entity.NftTokenResponse, error) {
-	if n == nil {
-		return nil, fmt.Errorf("input nft token model is nil")
-	}
-
-	nftResponse := &entity.NftTokenResponse{
-		CollectionAddress: n.CollectionAddress,
-		TokenId:           n.TokenId,
-		OwnerAddress:      n.OwnerAddress,
-		Name:              n.Name,
-		Description:       n.Description,
-		ImageUrl:          n.ImageUrl,
-		Image:             n.Image,
-		AnimationUrl:      n.AnimationUrl,
-		Backstory:         n.Backstory,
-	}
-
-	if n.Traits != nil {
-		var traits []*entity.NftTrait
-		err := json.Unmarshal([]byte(*n.Traits), &traits)
-		if err != nil {
-			return nil, fmt.Errorf("failed to unmarshal traits: %v", err)
-		}
-		for _, trait := range traits {
-			nftTraitResponse := entity.NftTraitResponse(*trait)
-			nftResponse.Traits = append(nftResponse.Traits, &nftTraitResponse)
-		}
-	}
-
-	return nftResponse, nil
-}
-
 type nftTokenDbImpl struct {
 	db *gorm.DB
 }
 
-func (n *nftTokenDbImpl) GetNftByTokenId(tokenId int, collectionAddress string) (*NftTokenModel, error) {
+func (n *nftTokenDbImpl) GetNftByTokenId(tokenId int, collectionAddress string) (*entity.NftTokenModel, error) {
 	collectionAddress = strings.ToLower(collectionAddress)
-	results := &NftTokenModel{}
+	results := &entity.NftTokenModel{}
 	r := n.db.Where("token_id = ? and collection_address = ?", tokenId, collectionAddress).First(&results)
 	if errors.Is(r.Error, gorm.ErrRecordNotFound) {
 		return nil, r.Error
@@ -119,7 +65,7 @@ func (n *nftTokenDbImpl) GetNfts(collectionAddresses []string, walletAddress str
 		query = query.Limit(*limit)
 	}
 
-	results := []*NftTokenModel{}
+	results := []*entity.NftTokenModel{}
 	r := query.Order("collection_address").Order("token_id").Find(&results)
 	if errors.Is(r.Error, gorm.ErrRecordNotFound) || len(results) == 0 {
 		return []*entity.NftTokenResponse{}, nil
@@ -182,9 +128,9 @@ func (n *nftTokenDbImpl) GetFilteredNfts(collectionAddresses []string, walletAdd
 	return filteredResults[start:end], totalFiltered, nil
 }
 
-func (n *nftTokenDbImpl) GetNftsByOwner(franchiseId int64, walletAddress string) ([]*NftTokenModel, error) {
+func (n *nftTokenDbImpl) GetNftsByOwner(franchiseId int64, walletAddress string) ([]*entity.NftTokenModel, error) {
 	walletAddress = strings.ToLower(walletAddress)
-	results := []*NftTokenModel{}
+	results := []*entity.NftTokenModel{}
 	r := n.db.Where("franchise_id = ? and owner_address = ?", franchiseId, walletAddress).
 		Order("collection_address").Order("token_id").Find(&results)
 	if errors.Is(r.Error, gorm.ErrRecordNotFound) {
@@ -197,10 +143,10 @@ func (n *nftTokenDbImpl) GetNftsByOwner(franchiseId int64, walletAddress string)
 	return results, nil
 }
 
-func (n *nftTokenDbImpl) UpdateNftBackstory(tokenId int, collectionAddress string, backstory *string) (*NftTokenModel, error) {
+func (n *nftTokenDbImpl) UpdateNftBackstory(tokenId int, collectionAddress string, backstory *string) (*entity.NftTokenModel, error) {
 	collectionAddress = strings.ToLower(collectionAddress)
 
-	nftToken := &NftTokenModel{}
+	nftToken := &entity.NftTokenModel{}
 	r := n.db.Model(&nftToken).Clauses(clause.Returning{}).Where("token_id = ? and collection_address = ?", tokenId, collectionAddress).Update("backstory", *backstory)
 	if r.RowsAffected == 0 {
 		return nil, gorm.ErrRecordNotFound
@@ -212,11 +158,11 @@ func (n *nftTokenDbImpl) UpdateNftBackstory(tokenId int, collectionAddress strin
 	return nftToken, nil
 }
 
-func (n *nftTokenDbImpl) UpdateNftOwner(tokenId int, collectionAddress string, ownerAddress string) (*NftTokenModel, error) {
+func (n *nftTokenDbImpl) UpdateNftOwner(tokenId int, collectionAddress string, ownerAddress string) (*entity.NftTokenModel, error) {
 	collectionAddress = strings.ToLower(collectionAddress)
 	ownerAddress = strings.ToLower(ownerAddress)
 
-	nftToken := &NftTokenModel{}
+	nftToken := &entity.NftTokenModel{}
 	r := n.db.Model(&nftToken).Clauses(clause.Returning{}).Where("token_id = ? and collection_address = ?", tokenId, collectionAddress).Update("owner_address", ownerAddress)
 	if r.RowsAffected == 0 {
 		return nil, gorm.ErrRecordNotFound
@@ -228,7 +174,7 @@ func (n *nftTokenDbImpl) UpdateNftOwner(tokenId int, collectionAddress string, o
 	return nftToken, nil
 }
 
-func (n *nftTokenDbImpl) CreateNft(nftToken *NftTokenModel) (*NftTokenModel, error) {
+func (n *nftTokenDbImpl) CreateNft(nftToken *entity.NftTokenModel) (*entity.NftTokenModel, error) {
 	nftToken.CollectionAddress = strings.ToLower(nftToken.CollectionAddress)
 	if nftToken.OwnerAddress != nil {
 		ownerAddress := strings.ToLower(*nftToken.OwnerAddress)
@@ -246,7 +192,7 @@ func (n *nftTokenDbImpl) CreateNft(nftToken *NftTokenModel) (*NftTokenModel, err
 	return nftToken, nil
 }
 
-func (n *nftTokenDbImpl) UpdateNft(nftToken *NftTokenModel) (*NftTokenModel, error) {
+func (n *nftTokenDbImpl) UpdateNft(nftToken *entity.NftTokenModel) (*entity.NftTokenModel, error) {
 	nftToken.CollectionAddress = strings.ToLower(nftToken.CollectionAddress)
 	if nftToken.OwnerAddress != nil {
 		ownerAddress := strings.ToLower(*nftToken.OwnerAddress)
@@ -267,7 +213,7 @@ func (n *nftTokenDbImpl) UpdateNft(nftToken *NftTokenModel) (*NftTokenModel, err
 func (n *nftTokenDbImpl) DeleteNft(tokenId int, collectionAddress string) error {
 	collectionAddress = strings.ToLower(collectionAddress)
 
-	r := n.db.Where("token_id = ? and collection_address = ?", tokenId, collectionAddress).Delete(&NftTokenModel{})
+	r := n.db.Where("token_id = ? and collection_address = ?", tokenId, collectionAddress).Delete(&entity.NftTokenModel{})
 	if r.RowsAffected == 0 {
 		return gorm.ErrRecordNotFound
 	}
