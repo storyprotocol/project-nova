@@ -1,5 +1,11 @@
 package entity
 
+import (
+	"encoding/json"
+	"fmt"
+	"time"
+)
+
 type NftTokensResponse struct {
 	Total int                 `json:"total"`
 	Data  []*NftTokenResponse `json:"data"`
@@ -52,4 +58,57 @@ func (n *NftTraitResponse) GetKey() string {
 
 func (n *NftTraitResponse) GetValue() interface{} {
 	return n.Value
+}
+
+// NftTokenModel represents the nft token's model in data storage
+type NftTokenModel struct {
+	ID                string     `gorm:"primaryKey;column:id" json:"id"`
+	CollectionAddress string     `json:"collectionAddress"`
+	TokenId           int        `json:"tokenId"`
+	OwnerAddress      *string    `json:"ownerAddress"`
+	Name              *string    `json:"name"`
+	Description       *string    `json:"description"`
+	ImageUrl          *string    `json:"imageUrl"`
+	Image             *string    `json:"image"`
+	AnimationUrl      *string    `json:"animationUrl"`
+	Traits            *string    `json:"traits"`
+	Backstory         *string    `json:"backstory"`
+	OwnerUpdatedAt    *time.Time `json:"ownerUpdatedAt"`
+	StoryUpdatedAt    *time.Time `json:"storyUpdatedAt"`
+}
+
+func (NftTokenModel) TableName() string {
+	return "nft_token"
+}
+
+func (n *NftTokenModel) ToNftTokenResponse() (*NftTokenResponse, error) {
+	if n == nil {
+		return nil, fmt.Errorf("input nft token model is nil")
+	}
+
+	nftResponse := &NftTokenResponse{
+		CollectionAddress: n.CollectionAddress,
+		TokenId:           n.TokenId,
+		OwnerAddress:      n.OwnerAddress,
+		Name:              n.Name,
+		Description:       n.Description,
+		ImageUrl:          n.ImageUrl,
+		Image:             n.Image,
+		AnimationUrl:      n.AnimationUrl,
+		Backstory:         n.Backstory,
+	}
+
+	if n.Traits != nil {
+		var traits []*NftTrait
+		err := json.Unmarshal([]byte(*n.Traits), &traits)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal traits: %v", err)
+		}
+		for _, trait := range traits {
+			nftTraitResponse := NftTraitResponse(*trait)
+			nftResponse.Traits = append(nftResponse.Traits, &nftTraitResponse)
+		}
+	}
+
+	return nftResponse, nil
 }

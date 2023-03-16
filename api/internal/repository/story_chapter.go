@@ -3,27 +3,14 @@ package repository
 import (
 	"errors"
 	"fmt"
-	"time"
 
+	"github.com/project-nova/backend/api/internal/entity"
 	"gorm.io/gorm"
 )
 
 type StoryChapterRepository interface {
-	GetChaptersByID(id string) ([]*StoryChapterModel, error)
-}
-
-type StoryChapterModel struct {
-	ID        string    `gorm:"primaryKey;column:id" json:"id"`
-	StoryId   string    `json:"storyId"`
-	SeqNum    int       `json:"seqNum"`
-	Title     string    `json:"title"`
-	CoverUrl  string    `json:"coverUrl"`
-	CreatedAt time.Time `json:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt"`
-}
-
-func (StoryChapterModel) TableName() string {
-	return "story_chapter"
+	GetChaptersByID(storyId string) ([]*entity.StoryChapterModel, error)
+	GetChapter(storyId string, chapterNum int) (*entity.StoryChapterModel, error)
 }
 
 func NewStoryChapterDbImpl(db *gorm.DB) StoryChapterRepository {
@@ -36,9 +23,9 @@ type storyChapterDbImpl struct {
 	db *gorm.DB
 }
 
-func (s *storyChapterDbImpl) GetChaptersByID(id string) ([]*StoryChapterModel, error) {
-	results := []*StoryChapterModel{}
-	r := s.db.Where("story_id = ?", id).Order("seq_num asc").Find(&results)
+func (s *storyChapterDbImpl) GetChaptersByID(storyId string) ([]*entity.StoryChapterModel, error) {
+	results := []*entity.StoryChapterModel{}
+	r := s.db.Where("story_id = ?", storyId).Order("seq_num asc").Find(&results)
 	if errors.Is(r.Error, gorm.ErrRecordNotFound) {
 		return nil, r.Error
 	}
@@ -47,4 +34,17 @@ func (s *storyChapterDbImpl) GetChaptersByID(id string) ([]*StoryChapterModel, e
 	}
 
 	return results, nil
+}
+
+func (s *storyChapterDbImpl) GetChapter(storyId string, chapterNum int) (*entity.StoryChapterModel, error) {
+	result := &entity.StoryChapterModel{}
+	r := s.db.Where("story_id = ? and seq_num = ?", storyId, chapterNum).First(result)
+	if errors.Is(r.Error, gorm.ErrRecordNotFound) {
+		return nil, r.Error
+	}
+	if r.Error != nil {
+		return nil, fmt.Errorf("failed to query db: %v", r.Error)
+	}
+
+	return result, nil
 }

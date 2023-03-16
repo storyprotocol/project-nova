@@ -300,8 +300,8 @@ func NewAdminCreateOrUpdateNftHandler(nftTokenRepository repository.NftTokenRepo
 	}
 }
 
-func createNftRecord(uri string, tokenId int, ownerAddress string, collectionAddress string) (*repository.NftTokenModel, error) {
-	nft := &repository.NftTokenModel{
+func createNftRecord(uri string, tokenId int, ownerAddress string, collectionAddress string) (*entity.NftTokenModel, error) {
+	nft := &entity.NftTokenModel{
 		ID:                uuid.New().String(),
 		TokenId:           tokenId,
 		OwnerAddress:      &ownerAddress,
