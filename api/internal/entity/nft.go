@@ -112,3 +112,12 @@ func (n *NftTokenModel) ToNftTokenResponse() (*NftTokenResponse, error) {
 
 	return nftResponse, nil
 }
+
+// UpdateNftBackstoryRequestBody is the request body for UpdateNftBackstoryRequest
+type UpdateNftBackstoryRequestBody struct {
+	CollectionAddress string `json:"collectionAddress"`
+	WalletAddress     string `json:"walletAddress"`
+	Message           string `json:"message"`
+	Backstory         string `json:"backstory"`
+	Signature         string `json:"signature"`
+}
