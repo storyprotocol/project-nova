@@ -52,17 +52,10 @@ func NewGetNftCollectionsHandler(
 }
 
 // NewUpdateNftBackstoryHandler: https://documenter.getpostman.com/view/25015244/2s935ppNga#d4af7069-ec5a-440a-b158-55524412da58
-func NewUpdateNftBackstoryHandler(nftTokenRepository repository.NftTokenRepository, authMessage string) func(c *gin.Context) {
+func NewUpdateNftBackstoryHandler(nftTokenRepository repository.NftTokenRepository) func(c *gin.Context) {
 	return func(c *gin.Context) {
 
-		type UpdateNftBackstoryRequestBody struct {
-			CollectionAddress string `json:"collectionAddress"`
-			WalletAddress     string `json:"walletAddress"`
-			Backstory         string `json:"backstory"`
-			Signature         string `json:"signature"`
-		}
-
-		var requestBody UpdateNftBackstoryRequestBody
+		var requestBody entity.UpdateNftBackstoryRequestBody
 		if err := c.BindJSON(&requestBody); err != nil {
 			logger.Errorf("Failed to read request body: %v", err)
 			c.String(http.StatusBadRequest, "invalid request body")
@@ -83,7 +76,7 @@ func NewUpdateNftBackstoryHandler(nftTokenRepository repository.NftTokenReposito
 			return
 		}
 
-		recoveredAddress, err := auth.RecoverAddress(authMessage, requestBody.Signature)
+		recoveredAddress, err := auth.RecoverAddress(requestBody.Message, requestBody.Signature)
 		if err != nil {
 			logger.Errorf("Failed to recover address: %v", err)
 			return

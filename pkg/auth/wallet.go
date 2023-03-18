@@ -1,6 +1,9 @@
 package auth
 
 import (
+	"fmt"
+
+	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/crypto"
 )
@@ -11,13 +14,13 @@ func RecoverAddress(message string, signature string) (string, error) {
 		return "", err
 	}
 	// Support both formats of recovery bit (27/28 or 0/1)
-	if decodedSignature[64] == 27 || decodedSignature[64] == 28 {
+	if decodedSignature[crypto.RecoveryIDOffset] == 27 || decodedSignature[crypto.RecoveryIDOffset] == 28 {
 		decodedSignature[64] -= 27
 	}
 
 	messageByte := []byte(message)
-	messageHash := crypto.Keccak256Hash(messageByte)
-	publicKey, err := crypto.SigToPub(messageHash.Bytes(), decodedSignature)
+	messageHash := accounts.TextHash(messageByte) //crypto.Keccak256Hash(messageByte)
+	publicKey, err := crypto.SigToPub(messageHash, decodedSignature)
 	if err != nil {
 		return "", err
 	}
@@ -26,12 +29,13 @@ func RecoverAddress(message string, signature string) (string, error) {
 	return address.String(), nil
 }
 
-// For Testing
-func SignMessage(message string) (string, error) {
-	messageByte := []byte(message)
+// For Testing only, pKey is from input so won't be stored anywhere
+func SignMessage(message string, pKey string) (string, error) {
+	fullMessage := fmt.Sprintf("\x19Ethereum Signed Message:\n%d%s", len(message), message)
+	messageByte := []byte(fullMessage)
 	messageHash := crypto.Keccak256Hash(messageByte)
 
-	privateKey, err := crypto.HexToECDSA("private key here")
+	privateKey, err := crypto.HexToECDSA(pKey)
 	if err != nil {
 		return "", err
 	}

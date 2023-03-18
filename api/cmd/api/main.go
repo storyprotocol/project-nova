@@ -124,6 +124,9 @@ func main() {
 		// Endpoint to get the merkle proof for the wallet address per allowlist
 		publicV1.GET("/wallet/:walletAddress/proof", handler.NewGetWalletProofHandler(walletMerkleProofRepository))
 
+		// Endpoint to return signing message
+		publicV1.GET("/wallet/:walletAddress/sign-message", handler.NewGetWalletSignMessageHandler())
+
 		// Endpoint to get all story chapters' information
 		publicV1.GET("/story/:franchiseId/:storyNum", handler.NewGetStoryChaptersHandler(storyChapterRepository, storyInfoRepository))
 
@@ -134,7 +137,7 @@ func main() {
 		publicV1.POST("/nft/list", handler.NewGetNftsHandler(nftTokenRepository, franchiseCollectionRepository))
 
 		// Endpoint to update nft backstory for the nft owner
-		publicV1.POST("/nft/:id/backstory", handler.NewUpdateNftBackstoryHandler(nftTokenRepository, cfg.AdminAuthMessage))
+		publicV1.POST("/nft/:id/backstory", handler.NewUpdateNftBackstoryHandler(nftTokenRepository))
 
 		// Endpoint to get the metadata of nft collection
 		publicV1.GET("/nft/collections", handler.NewGetNftCollectionsHandler(nftCollectionRepository, franchiseCollectionRepository))

@@ -10,6 +10,7 @@ import (
 	"github.com/project-nova/backend/api/internal/repository"
 	"github.com/project-nova/backend/pkg/logger"
 	"github.com/project-nova/backend/pkg/utils"
+	"github.com/rs/xid"
 	"gorm.io/gorm"
 )
 
@@ -46,6 +47,23 @@ func NewGetWalletProofHandler(walletMerkleProofRepo repository.WalletMerkleProof
 
 		c.JSON(http.StatusOK, gin.H{
 			"proof": result.Proof,
+		})
+	}
+}
+
+// NewGetWalletSignMessageHandler creates a handler to return wallet signing message
+func NewGetWalletSignMessageHandler() func(c *gin.Context) {
+	return func(c *gin.Context) {
+		address := c.Param("walletAddress")
+		if !utils.IsValidAddress(address) {
+			logger.Errorf("Invalid wallet address: %s", address)
+			c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid wallet addresss"})
+			return
+		}
+
+		nonce := xid.New().String()
+		c.JSON(http.StatusOK, gin.H{
+			"message": fmt.Sprintf(constant.BackstorySignMessage, nonce),
 		})
 	}
 }
