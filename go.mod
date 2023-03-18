@@ -12,6 +12,7 @@ require (
 	github.com/lib/pq v1.10.7
 	github.com/natefinch/lumberjack v2.0.0+incompatible
 	github.com/pkg/errors v0.9.1
+	github.com/rs/xid v1.4.0
 	github.com/shopspring/decimal v1.3.1
 	github.com/spf13/cobra v1.6.1
 	github.com/stretchr/testify v1.8.1
@@ -59,7 +60,6 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/rjeczalik/notify v0.9.2 // indirect
-	github.com/rs/xid v1.4.0 // indirect
 	github.com/shirou/gopsutil v3.21.11+incompatible // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/tklauser/go-sysconf v0.3.10 // indirect
