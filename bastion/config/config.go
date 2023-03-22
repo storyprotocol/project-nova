@@ -18,6 +18,7 @@ type TaskConfig struct {
 	AdminAuthMessage      string `yaml:"admin_auth_message"`
 	AuthKeyId             string `yaml:"auth_key_id"`
 	S3OperationBucketName string `yaml:"s3_operation_bucket_name"`
+	NotionAuthToken       string `yaml:"notion_auth_token"`
 }
 
 const (

@@ -34,6 +34,9 @@ help:
 	@echo '  lint:                - Run linter'
 	@echo '  abigen:              - Create golang abi client for smart contracts based on the input json file.'
 	@echo '                         For example: make abigen package=erc721. package corresponding to the input json name and output package name'
+	@echo '  s3-download:         - S3 download based on the project and chapter and env passed in.'
+	@echo '                         For example: make s3 dowload project=project-nova chapter=1:1:1 env=staging' 
+	@echo '  s3-upload:           - S3 upload based on the project and chapter and env passed in.'
 
 ecr-auth:
 	aws ecr get-login-password --region ${REGION} | docker login --username AWS --password-stdin ${ECR}
@@ -108,3 +111,11 @@ lint:
 .PHONY: abigen
 abigen:
 	mkdir -p ./pkg/abi/${package}; abigen --abi=./resource/abi/${package}.json --pkg=${package} --out=./pkg/abi/${package}/${package}.go
+
+.PHONY: s3-upload
+s3-upload:
+	aws s3 cp api/resource/content/${project}/${chapter}/content.json  s3://${project}-content-${env}/${chapter}/content.json
+
+.PHONY: s3-download
+s3-download:
+	aws s3 cp s3://${project}-content-${env}/${chapter}/content.json api/resource/content/${project}/${chapter}/content.json  

@@ -3,28 +3,33 @@ package s3
 import (
 	"fmt"
 	"io"
+	"os"
 	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
+	"github.com/project-nova/backend/pkg/logger"
 )
 
 type S3Client interface {
 	DownloadObject(output io.WriterAt, bucket string, key string) (int64, error)
+	UploadObject(bucket string, key string, filename string, public bool) (*s3manager.UploadOutput, error)
 	ListObjectsNonRecursive(bucket string) ([]*string, error)
 }
 
 type s3Client struct {
 	client     *s3.S3
 	downloader *s3manager.Downloader
+	uploader   *s3manager.Uploader
 }
 
 func NewS3Client(sess *session.Session) S3Client {
 	return &s3Client{
 		client:     s3.New(sess),
 		downloader: s3manager.NewDownloader(sess),
+		uploader:   s3manager.NewUploader(sess),
 	}
 }
 
@@ -38,6 +43,32 @@ func (s *s3Client) DownloadObject(output io.WriterAt, bucket string, key string)
 		})
 
 	return numBytes, err
+}
+
+func (s *s3Client) UploadObject(bucket string, key string, filename string, public bool) (*s3manager.UploadOutput, error) {
+	file, err := os.Open(filename)
+	if err != nil {
+		return nil, fmt.Errorf("failed to open file %v. error: %v", filename, err)
+	}
+
+	input := &s3manager.UploadInput{
+		Bucket:      aws.String(bucket),
+		Key:         aws.String(key),
+		Body:        file,
+		ContentType: aws.String(getContentType(filename)),
+	}
+
+	if public {
+		input.ACL = aws.String("public-read")
+	}
+
+	output, err := s.uploader.Upload(input)
+	if err != nil {
+		return nil, fmt.Errorf("unable to upload %v to %v: %v", filename, bucket, err)
+	}
+
+	logger.Infof("upload object %v to %v succeeded", filename, bucket)
+	return output, nil
 }
 
 func (s *s3Client) ListObjectsNonRecursive(bucket string) ([]*string, error) {
