@@ -14,6 +14,8 @@ type ApiGateway interface {
 	CreateOrUpdateNftRecord(tokenId int, collectionAddress string, authMessage string) error
 	DeleteNftRecord(tokenId int, collectionAddress string, authMessage string) error
 	CreateProof(address *string, proof *string, allowlistId *string, authMessage string) error
+	CreateStoryChapter(franchiseId string, storyNum string, chapterNum string, requestBody *CreateStoryChapterRequestBody, authMessage string) error
+	UpdateContentCache(franchiseId string, storyNum string, chapterNum string, authMessage string) error
 }
 
 func NewApiHttpGateway(url string) ApiGateway {
@@ -94,6 +96,32 @@ func (s *apiHttpGateway) CreateProof(address *string, proof *string, allowlistId
 	_, err := s.client.RequestAddHeaders("POST", requestURL, headers, nil, nil)
 	if err != nil {
 		return fmt.Errorf("http request to create proof failed. error %v ", err)
+	}
+	return nil
+}
+
+func (s *apiHttpGateway) CreateStoryChapter(franchiseId string, storyNum string, chapterNum string, requestBody *CreateStoryChapterRequestBody, authMessage string) error {
+	requestURL := fmt.Sprintf("/admin/v1/story/%s/%s/%s", franchiseId, storyNum, chapterNum)
+	headers := &map[string]string{
+		middleware.AuthMessageHeaderKey: authMessage,
+	}
+
+	_, err := s.client.RequestAddHeaders("POST", requestURL, headers, requestBody, nil)
+	if err != nil {
+		return fmt.Errorf("http request to create story chapter failed. error %v ", err)
+	}
+	return nil
+}
+
+func (s *apiHttpGateway) UpdateContentCache(franchiseId string, storyNum string, chapterNum string, authMessage string) error {
+	requestURL := fmt.Sprintf("/admin/v1/story/%s/%s/%s/cache", franchiseId, storyNum, chapterNum)
+	headers := &map[string]string{
+		middleware.AuthMessageHeaderKey: authMessage,
+	}
+
+	_, err := s.client.RequestAddHeaders("POST", requestURL, headers, nil, nil)
+	if err != nil {
+		return fmt.Errorf("http request to update content cache failed. error %v ", err)
 	}
 	return nil
 }

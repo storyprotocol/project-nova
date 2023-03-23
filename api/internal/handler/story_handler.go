@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/project-nova/backend/api/internal/entity"
 	"github.com/project-nova/backend/api/internal/repository"
+	"github.com/project-nova/backend/pkg/gateway"
 	"github.com/project-nova/backend/pkg/logger"
 )
 
@@ -119,5 +120,95 @@ func NewGetStoryChapterContentsHandler(
 		}
 
 		c.JSON(http.StatusOK, storyContents)
+	}
+}
+
+// NewAdminCreateStoryChapterHandler creates the handler to handle POST /story/:franchiseId/:storyNum/:chapterNum request.
+func NewAdminCreateStoryChapterHandler(
+	storyChapterRepo repository.StoryChapterRepository,
+	storyInfoRepo repository.StoryInfoRepository,
+) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		var requestBody gateway.CreateStoryChapterRequestBody
+		if err := c.BindJSON(&requestBody); err != nil {
+			logger.Errorf("Failed to read request body: %v", err)
+			c.String(http.StatusBadRequest, "invalid request body")
+			return
+		}
+
+		franchiseId, err := strconv.ParseInt(c.Param("franchiseId"), 10, 64)
+		if err != nil {
+			logger.Errorf("Failed to convert franchise id: %v", err)
+			c.String(http.StatusBadRequest, "franchise id is invalid")
+			return
+		}
+
+		storyNum, err := strconv.Atoi(c.Param("storyNum"))
+		if err != nil {
+			logger.Errorf("Failed to convert story num: %v", err)
+			c.String(http.StatusBadRequest, "story num is invalid")
+			return
+		}
+
+		chapterNum, err := strconv.Atoi(c.Param("chapterNum"))
+		if err != nil {
+			logger.Errorf("Failed to convert chapter num: %v", err)
+			c.String(http.StatusBadRequest, "chapter num is invalid")
+			return
+		}
+
+		storyInfoResult, err := storyInfoRepo.GetStoryByFranchise(franchiseId, storyNum)
+		if err != nil {
+			logger.Errorf("Failed to get story info: %v", err)
+			c.String(http.StatusInternalServerError, "Internal server error")
+			return
+		}
+
+		storyId := storyInfoResult.ID
+		storyChapter := entity.ToStoryChapterModel(&requestBody, storyId, chapterNum)
+		err = storyChapterRepo.CreateChapter(storyChapter)
+		if err != nil {
+			logger.Errorf("Failed to create story chapter: %v", err)
+			c.String(http.StatusInternalServerError, "Internal server error")
+			return
+		}
+
+		c.JSON(http.StatusOK, storyChapter)
+	}
+}
+
+func NewAdminUpdateStoryChapterCacheHandler(
+	storyContentRepo repository.StoryContentRepository,
+) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		franchiseId, err := strconv.ParseInt(c.Param("franchiseId"), 10, 64)
+		if err != nil {
+			logger.Errorf("Failed to convert franchise id: %v", err)
+			c.String(http.StatusBadRequest, "franchise id is invalid")
+			return
+		}
+
+		storyNum, err := strconv.Atoi(c.Param("storyNum"))
+		if err != nil {
+			logger.Errorf("Failed to convert story num: %v", err)
+			c.String(http.StatusBadRequest, "story num is invalid")
+			return
+		}
+
+		chapterNum, err := strconv.Atoi(c.Param("chapterNum"))
+		if err != nil {
+			logger.Errorf("Failed to convert chapter num: %v", err)
+			c.String(http.StatusBadRequest, "chapter num is invalid")
+			return
+		}
+
+		content, err := storyContentRepo.AddContentByChapter(franchiseId, storyNum, chapterNum)
+		if err != nil {
+			logger.Errorf("Failed to update chapter content cache: %v", err)
+			c.String(http.StatusInternalServerError, "Internal server error")
+			return
+		}
+
+		c.JSON(http.StatusOK, content)
 	}
 }

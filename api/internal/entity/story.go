@@ -1,6 +1,11 @@
 package entity
 
-import "time"
+import (
+	"time"
+
+	"github.com/google/uuid"
+	"github.com/project-nova/backend/pkg/gateway"
+)
 
 type StoryChapterResp struct {
 	ChapterNum int    `json:"chapterNum"`
@@ -42,4 +47,29 @@ func (s *StoryChapterModel) ToStoryChapterResp() *StoryChapterResp {
 	}
 
 	return resp
+}
+
+func ToStoryChapterModel(request *gateway.CreateStoryChapterRequestBody, storyId string, chapterNum int) *StoryChapterModel {
+	storyChapterModel := &StoryChapterModel{
+		ID:      uuid.New().String(),
+		StoryId: storyId,
+		SeqNum:  chapterNum,
+	}
+
+	if request.Heading != nil {
+		storyChapterModel.Heading = request.Heading
+	}
+	if request.Title != nil {
+		storyChapterModel.Title = request.Title
+	}
+	if request.CoverUrl != nil {
+		storyChapterModel.CoverUrl = request.CoverUrl
+	}
+	if request.ReleaseAt == nil {
+		curr := time.Now().UTC()
+		request.ReleaseAt = &curr
+	}
+	storyChapterModel.ReleaseAt = *request.ReleaseAt
+
+	return storyChapterModel
 }

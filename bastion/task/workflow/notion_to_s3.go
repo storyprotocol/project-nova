@@ -167,6 +167,11 @@ func (n *notionToS3Workflow) transferImage(url string) (string, error) {
 		return "", fmt.Errorf("failed to upload image to S3: %v", err)
 	}
 
+	err = os.Remove(imageName)
+	if err != nil {
+		logger.Errorf("Failed to remove image file %s: %v", imageName, err)
+	}
+
 	return output.Location, nil
 }
 
@@ -212,6 +217,11 @@ func (n *notionToS3Workflow) createAndUploadContentJson(content interface{}) err
 	_, err = n.s3Client.UploadObject(n.bucket, n.folder+"/"+constant.ContentObject, constant.ContentObject, false)
 	if err != nil {
 		return fmt.Errorf("failed to upload image to S3: %v", err)
+	}
+
+	err = os.Remove(constant.ContentObject)
+	if err != nil {
+		logger.Errorf("Failed to remove josn file: %v", err)
 	}
 
 	return nil
