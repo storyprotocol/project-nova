@@ -161,6 +161,12 @@ func main() {
 
 		// Admin Endpoint to delete nft
 		adminV1.DELETE("/nft/:id", handler.NewAdminDeleteNftHandler(nftTokenRepository))
+
+		// Admin Endpoint to add a story chapter
+		adminV1.POST("/story/:franchiseId/:storyNum/:chapterNum", handler.NewAdminCreateStoryChapterHandler(storyChapterRepository, storyInfoRepository))
+
+		// Admin Endpoint to update chapter content to cache
+		adminV1.POST("/story/:franchiseId/:storyNum/:chapterNum/cache", handler.NewAdminUpdateStoryChapterCacheHandler(storyContentRepository))
 	}
 
 	port := fmt.Sprintf(":%d", cfg.Port)

@@ -11,6 +11,7 @@ import (
 type StoryChapterRepository interface {
 	GetChaptersByID(storyId string) ([]*entity.StoryChapterModel, error)
 	GetChapter(storyId string, chapterNum int) (*entity.StoryChapterModel, error)
+	CreateChapter(chapter *entity.StoryChapterModel) error
 }
 
 func NewStoryChapterDbImpl(db *gorm.DB) StoryChapterRepository {
@@ -47,4 +48,16 @@ func (s *storyChapterDbImpl) GetChapter(storyId string, chapterNum int) (*entity
 	}
 
 	return result, nil
+}
+
+func (s *storyChapterDbImpl) CreateChapter(chapter *entity.StoryChapterModel) error {
+	r := s.db.Create(chapter)
+	if r.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+	if r.Error != nil {
+		return fmt.Errorf("failed to insert into db: %v", r.Error)
+	}
+
+	return nil
 }

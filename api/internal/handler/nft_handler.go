@@ -79,6 +79,7 @@ func NewUpdateNftBackstoryHandler(nftTokenRepository repository.NftTokenReposito
 		recoveredAddress, err := auth.RecoverAddress(requestBody.Message, requestBody.Signature)
 		if err != nil {
 			logger.Errorf("Failed to recover address: %v", err)
+			c.String(http.StatusForbidden, "The wallet doesn't have permission for this operation")
 			return
 		}
 
