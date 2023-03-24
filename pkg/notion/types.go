@@ -48,8 +48,14 @@ type Paragraph struct {
 }
 
 type RichText struct {
-	Type      string `json:"type"`
-	PlainText string `json:"plain_text"`
+	Type        string     `json:"type"`
+	Annotations Annotation `json:"annotations"`
+	PlainText   string     `json:"plain_text"`
+}
+
+type Annotation struct {
+	Bold   bool `json:"bold"`
+	Italic bool `json:"italic"`
 }
 
 type Image struct {

@@ -228,7 +228,7 @@ func (n *notionToS3Workflow) createAndUploadContentJson(content interface{}) err
 }
 
 func (n *notionToS3Workflow) getContent(paragraph *notion.Paragraph) (string, error) {
-	if paragraph == nil || paragraph.RichTexts == nil || len(paragraph.RichTexts) > 1 {
+	if paragraph == nil || paragraph.RichTexts == nil {
 		return "", fmt.Errorf("invalid paragraph")
 	}
 
@@ -236,7 +236,23 @@ func (n *notionToS3Workflow) getContent(paragraph *notion.Paragraph) (string, er
 		return "\n", nil
 	}
 
-	return paragraph.RichTexts[0].PlainText + "\n", nil
+	if len(paragraph.RichTexts) == 1 {
+		return paragraph.RichTexts[0].PlainText + "\n", nil
+	}
+
+	var text string
+	for _, richText := range paragraph.RichTexts {
+		curText := richText.PlainText
+		if richText.Annotations.Bold {
+			curText = "**" + curText + "**"
+		}
+		if richText.Annotations.Italic {
+			curText = "*" + curText + "*"
+		}
+		text += curText
+	}
+
+	return text, nil
 }
 
 func (n *notionToS3Workflow) processColumnList(block *notion.Block) (*model.StorySectionModel, error) {
