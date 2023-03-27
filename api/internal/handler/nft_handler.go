@@ -137,20 +137,20 @@ func NewGetNftsHandler(nftTokenRepository repository.NftTokenRepository, franchi
 		offsetStr := c.DefaultQuery("offset", "")
 		franchiseId := c.DefaultQuery("franchiseId", "")
 
-		if walletAddress != "" {
-			walletAddress, err := utils.SanitizeAddress(walletAddress)
-			if err != nil {
-				logger.Errorf("Invalid wallet address: %s", walletAddress)
-				c.JSON(http.StatusBadRequest, ErrorMessage("Invalid wallet address"))
-				return
-			}
-		}
-
 		collectionAddresses, err := getCollectionAddresses(franchiseId, collectionAddress, franchiseCollectionRepository)
 		if err != nil {
 			logger.Errorf("Failed to get collection addresses: %v", err)
 			c.JSON(http.StatusBadRequest, ErrorMessage(err.Error()))
 			return
+		}
+
+		if walletAddress != "" {
+			walletAddress, err = utils.SanitizeAddress(walletAddress)
+			if err != nil {
+				logger.Errorf("Invalid wallet address: %s", walletAddress)
+				c.JSON(http.StatusBadRequest, ErrorMessage("Invalid wallet address"))
+				return
+			}
 		}
 
 		var offset *int
