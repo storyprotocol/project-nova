@@ -3,7 +3,6 @@ package repository
 import (
 	"errors"
 	"fmt"
-	"strings"
 	"time"
 
 	"gorm.io/gorm"
@@ -39,10 +38,6 @@ type nftCollectionDbImpl struct {
 }
 
 func (s *nftCollectionDbImpl) GetCollections(collectionAddresses []string) ([]*NftCollectionModel, error) {
-	for idx, address := range collectionAddresses {
-		collectionAddresses[idx] = strings.ToLower(address)
-	}
-
 	results := []*NftCollectionModel{}
 	r := s.db.Where("collection_address IN ?", collectionAddresses).Find(&results)
 	if errors.Is(r.Error, gorm.ErrRecordNotFound) {
