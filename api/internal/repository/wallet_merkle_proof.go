@@ -3,7 +3,6 @@ package repository
 import (
 	"errors"
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -39,8 +38,6 @@ type walletMerkleProofDbImpl struct {
 }
 
 func (s *walletMerkleProofDbImpl) GetMerkleProof(walletAddress string, allowlistId string) (*WalletMerkleProofModel, error) {
-	walletAddress = strings.ToLower(walletAddress)
-
 	result := &WalletMerkleProofModel{}
 	r := s.db.Where("wallet_address = ? and allowlist_id = ?", walletAddress, allowlistId).First(&result)
 	if errors.Is(r.Error, gorm.ErrRecordNotFound) {
@@ -54,7 +51,6 @@ func (s *walletMerkleProofDbImpl) GetMerkleProof(walletAddress string, allowlist
 }
 
 func (s *walletMerkleProofDbImpl) CreateMerkleProof(walletAddress string, allowlistId string, proof string) (*WalletMerkleProofModel, error) {
-	walletAddress = strings.ToLower(walletAddress)
 	model := &WalletMerkleProofModel{
 		ID:            uuid.New().String(),
 		WalletAddress: walletAddress,

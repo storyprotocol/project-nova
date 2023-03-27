@@ -22,21 +22,21 @@ func NewGetStoryChaptersHandler(
 		franchiseId, err := strconv.ParseInt(c.Param("franchiseId"), 10, 64)
 		if err != nil {
 			logger.Errorf("Failed to convert franchise id: %v", err)
-			c.String(http.StatusBadRequest, "franchise id is invalid")
+			c.JSON(http.StatusBadRequest, ErrorMessage("franchise id is invalid"))
 			return
 		}
 
 		storyNum, err := strconv.Atoi(c.Param("storyNum"))
 		if err != nil {
 			logger.Errorf("Failed to convert story num: %v", err)
-			c.String(http.StatusBadRequest, "story num is invalid")
+			c.JSON(http.StatusBadRequest, ErrorMessage("story num is invalid"))
 			return
 		}
 
 		storyInfoResult, err := storyInfoRepo.GetStoryByFranchise(franchiseId, storyNum)
 		if err != nil {
 			logger.Errorf("Failed to get story info: %v", err)
-			c.String(http.StatusInternalServerError, "Internal server error")
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
 			return
 		}
 
@@ -45,7 +45,7 @@ func NewGetStoryChaptersHandler(
 		storyChapters, err := storyChapterRepo.GetChaptersByID(storyId)
 		if err != nil {
 			logger.Errorf("Failed to get story chapters: %v", err)
-			c.String(http.StatusInternalServerError, "Internal server error")
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
 			return
 		}
 
@@ -72,28 +72,28 @@ func NewGetStoryChapterContentsHandler(
 		franchiseId, err := strconv.ParseInt(c.Param("franchiseId"), 10, 64)
 		if err != nil {
 			logger.Errorf("Failed to convert franchise id: %v", err)
-			c.String(http.StatusBadRequest, "franchise id is invalid")
+			c.JSON(http.StatusBadRequest, ErrorMessage("franchise id is invalid"))
 			return
 		}
 
 		storyNum, err := strconv.Atoi(c.Param("storyNum"))
 		if err != nil {
 			logger.Errorf("Failed to convert story num: %v", err)
-			c.String(http.StatusBadRequest, "story num is invalid")
+			c.JSON(http.StatusBadRequest, ErrorMessage("story num is invalid"))
 			return
 		}
 
 		chapterNum, err := strconv.Atoi(c.Param("chapterNum"))
 		if err != nil {
 			logger.Errorf("Failed to convert chapter num: %v", err)
-			c.String(http.StatusBadRequest, "chapter num is invalid")
+			c.JSON(http.StatusBadRequest, ErrorMessage("chapter num is invalid"))
 			return
 		}
 
 		storyInfoResult, err := storyInfoRepo.GetStoryByFranchise(franchiseId, storyNum)
 		if err != nil {
 			logger.Errorf("Failed to get story info: %v", err)
-			c.String(http.StatusInternalServerError, "Internal server error")
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
 			return
 		}
 
@@ -102,20 +102,20 @@ func NewGetStoryChapterContentsHandler(
 		storyChapter, err := storyChapterRepo.GetChapter(storyId, chapterNum)
 		if err != nil {
 			logger.Errorf("Failed to get story chapter: %v", err)
-			c.String(http.StatusInternalServerError, "Internal server error")
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
 			return
 		}
 
 		if storyChapter.ReleaseAt.After(time.Now()) {
 			logger.Error("Denied chapter request, chapter content is not released yet")
-			c.String(http.StatusInternalServerError, "Internal server error")
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
 			return
 		}
 
 		storyContents, err := storyContentRepo.GetContentByChapter(franchiseId, storyNum, chapterNum)
 		if err != nil {
 			logger.Errorf("Failed to get story contents: %v", err)
-			c.String(http.StatusInternalServerError, "Internal server error")
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
 			return
 		}
 
@@ -132,35 +132,35 @@ func NewAdminCreateStoryChapterHandler(
 		var requestBody gateway.CreateStoryChapterRequestBody
 		if err := c.BindJSON(&requestBody); err != nil {
 			logger.Errorf("Failed to read request body: %v", err)
-			c.String(http.StatusBadRequest, "invalid request body")
+			c.JSON(http.StatusBadRequest, ErrorMessage("invalid request body"))
 			return
 		}
 
 		franchiseId, err := strconv.ParseInt(c.Param("franchiseId"), 10, 64)
 		if err != nil {
 			logger.Errorf("Failed to convert franchise id: %v", err)
-			c.String(http.StatusBadRequest, "franchise id is invalid")
+			c.JSON(http.StatusBadRequest, ErrorMessage("franchise id is invalid"))
 			return
 		}
 
 		storyNum, err := strconv.Atoi(c.Param("storyNum"))
 		if err != nil {
 			logger.Errorf("Failed to convert story num: %v", err)
-			c.String(http.StatusBadRequest, "story num is invalid")
+			c.JSON(http.StatusBadRequest, ErrorMessage("story num is invalid"))
 			return
 		}
 
 		chapterNum, err := strconv.Atoi(c.Param("chapterNum"))
 		if err != nil {
 			logger.Errorf("Failed to convert chapter num: %v", err)
-			c.String(http.StatusBadRequest, "chapter num is invalid")
+			c.JSON(http.StatusBadRequest, ErrorMessage("chapter num is invalid"))
 			return
 		}
 
 		storyInfoResult, err := storyInfoRepo.GetStoryByFranchise(franchiseId, storyNum)
 		if err != nil {
 			logger.Errorf("Failed to get story info: %v", err)
-			c.String(http.StatusInternalServerError, "Internal server error")
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
 			return
 		}
 
@@ -169,7 +169,7 @@ func NewAdminCreateStoryChapterHandler(
 		err = storyChapterRepo.CreateChapter(storyChapter)
 		if err != nil {
 			logger.Errorf("Failed to create story chapter: %v", err)
-			c.String(http.StatusInternalServerError, "Internal server error")
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
 			return
 		}
 
@@ -177,6 +177,7 @@ func NewAdminCreateStoryChapterHandler(
 	}
 }
 
+// NewAdminUpdateStoryChapterCacheHandler creates a handler to handle story chapter cache refreshment request
 func NewAdminUpdateStoryChapterCacheHandler(
 	storyContentRepo repository.StoryContentRepository,
 ) func(c *gin.Context) {
@@ -184,28 +185,28 @@ func NewAdminUpdateStoryChapterCacheHandler(
 		franchiseId, err := strconv.ParseInt(c.Param("franchiseId"), 10, 64)
 		if err != nil {
 			logger.Errorf("Failed to convert franchise id: %v", err)
-			c.String(http.StatusBadRequest, "franchise id is invalid")
+			c.JSON(http.StatusBadRequest, ErrorMessage("franchise id is invalid"))
 			return
 		}
 
 		storyNum, err := strconv.Atoi(c.Param("storyNum"))
 		if err != nil {
 			logger.Errorf("Failed to convert story num: %v", err)
-			c.String(http.StatusBadRequest, "story num is invalid")
+			c.JSON(http.StatusBadRequest, ErrorMessage("story num is invalid"))
 			return
 		}
 
 		chapterNum, err := strconv.Atoi(c.Param("chapterNum"))
 		if err != nil {
 			logger.Errorf("Failed to convert chapter num: %v", err)
-			c.String(http.StatusBadRequest, "chapter num is invalid")
+			c.JSON(http.StatusBadRequest, ErrorMessage("chapter num is invalid"))
 			return
 		}
 
 		content, err := storyContentRepo.AddContentByChapter(franchiseId, storyNum, chapterNum)
 		if err != nil {
 			logger.Errorf("Failed to update chapter content cache: %v", err)
-			c.String(http.StatusInternalServerError, "Internal server error")
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
 			return
 		}
 

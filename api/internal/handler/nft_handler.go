@@ -36,14 +36,14 @@ func NewGetNftCollectionsHandler(
 		collectionAddresses, err := getCollectionAddresses(franchiseId, collectionAddress, franchiseCollectionRepository)
 		if err != nil {
 			logger.Errorf("Failed to get collection addresses: %v", err)
-			c.String(http.StatusBadRequest, err.Error())
+			c.JSON(http.StatusBadRequest, ErrorMessage(err.Error()))
 			return
 		}
 
 		results, err := nftCollectionRepository.GetCollections(collectionAddresses)
 		if err != nil {
 			logger.Errorf("Failed to get collections: %v", err)
-			c.String(http.StatusInternalServerError, "Internal server error")
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
 			return
 		}
 
@@ -58,68 +58,68 @@ func NewUpdateNftBackstoryHandler(nftTokenRepository repository.NftTokenReposito
 		var requestBody entity.UpdateNftBackstoryRequestBody
 		if err := c.BindJSON(&requestBody); err != nil {
 			logger.Errorf("Failed to read request body: %v", err)
-			c.String(http.StatusBadRequest, "invalid request body")
+			c.JSON(http.StatusBadRequest, ErrorMessage("invalid request body"))
 			return
 		}
 
 		collectionAddress, err := utils.SanitizeAddress(requestBody.CollectionAddress)
 		if err != nil {
 			logger.Errorf("Invalid collection address: %s", requestBody.CollectionAddress)
-			c.String(http.StatusBadRequest, "Invalid collection address")
+			c.JSON(http.StatusBadRequest, ErrorMessage("Invalid collection address"))
 			return
 		}
 
 		walletAddress, err := utils.SanitizeAddress(requestBody.WalletAddress)
 		if err != nil {
 			logger.Errorf("Invalid wallet address: %s", requestBody.WalletAddress)
-			c.String(http.StatusBadRequest, "Invalid wallet address")
+			c.JSON(http.StatusBadRequest, ErrorMessage("Invalid wallet address"))
 			return
 		}
 
 		recoveredAddress, err := auth.RecoverAddress(requestBody.Message, requestBody.Signature)
 		if err != nil {
 			logger.Errorf("Failed to recover address: %v", err)
-			c.String(http.StatusForbidden, "The wallet doesn't have permission for this operation")
+			c.JSON(http.StatusForbidden, ErrorMessage("The wallet doesn't have permission for this operation"))
 			return
 		}
 
 		recoveredAddress, err = utils.SanitizeAddress(recoveredAddress)
 		if err != nil {
 			logger.Errorf("Wallet verification failed, invalid recovered address: %s", recoveredAddress)
-			c.String(http.StatusForbidden, "The wallet doesn't have permission for this operation")
+			c.JSON(http.StatusForbidden, ErrorMessage("The wallet doesn't have permission for this operation"))
 			return
 		}
 
 		if recoveredAddress != walletAddress {
 			logger.Errorf("Wallet verification failed, recovered address: %s, wallet address: %s", recoveredAddress, walletAddress)
-			c.String(http.StatusForbidden, "The wallet doesn't have permission for this operation")
+			c.JSON(http.StatusForbidden, ErrorMessage("The wallet doesn't have permission for this operation"))
 			return
 		}
 
 		tokenId, err := strconv.Atoi(c.Param("id"))
 		if err != nil {
 			logger.Errorf("Failed to convert token id: %v", err)
-			c.String(http.StatusBadRequest, "token id is invalid")
+			c.JSON(http.StatusBadRequest, ErrorMessage("token id is invalid"))
 			return
 		}
 
 		nftToken, err := nftTokenRepository.GetNftByTokenId(tokenId, collectionAddress)
 		if err != nil {
 			logger.Errorf("Failed to get nft by token id: %v", err)
-			c.String(http.StatusInternalServerError, "Internal server error")
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
 			return
 		}
 
 		if nftToken.OwnerAddress == nil || *nftToken.OwnerAddress != walletAddress {
 			logger.Errorf("The request wallet is not the owner of the nft, owner address: %s, wallet address: %s", *nftToken.OwnerAddress, walletAddress)
-			c.String(http.StatusForbidden, "The wallet doesn't have permission for this operation")
+			c.JSON(http.StatusForbidden, ErrorMessage("The wallet doesn't have permission for this operation"))
 			return
 		}
 
 		nftToken, err = nftTokenRepository.UpdateNftBackstory(tokenId, collectionAddress, &requestBody.Backstory)
 		if err != nil {
 			logger.Errorf("Failed to update nft backstory: %v", err)
-			c.String(http.StatusInternalServerError, "Internal server error")
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
 			return
 		}
 
@@ -137,10 +137,19 @@ func NewGetNftsHandler(nftTokenRepository repository.NftTokenRepository, franchi
 		offsetStr := c.DefaultQuery("offset", "")
 		franchiseId := c.DefaultQuery("franchiseId", "")
 
+		if walletAddress != "" {
+			walletAddress, err := utils.SanitizeAddress(walletAddress)
+			if err != nil {
+				logger.Errorf("Invalid wallet address: %s", walletAddress)
+				c.JSON(http.StatusBadRequest, ErrorMessage("Invalid wallet address"))
+				return
+			}
+		}
+
 		collectionAddresses, err := getCollectionAddresses(franchiseId, collectionAddress, franchiseCollectionRepository)
 		if err != nil {
 			logger.Errorf("Failed to get collection addresses: %v", err)
-			c.String(http.StatusBadRequest, err.Error())
+			c.JSON(http.StatusBadRequest, ErrorMessage(err.Error()))
 			return
 		}
 
@@ -150,12 +159,12 @@ func NewGetNftsHandler(nftTokenRepository repository.NftTokenRepository, franchi
 			limitInt, err := strconv.Atoi(limitStr)
 			if err != nil {
 				logger.Errorf("Failed to convert limit string to integer : %v", err)
-				c.String(http.StatusBadRequest, "limit is invalid")
+				c.JSON(http.StatusBadRequest, ErrorMessage("limit is invalid"))
 				return
 			}
 			if limitInt < 0 || limitInt > constant.NftMaxLimit {
 				logger.Errorf("Invalid input limit: %d", limitInt)
-				c.JSON(http.StatusBadRequest, gin.H{"message": "limit is invalid. limit should be <= 500"})
+				c.JSON(http.StatusBadRequest, ErrorMessage(fmt.Sprintf("limit is invalid. limit should be <= %d", constant.NftMaxLimit)))
 				return
 			}
 			limit = &limitInt
@@ -165,12 +174,12 @@ func NewGetNftsHandler(nftTokenRepository repository.NftTokenRepository, franchi
 			offsetInt, err := strconv.Atoi(offsetStr)
 			if err != nil {
 				logger.Errorf("Failed to convert offset string to integer : %v", err)
-				c.String(http.StatusBadRequest, "offset is invalid")
+				c.JSON(http.StatusBadRequest, ErrorMessage("offset is invalid"))
 				return
 			}
 			if offsetInt < 0 {
 				logger.Errorf("Invalid input offset: %d", offsetInt)
-				c.JSON(http.StatusBadRequest, gin.H{"message": "offset is invalid. offset should be >= 0"})
+				c.JSON(http.StatusBadRequest, ErrorMessage("offset is invalid. offset should be >= 0"))
 				return
 			}
 			offset = &offsetInt
@@ -201,21 +210,21 @@ func NewGetNftsHandler(nftTokenRepository repository.NftTokenRepository, franchi
 			nfts, totalUnfiltered, err = nftTokenRepository.GetFilteredNfts(collectionAddresses, walletAddress, filter, offset, limit)
 			if err != nil {
 				logger.Errorf("Failed to get filtered nfts: %v", err)
-				c.String(http.StatusInternalServerError, "Internal server error")
+				c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
 				return
 			}
 		} else {
 			nfts, err = nftTokenRepository.GetNfts(collectionAddresses, walletAddress, offset, limit)
 			if err != nil {
 				logger.Errorf("Failed to get nfts: %v", err)
-				c.String(http.StatusInternalServerError, "Internal server error")
+				c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
 				return
 			}
 
 			totalNfts, err := nftTokenRepository.GetNfts(collectionAddresses, walletAddress, nil, nil)
 			if err != nil {
 				logger.Errorf("Failed to get total nfts: %v", err)
-				c.String(http.StatusInternalServerError, "Internal server error")
+				c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
 				return
 			}
 			totalUnfiltered = len(totalNfts)
@@ -228,13 +237,14 @@ func NewGetNftsHandler(nftTokenRepository repository.NftTokenRepository, franchi
 	}
 }
 
+// NewAdminGetCollectionsHandler creates a handler to handle requests to get all collections
 func NewAdminGetCollectionsHandler(nftCollectionRepository repository.NftCollectionRepository, client *ethclient.Client) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		// Get all collections here should be fine as we won't have even more than 100 collections for a while
 		results, err := nftCollectionRepository.GetAllCollections()
 		if err != nil {
 			logger.Errorf("Failed to get collections: %v", err)
-			c.String(http.StatusInternalServerError, "Internal server error")
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
 			return
 		}
 
@@ -242,18 +252,21 @@ func NewAdminGetCollectionsHandler(nftCollectionRepository repository.NftCollect
 	}
 }
 
+// NewAdminCreateOrUpdateNftHandler creates a handler to handle requests to create or update a nft token data
 func NewAdminCreateOrUpdateNftHandler(nftTokenRepository repository.NftTokenRepository, client *ethclient.Client) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		tokenId, err := strconv.ParseInt(c.Param("id"), 10, 64)
 		if err != nil {
 			logger.Errorf("Failed to convert token id: %v", err)
-			c.JSON(http.StatusBadRequest, gin.H{"message": "token id is invalid"})
+			c.JSON(http.StatusBadRequest, ErrorMessage("token id is invalid"))
 			return
 		}
 
 		collectionAddress := c.DefaultQuery("collectionAddress", "")
-		if collectionAddress == "" {
-			c.JSON(http.StatusBadRequest, gin.H{"message": fmt.Sprintf("input address is invalid, address: %s", collectionAddress)})
+		collectionAddress, err = utils.SanitizeAddress(collectionAddress)
+		if err != nil {
+			logger.Errorf("Invalid collection address: %s", collectionAddress)
+			c.JSON(http.StatusBadRequest, ErrorMessage("Invalid collection address"))
 			return
 		}
 
@@ -261,28 +274,35 @@ func NewAdminCreateOrUpdateNftHandler(nftTokenRepository repository.NftTokenRepo
 		contract, err := erc721.NewErc721(address, client)
 		if err != nil {
 			logger.Errorf("Failed to instantiate the contract: %v", err)
-			c.JSON(http.StatusInternalServerError, gin.H{"message": "Internal server error"})
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
 			return
 		}
 
 		uri, err := contract.TokenURI(nil, big.NewInt(tokenId))
 		if err != nil {
 			logger.Errorf("Failed to query uri: %v", err)
-			c.JSON(http.StatusInternalServerError, gin.H{"message": "Internal server error"})
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
 			return
 		}
 
 		ownerAddress, err := contract.OwnerOf(nil, big.NewInt(tokenId))
 		if err != nil {
 			logger.Errorf("Failed to query uri: %v", err)
-			c.JSON(http.StatusInternalServerError, gin.H{"message": "Internal server error"})
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
 			return
 		}
 
-		nft, err := createNftRecord(uri, int(tokenId), ownerAddress.String(), collectionAddress)
+		walletAddress, err := utils.SanitizeAddress(ownerAddress.String())
+		if err != nil {
+			logger.Errorf("Invalid wallet address: %s", walletAddress)
+			c.JSON(http.StatusBadRequest, ErrorMessage("Invalid wallet address"))
+			return
+		}
+
+		nft, err := createNftRecord(uri, int(tokenId), walletAddress, collectionAddress)
 		if err != nil {
 			logger.Errorf("Failed to construct nft record: %v", err)
-			c.JSON(http.StatusInternalServerError, gin.H{"message": "Internal server error"})
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
 			return
 		}
 
@@ -292,14 +312,14 @@ func NewAdminCreateOrUpdateNftHandler(nftTokenRepository repository.NftTokenRepo
 				nftToken, err := nftTokenRepository.CreateNft(nft)
 				if err != nil {
 					logger.Errorf("Failed to create nft token db record: %v", err)
-					c.JSON(http.StatusInternalServerError, gin.H{"message": "Internal server error"})
+					c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
 					return
 				}
 				c.JSON(http.StatusOK, nftToken)
 				return
 			}
 			logger.Errorf("Failed to get nft record: %v", err)
-			c.JSON(http.StatusInternalServerError, gin.H{"message": "Internal server error"})
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
 			return
 		}
 
@@ -308,7 +328,7 @@ func NewAdminCreateOrUpdateNftHandler(nftTokenRepository repository.NftTokenRepo
 		nftToken, err := nftTokenRepository.UpdateNft(nft)
 		if err != nil {
 			logger.Errorf("Failed to update nft token db record: %v", err)
-			c.JSON(http.StatusInternalServerError, gin.H{"message": "Internal server error"})
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
 			return
 		}
 
@@ -368,18 +388,21 @@ func createNftRecord(uri string, tokenId int, ownerAddress string, collectionAdd
 	return nft, nil
 }
 
+// (Deprecated) NewAdminUpdateNftOwnerHandler creates a handler to handle requests to update nft owner of an nft
 func NewAdminUpdateNftOwnerHandler(nftTokenRepository repository.NftTokenRepository, client *ethclient.Client) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		tokenId, err := strconv.ParseInt(c.Param("id"), 10, 64)
 		if err != nil {
 			logger.Errorf("Failed to convert token id: %v", err)
-			c.String(http.StatusBadRequest, "token id is invalid")
+			c.JSON(http.StatusBadRequest, ErrorMessage("token id is invalid"))
 			return
 		}
 
 		collectionAddress := c.DefaultQuery("collectionAddress", "")
-		if collectionAddress == "" {
-			c.String(http.StatusBadRequest, fmt.Sprintf("input address is invalid, address: %s", collectionAddress))
+		collectionAddress, err = utils.SanitizeAddress(collectionAddress)
+		if err != nil {
+			logger.Errorf("Invalid collection address: %s", collectionAddress)
+			c.JSON(http.StatusBadRequest, ErrorMessage("Invalid collection address"))
 			return
 		}
 
@@ -387,21 +410,28 @@ func NewAdminUpdateNftOwnerHandler(nftTokenRepository repository.NftTokenReposit
 		contract, err := erc721.NewErc721(address, client)
 		if err != nil {
 			logger.Errorf("Failed to instantiate the contract: %v", err)
-			c.String(http.StatusInternalServerError, "Internal server error")
+			c.JSON(http.StatusInternalServerError, "Internal server error")
 			return
 		}
 
 		ownerAddress, err := contract.OwnerOf(nil, big.NewInt(tokenId))
 		if err != nil {
 			logger.Errorf("Failed to query uri: %v", err)
-			c.String(http.StatusInternalServerError, "Internal server error")
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
 			return
 		}
 
-		nftToken, err := nftTokenRepository.UpdateNftOwner(int(tokenId), collectionAddress, ownerAddress.String())
+		walletAddress, err := utils.SanitizeAddress(ownerAddress.String())
+		if err != nil {
+			logger.Errorf("Invalid wallet address: %s", walletAddress)
+			c.JSON(http.StatusBadRequest, ErrorMessage("Invalid wallet address"))
+			return
+		}
+
+		nftToken, err := nftTokenRepository.UpdateNftOwner(int(tokenId), collectionAddress, walletAddress)
 		if err != nil {
 			logger.Errorf("Failed to update nft owner: %v", err)
-			c.String(http.StatusInternalServerError, "Internal server error")
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
 			return
 		}
 
@@ -409,25 +439,28 @@ func NewAdminUpdateNftOwnerHandler(nftTokenRepository repository.NftTokenReposit
 	}
 }
 
+// NewAdminDeleteNftHandler creates a handler to handle requests for deleting a nft record from db
 func NewAdminDeleteNftHandler(nftTokenRepository repository.NftTokenRepository) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		tokenId, err := strconv.ParseInt(c.Param("id"), 10, 64)
 		if err != nil {
 			logger.Errorf("Failed to convert token id: %v", err)
-			c.String(http.StatusBadRequest, "token id is invalid")
+			c.JSON(http.StatusBadRequest, ErrorMessage("token id is invalid"))
 			return
 		}
 
 		collectionAddress := c.DefaultQuery("collectionAddress", "")
-		if collectionAddress == "" {
-			c.String(http.StatusBadRequest, fmt.Sprintf("input collection address is invalid, address: %s", collectionAddress))
+		collectionAddress, err = utils.SanitizeAddress(collectionAddress)
+		if err != nil {
+			logger.Errorf("Invalid collection address: %s", collectionAddress)
+			c.JSON(http.StatusBadRequest, ErrorMessage("Invalid collection address"))
 			return
 		}
 
 		err = nftTokenRepository.DeleteNft(int(tokenId), collectionAddress)
 		if err != nil {
 			logger.Errorf("Failed to delete nft: %v", err)
-			c.String(http.StatusInternalServerError, "Internal server error")
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
 			return
 		}
 
@@ -442,6 +475,10 @@ func getCollectionAddresses(
 ) ([]string, error) {
 	collectionAddresses := []string{}
 	if collectionAddress != "" {
+		collectionAddress, err := utils.SanitizeAddress(collectionAddress)
+		if err != nil {
+			return nil, fmt.Errorf("invalid collection address: %v", err)
+		}
 		collectionAddresses = append(collectionAddresses, collectionAddress)
 	} else if franchiseId != "" {
 		franchiseIdInt, err := strconv.ParseInt(franchiseId, 10, 64)
