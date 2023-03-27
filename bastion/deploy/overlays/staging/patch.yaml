@@ -9,6 +9,7 @@ spec:
     spec:
       containers:
       - name: bastion
+        image: 243963068353.dkr.ecr.us-east-2.amazonaws.com/bastion:latest
         env:
           - name: SERVER_ENV
             value: "staging"
