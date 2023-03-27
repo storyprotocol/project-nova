@@ -1,7 +1,12 @@
 LASTEST_COMMIT = $(shell git rev-parse --short HEAD)
 TAG ?= ${USER}-local-${LASTEST_COMMIT}
 
+ENV ?= staging
 REGION ?= us-east-2
+ifeq ($(ENV), prod)
+	REGION = us-east-1
+endif
+
 ECR ?= 243963068353.dkr.ecr.${REGION}.amazonaws.com
 
 BUILDER_IMAGE ?= builder
@@ -91,6 +96,7 @@ build-%:
 	docker-compose build $*
 
 push-%: ecr-auth
+	@echo "pushing to ${ENV}"
 	docker tag $* ${ECR}/$*:${TAG}
 	docker tag $* ${ECR}/$*:latest
 	docker push ${ECR}/$*:${TAG}
