@@ -10,6 +10,7 @@ import (
 	"github.com/project-nova/backend/api/internal/repository"
 	"github.com/project-nova/backend/pkg/gateway"
 	"github.com/project-nova/backend/pkg/logger"
+	"gorm.io/gorm"
 )
 
 // NewGetStoryChaptersHandler creates a handler to handle GET /story/:franchiseId/:storyNum request.
@@ -165,15 +166,31 @@ func NewAdminCreateStoryChapterHandler(
 		}
 
 		storyId := storyInfoResult.ID
-		storyChapter := entity.ToStoryChapterModel(&requestBody, storyId, chapterNum)
-		err = storyChapterRepo.CreateChapter(storyChapter)
+		chapter, err := storyChapterRepo.GetChapter(storyId, chapterNum)
+		if err == gorm.ErrRecordNotFound {
+			chapter = entity.ToStoryChapterModel(&requestBody, storyId, chapterNum)
+			err = storyChapterRepo.CreateChapter(chapter)
+			if err != nil {
+				logger.Errorf("Failed to create story chapter: %v", err)
+				c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+				return
+			}
+		}
 		if err != nil {
-			logger.Errorf("Failed to create story chapter: %v", err)
+			logger.Errorf("Failed to get story chapter: %v", err)
 			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
 			return
 		}
 
-		c.JSON(http.StatusOK, storyChapter)
+		chapter.FromCreateStoryChapterRequestBody(&requestBody)
+		err = storyChapterRepo.UpdateChapter(chapter)
+		if err != nil {
+			logger.Errorf("Failed to update story chapter: %v", err)
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+			return
+		}
+
+		c.JSON(http.StatusOK, chapter)
 	}
 }
 
