@@ -92,15 +92,14 @@ var uploadContentCmd = &cobra.Command{
 		// 7. Call api server to update DB and set a release time
 		requestBody := gateway.FromStoryChapterModel(content)
 		// Convert release time
-		releaseTime := time.Now().UTC()
 		if releaseAt != "" {
 			layout := "2006-01-02T15:04:05Z"
-			releaseTime, err = time.Parse(layout, releaseAt)
+			releaseTime, err := time.Parse(layout, releaseAt)
 			if err != nil {
 				logger.Fatalf("failed to parse release time %s: %v", releaseAt, err)
 			}
+			requestBody.ReleaseAt = &releaseTime
 		}
-		requestBody.ReleaseAt = &releaseTime
 
 		err = apiGateway.CreateStoryChapter(franchiseId, storyNum, chapterNum, requestBody, encryptedBase64)
 		if err != nil {
