@@ -49,6 +49,21 @@ func (s *StoryChapterModel) ToStoryChapterResp() *StoryChapterResp {
 	return resp
 }
 
+func (s *StoryChapterModel) FromCreateStoryChapterRequestBody(request *gateway.CreateStoryChapterRequestBody) {
+	if request.Heading != nil {
+		s.Heading = request.Heading
+	}
+	if request.Title != nil {
+		s.Title = request.Title
+	}
+	if request.CoverUrl != nil {
+		s.CoverUrl = request.CoverUrl
+	}
+	if request.ReleaseAt != nil {
+		s.ReleaseAt = *request.ReleaseAt
+	}
+}
+
 func ToStoryChapterModel(request *gateway.CreateStoryChapterRequestBody, storyId string, chapterNum int) *StoryChapterModel {
 	storyChapterModel := &StoryChapterModel{
 		ID:      uuid.New().String(),
