@@ -468,6 +468,52 @@ func NewAdminDeleteNftHandler(nftTokenRepository repository.NftTokenRepository) 
 	}
 }
 
+// NewAdminUpdateCollectionAddressHandler creates a handler to handle requests for updating nft collection address
+func NewAdminUpdateCollectionAddressHandler(
+	nftCollectionRepository repository.NftCollectionRepository,
+	franchiseCollectionRepository repository.FranchiseCollectionRepository,
+	nftAllowlistRepository repository.NftAllowlistRepository,
+) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		oldAddress, err := utils.SanitizeAddress(c.Param("address"))
+		if err != nil {
+			logger.Errorf("Invalid old collection address: %s", oldAddress)
+			c.JSON(http.StatusBadRequest, ErrorMessage("Invalid old collection address"))
+			return
+		}
+
+		newAddress, err := utils.SanitizeAddress(c.DefaultQuery("newAddress", ""))
+		if err != nil {
+			logger.Errorf("Invalid new collection address: %s", newAddress)
+			c.JSON(http.StatusBadRequest, ErrorMessage("Invalid new collection address"))
+			return
+		}
+
+		err = nftCollectionRepository.UpdateCollectionAddress(oldAddress, newAddress)
+		if err != nil {
+			logger.Errorf("Failed to update collection address in nft collection: %v", err)
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+			return
+		}
+
+		err = franchiseCollectionRepository.UpdateCollectionAddress(oldAddress, newAddress)
+		if err != nil {
+			logger.Errorf("Failed to update collection address in franchise collection: %v", err)
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+			return
+		}
+
+		err = nftAllowlistRepository.UpdateCollectionAddress(oldAddress, newAddress)
+		if err != nil {
+			logger.Errorf("Failed to update collection address in nft allowlist: %v", err)
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+			return
+		}
+
+		c.JSON(http.StatusOK, nil)
+	}
+}
+
 func getCollectionAddresses(
 	franchiseId string,
 	collectionAddress string,
