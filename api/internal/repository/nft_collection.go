@@ -11,6 +11,7 @@ import (
 type NftCollectionRepository interface {
 	GetCollections(collectionAddresses []string) ([]*NftCollectionModel, error)
 	GetAllCollections() ([]*NftCollectionModel, error)
+	UpdateCollectionAddress(oldAddress string, newAddress string) error
 }
 
 type NftCollectionModel struct {
@@ -61,4 +62,16 @@ func (s *nftCollectionDbImpl) GetAllCollections() ([]*NftCollectionModel, error)
 	}
 
 	return results, nil
+}
+
+func (s *nftCollectionDbImpl) UpdateCollectionAddress(oldAddress string, newAddress string) error {
+	r := s.db.Model(&NftCollectionModel{}).Where("collection_address = ?", oldAddress).
+		Update("collection_address", newAddress)
+	if r.RowsAffected == 0 {
+		return fmt.Errorf("no rows are affected")
+	}
+	if r.Error != nil {
+		return fmt.Errorf("failed to update db: %v", r.Error)
+	}
+	return nil
 }

@@ -11,6 +11,7 @@ import (
 type FranchiseCollectionRepository interface {
 	GetCollectionAddressesByFranchise(franchiseId int64) ([]string, error)
 	GetAndLoadFranchiseCollections() error
+	UpdateCollectionAddress(oldAddress string, newAddress string) error
 }
 
 type FranchiseCollectionModel struct {
@@ -79,5 +80,17 @@ func (s *franchiseCollectionDbImpl) GetAndLoadFranchiseCollections() error {
 		s.franchiseCollectionsMap[record.FranchiseId] = append(s.franchiseCollectionsMap[record.FranchiseId], record.CollectionAddress)
 	}
 
+	return nil
+}
+
+func (s *franchiseCollectionDbImpl) UpdateCollectionAddress(oldAddress string, newAddress string) error {
+	r := s.db.Model(&FranchiseCollectionModel{}).Where("collection_address = ?", oldAddress).
+		Update("collection_address", newAddress)
+	if r.RowsAffected == 0 {
+		return fmt.Errorf("no rows are affected")
+	}
+	if r.Error != nil {
+		return fmt.Errorf("failed to update db: %v", r.Error)
+	}
 	return nil
 }

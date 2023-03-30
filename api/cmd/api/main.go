@@ -96,6 +96,7 @@ func main() {
 	walletMerkleProofRepository := repository.NewWalletMerkleProofDbImpl(db)
 	nftTokenRepository := repository.NewNftTokenDbImpl(db)
 	nftCollectionRepository := repository.NewNftCollectionDbImpl(db)
+	nftAllowlistRepository := repository.NewNftAllowlistDbImpl(db)
 	storyChapterRepository := repository.NewStoryChapterDbImpl(db)
 	storyInfoRepository := repository.NewStoryInfoDbImpl(db)
 
@@ -152,6 +153,9 @@ func main() {
 
 		// Admin Endpoint to get collection data
 		adminV1.GET("/nft/collections", handler.NewAdminGetCollectionsHandler(nftCollectionRepository, ethClient))
+
+		// Admin Endpoint to update collection address
+		adminV1.POST("/nft/collection/:address", handler.NewAdminUpdateCollectionAddressHandler(nftCollectionRepository, franchiseCollectionRepository, nftAllowlistRepository))
 
 		// Admin Endpoint to fetch and create nft metadata
 		adminV1.POST("/nft/:id", handler.NewAdminCreateOrUpdateNftHandler(nftTokenRepository, ethClient))
