@@ -181,6 +181,11 @@ func NewAdminCreateStoryChapterHandler(
 			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
 			return
 		}
+		if chapter == nil {
+			logger.Errorf("Get nil story chapter")
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+			return
+		}
 
 		chapter.FromCreateStoryChapterRequestBody(&requestBody)
 		err = storyChapterRepo.UpdateChapter(chapter)
