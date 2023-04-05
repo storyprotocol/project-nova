@@ -173,6 +173,31 @@ func main() {
 		adminV1.POST("/story/:franchiseId/:storyNum/:chapterNum/cache", handler.NewAdminUpdateStoryChapterCacheHandler(storyContentRepository))
 	}
 
+	protocolV1 := r.Group("/protocol/v1")
+	protocolV1.Use(cors.Default())
+	{
+		// Endpoint to list all franchise
+		protocolV1.GET("/franchise", handler.NewGetFranchisesHandler())
+
+		// Endpoint to get franchise collections
+		//protocolV1.GET("/franchise/:franchiseAddress", handler.NewGetFranchiseCollectionsHandler())
+
+		// Endpoint to get characters per collection
+		protocolV1.GET("/character/:franchiseAddress/:collectionAddress", handler.NewGetCharactersHandler())
+
+		// Endpoint to get collectors of a character
+		protocolV1.GET("/character/:franchiseAddress/:collectionAddress/:tokenId/collectors", handler.NewGetCollectorsHandler())
+
+		// Endpoint to get stories per collection
+		protocolV1.GET("/story/:franchiseAddress/:collectionAddress", handler.NewGetStoriesHandler())
+
+		// Endpoint to get a story
+		//protocolV1.GET("/story/:franchiseAddress/:collectionAddress/:storyId", handler.NewGetStoryContentHandler())
+
+		// Endpoint to get derivative stories of a story
+		protocolV1.GET("/story/:franchiseAddress/:collectionAddress/:tokenId/derivatives", handler.NewGetDerivativesHandler())
+	}
+
 	port := fmt.Sprintf(":%d", cfg.Port)
 	_ = r.Run(port)
 }
