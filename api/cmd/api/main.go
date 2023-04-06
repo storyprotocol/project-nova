@@ -180,16 +180,22 @@ func main() {
 		protocolV1.GET("/franchise", handler.NewGetFranchisesHandler())
 
 		// Endpoint to get franchise collections
-		//protocolV1.GET("/franchise/:franchiseAddress", handler.NewGetFranchiseCollectionsHandler())
+		protocolV1.GET("/franchise/:franchiseAddress", handler.NewGetFranchiseCollectionsHandler())
 
 		// Endpoint to get characters per collection
 		protocolV1.GET("/character/:franchiseAddress/:collectionAddress", handler.NewGetCharactersHandler())
+
+		// Endpoint to get a single character per collection
+		protocolV1.GET("/character/:franchiseAddress/:collectionAddress/:tokenId", handler.NewGetCharacterHandler())
 
 		// Endpoint to get collectors of a character
 		protocolV1.GET("/character/:franchiseAddress/:collectionAddress/:tokenId/collectors", handler.NewGetCollectorsHandler())
 
 		// Endpoint to get stories per collection
 		protocolV1.GET("/story/:franchiseAddress/:collectionAddress", handler.NewGetStoriesHandler())
+
+		// Endpoint to get a single story per collection
+		protocolV1.GET("/story/:franchiseAddress/:collectionAddress/:tokenId", handler.NewGetStoryHandler())
 
 		// Endpoint to get a story
 		//protocolV1.GET("/story/:franchiseAddress/:collectionAddress/:storyId", handler.NewGetStoryContentHandler())

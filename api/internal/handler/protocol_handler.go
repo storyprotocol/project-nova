@@ -14,6 +14,13 @@ func NewGetFranchisesHandler() func(c *gin.Context) {
 	}
 }
 
+// GET /franchise/:franchiseAddress
+func NewGetFranchiseCollectionsHandler() func(c *gin.Context) {
+	return func(c *gin.Context) {
+		c.JSON(http.StatusOK, entity.SingleFranchise)
+	}
+}
+
 // GET /character/:franchiseAddress/:collectionAddress
 func NewGetCharactersHandler() func(c *gin.Context) {
 	return func(c *gin.Context) {
@@ -21,17 +28,31 @@ func NewGetCharactersHandler() func(c *gin.Context) {
 	}
 }
 
-// GET
+// GET /character/:franchiseAddress/:collectionAddress/:tokenId
+func NewGetCharacterHandler() func(c *gin.Context) {
+	return func(c *gin.Context) {
+		c.JSON(http.StatusOK, entity.SingleCharacter)
+	}
+}
+
+// GET /character/:franchiseAddress/:collectionAddress/:tokenId/collectors
 func NewGetCollectorsHandler() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		c.JSON(http.StatusOK, entity.Collectors)
 	}
 }
 
-// GET
+// Get /story/:franchiseAddress/:collectionAddress
 func NewGetStoriesHandler() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		c.JSON(http.StatusOK, entity.Stories)
+	}
+}
+
+// Get /story/:franchiseAddress/:collectionAddress/:tokenId
+func NewGetStoryHandler() func(c *gin.Context) {
+	return func(c *gin.Context) {
+		c.JSON(http.StatusOK, entity.SingleStory)
 	}
 }
 
