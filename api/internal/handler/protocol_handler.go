@@ -17,28 +17,21 @@ func NewGetFranchisesHandler() func(c *gin.Context) {
 // GET /character/:franchiseAddress/:collectionAddress
 func NewGetCharactersHandler() func(c *gin.Context) {
 	return func(c *gin.Context) {
-
+		c.JSON(http.StatusOK, entity.Characters)
 	}
 }
 
 // GET
 func NewGetCollectorsHandler() func(c *gin.Context) {
 	return func(c *gin.Context) {
-
+		c.JSON(http.StatusOK, entity.Collectors)
 	}
 }
 
 // GET
 func NewGetStoriesHandler() func(c *gin.Context) {
 	return func(c *gin.Context) {
-
-	}
-}
-
-// GET
-func NewGetStoryContentHandler() func(c *gin.Context) {
-	return func(c *gin.Context) {
-
+		c.JSON(http.StatusOK, entity.Stories)
 	}
 }
 
