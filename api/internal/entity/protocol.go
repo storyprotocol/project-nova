@@ -1,30 +1,76 @@
 package entity
 
 type Franchise struct {
-	Address            string   `json:"address"`
-	Name               string   `json:"name"`
-	VaultAddress       string   `json:"vaultAddress"`
-	CharacterContracts []string `json:"characterContract"`
-	StoryContracts     []string `json:"storyContract"`
+	Address            string                 `json:"address"`
+	Name               string                 `json:"name"`
+	VaultAddress       string                 `json:"vaultAddress"`
+	CharacterContracts []*CharacterCollection `json:"characterContract"`
+	StoryContracts     []*StoryCollection     `json:"storyContract"`
 }
 
 var SingleFranchise = &Franchise{
-	Address:            "0xForcedOffline",
-	Name:               "Forced Offline",
-	VaultAddress:       "0xForcedOfflineVault",
-	CharacterContracts: []string{"0xForcedOfflineCharacter", "0xForcedOfflineFanFicCharacter"},
-	StoryContracts:     []string{"0xForcedOfflineStory", "0xForcedOfflineFanFic"},
+	Address:      "0xForcedOffline",
+	Name:         "Forced Offline",
+	VaultAddress: "0xForcedOfflineVault",
+	CharacterContracts: []*CharacterCollection{
+		{
+			Address: "0xForcedOfflineCharacter",
+			Name:    "Force Offline Main",
+		},
+		{
+			Address: "0xForcedOfflineFanFicCharacter",
+			Name:    "Forced offline FanFic",
+		},
+	},
+	StoryContracts: []*StoryCollection{
+		{
+			Address: "0xForcedOfflineStory",
+			IsCanon: true,
+		},
+		{
+			Address: "0xForcedOfflineFanFic",
+			IsCanon: false,
+		},
+	},
 }
 
 var Franchises = []*Franchise{
 	SingleFranchise,
 	{
-		Address:            "0xWhiteFountain",
-		Name:               "White Fountain",
-		VaultAddress:       "0xWhiteFountainVault",
-		CharacterContracts: []string{"0xWhiteFountainCharacter"},
-		StoryContracts:     []string{"0xWhiteFoundtainStory"},
+		Address:      "0xWhiteFountain",
+		Name:         "White Fountain",
+		VaultAddress: "0xWhiteFountainVault",
+		CharacterContracts: []*CharacterCollection{
+			{
+				Address: "0xWhiteFountainCharacter",
+				Name:    "White Fountain Main",
+			},
+			{
+				Address: "0xWhiteFountainFanFicCharacter",
+				Name:    "White Fountain FanFic",
+			},
+		},
+		StoryContracts: []*StoryCollection{
+			{
+				Address: "0xWhiteFountainStory",
+				IsCanon: true,
+			},
+			{
+				Address: "0xWhiteFountainFanfic",
+				IsCanon: false,
+			},
+		},
 	},
+}
+
+type CharacterCollection struct {
+	Name    string `json:"name"`
+	Address string `json:"address"`
+}
+
+type StoryCollection struct {
+	Address string `json:"address"`
+	IsCanon bool   `json:"isCanon"`
 }
 
 type Character struct {
