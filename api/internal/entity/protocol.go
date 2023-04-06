@@ -91,6 +91,7 @@ var SingleCharacter = &Character{
 	OwnerAddress:      "jason.eth",
 	Name:              "Rayze",
 	Description:       "Rayze is the main character of force offline",
+	ImageUrl:          "https://ipfs.io/ipfs/QmNvRAgJbWgcCvY2cJgvqvfgu6SwRKr5zsbZufm3owpaEc/images/145.png",
 	Traits: []*NftTraitResponse{
 		{
 			TraitType: "hairColor",
@@ -108,6 +109,7 @@ var Characters = []*Character{
 		OwnerAddress:      "allen.eth",
 		Name:              "Myza",
 		Description:       "Myza is the girlfriend of Rayze",
+		ImageUrl:          "https://ipfs.io/ipfs/QmNvRAgJbWgcCvY2cJgvqvfgu6SwRKr5zsbZufm3owpaEc/images/11.png",
 		Traits: []*NftTraitResponse{
 			{
 				TraitType: "hairColor",
