@@ -257,7 +257,7 @@ func NewGetStoriesHandler(client *ethclient.Client) func(c *gin.Context) {
 		logger.Infof("total supply: %d", supply)
 
 		supplyInt := supply.Int64()
-		for i := 0; i < int(supplyInt); i++ {
+		for i := 1; i < int(supplyInt); i++ {
 			storyInfo, err := registryContract.Story(nil, collectionAddr, big.NewInt(int64(i)))
 			if err != nil {
 				logger.Errorf("Failed to get story info for token %d: %v", i, err)
