@@ -1,0 +1,281 @@
+[
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_canonCollection",
+        "type": "address"
+      },
+      {
+        "internalType": "bool",
+        "name": "_externalCanon",
+        "type": "bool"
+      },
+      {
+        "internalType": "address",
+        "name": "_fanficCollection",
+        "type": "address"
+      },
+      {
+        "internalType": "bool",
+        "name": "_externalFanfic",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "collection",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "charId",
+        "type": "uint256"
+      }
+    ],
+    "name": "CharacterAdded",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "collection",
+        "type": "address"
+      },
+      {
+        "components": [
+          {
+            "internalType": "string",
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "description",
+            "type": "string"
+          },
+          {
+            "components": [
+              {
+                "internalType": "address",
+                "name": "feeCollector",
+                "type": "address"
+              },
+              {
+                "internalType": "string",
+                "name": "name",
+                "type": "string"
+              }
+            ],
+            "internalType": "struct ICharacterRegistry.Author",
+            "name": "author",
+            "type": "tuple"
+          },
+          {
+            "internalType": "address",
+            "name": "licenseModule",
+            "type": "address"
+          },
+          {
+            "internalType": "enum ICharacterRegistry.CharacterType",
+            "name": "charType",
+            "type": "uint8"
+          }
+        ],
+        "internalType": "struct ICharacterRegistry.CharacterInfo",
+        "name": "info",
+        "type": "tuple"
+      },
+      {
+        "internalType": "uint256",
+        "name": "externalId",
+        "type": "uint256"
+      }
+    ],
+    "name": "addCharacter",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "canonCollection",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "collection",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "charInfoId",
+        "type": "uint256"
+      }
+    ],
+    "name": "character",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "string",
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "description",
+            "type": "string"
+          },
+          {
+            "components": [
+              {
+                "internalType": "address",
+                "name": "feeCollector",
+                "type": "address"
+              },
+              {
+                "internalType": "string",
+                "name": "name",
+                "type": "string"
+              }
+            ],
+            "internalType": "struct ICharacterRegistry.Author",
+            "name": "author",
+            "type": "tuple"
+          },
+          {
+            "internalType": "address",
+            "name": "licenseModule",
+            "type": "address"
+          },
+          {
+            "internalType": "enum ICharacterRegistry.CharacterType",
+            "name": "charType",
+            "type": "uint8"
+          }
+        ],
+        "internalType": "struct ICharacterRegistry.CharacterInfo",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "index",
+        "type": "uint256"
+      }
+    ],
+    "name": "collectionAt",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "externalCanon",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "externalFanfic",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "fanficCollection",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "collection",
+        "type": "address"
+      }
+    ],
+    "name": "isExternalCollection",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "totalCollections",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]

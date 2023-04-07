@@ -4,31 +4,35 @@ type Franchise struct {
 	Address            string                 `json:"address"`
 	Name               string                 `json:"name"`
 	VaultAddress       string                 `json:"vaultAddress"`
+	CharacterRegistry  string                 `json:"characterRegistry"`
 	CharacterContracts []*CharacterCollection `json:"characterContract"`
+	StoryRegistry      string                 `json:"storyRegistry"`
 	StoryContracts     []*StoryCollection     `json:"storyContract"`
 }
 
 var SingleFranchise = &Franchise{
-	Address:      "0xForcedOffline",
-	Name:         "Forced Offline",
-	VaultAddress: "0xForcedOfflineVault",
+	Address:           "0x7c50c053f1d7f889c528dab717760a155bf3f543",
+	Name:              "Forced Offline",
+	VaultAddress:      "0x7c50c053f1d7f889c528dab717760a155bf3f543",
+	CharacterRegistry: "0x29943be4cc35e5517c10e2917cecab8d96b53eea",
 	CharacterContracts: []*CharacterCollection{
 		{
-			Address: "0xForcedOfflineCharacter",
+			Address: "0xc6dc20dd779136555f6933a90bfd8defe0f6c8de",
 			Name:    "Force Offline Main",
 		},
 		{
-			Address: "0xForcedOfflineFanFicCharacter",
+			Address: "0x31ed93fd8c4f656fa3e32693b3b8403687bc5503",
 			Name:    "Forced offline FanFic",
 		},
 	},
+	StoryRegistry: "0xbbbe9a2b68f8d2262ff608b615c2958df8b55f69",
 	StoryContracts: []*StoryCollection{
 		{
-			Address: "0xForcedOfflineStory",
+			Address: "0x6ff9cdefdaa8f58de2793b73a51cc6eb20f518da",
 			IsCanon: true,
 		},
 		{
-			Address: "0xForcedOfflineFanFic",
+			Address: "0x5bcba74072a61c16ef19d966d0ed8c936131c3f0",
 			IsCanon: false,
 		},
 	},
@@ -36,31 +40,39 @@ var SingleFranchise = &Franchise{
 
 var Franchises = []*Franchise{
 	SingleFranchise,
-	{
-		Address:      "0xWhiteFountain",
-		Name:         "White Fountain",
-		VaultAddress: "0xWhiteFountainVault",
-		CharacterContracts: []*CharacterCollection{
-			{
-				Address: "0xWhiteFountainCharacter",
-				Name:    "White Fountain Main",
+	/*
+		{
+			Address:           "0xWhiteFountain",
+			Name:              "White Fountain",
+			VaultAddress:      "0xWhiteFountainVault",
+			CharacterRegistry: "",
+			CharacterContracts: []*CharacterCollection{
+				{
+					Address: "0xWhiteFountainCharacter",
+					Name:    "White Fountain Main",
+				},
+				{
+					Address: "0xWhiteFountainFanFicCharacter",
+					Name:    "White Fountain FanFic",
+				},
 			},
-			{
-				Address: "0xWhiteFountainFanFicCharacter",
-				Name:    "White Fountain FanFic",
+			StoryRegistry: "",
+			StoryContracts: []*StoryCollection{
+				{
+					Address: "0xWhiteFountainStory",
+					IsCanon: true,
+				},
+				{
+					Address: "0xWhiteFountainFanfic",
+					IsCanon: false,
+				},
 			},
 		},
-		StoryContracts: []*StoryCollection{
-			{
-				Address: "0xWhiteFountainStory",
-				IsCanon: true,
-			},
-			{
-				Address: "0xWhiteFountainFanfic",
-				IsCanon: false,
-			},
-		},
-	},
+	*/
+}
+
+var FranchiseMap = map[string]*Franchise{
+	"0xforcedoffline": SingleFranchise,
 }
 
 type CharacterCollection struct {
@@ -185,4 +197,12 @@ var Collectors = []*Collector{
 	{
 		Address: "leo.eth",
 	},
+}
+
+type CharacterNftOnchainMeta struct {
+	Name        *string     `json:"name"`
+	Description *string     `json:"decription"`
+	Image       *string     `json:"image"`
+	Author      *string     `json:"author"`
+	Attributes  []*NftTrait `json:"attributes"`
 }

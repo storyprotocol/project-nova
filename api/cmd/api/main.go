@@ -177,25 +177,25 @@ func main() {
 	protocolV1.Use(cors.Default())
 	{
 		// Endpoint to list all franchise
-		protocolV1.GET("/franchise", handler.NewGetFranchisesHandler())
+		protocolV1.GET("/franchise", handler.NewGetFranchisesHandler(ethClient))
 
 		// Endpoint to get franchise collections
-		protocolV1.GET("/franchise/:franchiseAddress", handler.NewGetFranchiseCollectionsHandler())
+		protocolV1.GET("/franchise/:franchiseAddress", handler.NewGetFranchiseCollectionsHandler(ethClient))
 
 		// Endpoint to get characters per collection
-		protocolV1.GET("/character/:franchiseAddress/:collectionAddress", handler.NewGetCharactersHandler())
+		protocolV1.GET("/character/:franchiseAddress/:collectionAddress", handler.NewGetCharactersHandler(ethClient))
 
 		// Endpoint to get a single character per collection
-		protocolV1.GET("/character/:franchiseAddress/:collectionAddress/:tokenId", handler.NewGetCharacterHandler())
+		protocolV1.GET("/character/:franchiseAddress/:collectionAddress/:tokenId", handler.NewGetCharacterHandler(ethClient))
 
 		// Endpoint to get collectors of a character
-		protocolV1.GET("/character/:franchiseAddress/:collectionAddress/:tokenId/collectors", handler.NewGetCollectorsHandler())
+		protocolV1.GET("/character/:franchiseAddress/:collectionAddress/:tokenId/collectors", handler.NewGetCollectorsHandler(ethClient))
 
 		// Endpoint to get stories per collection
-		protocolV1.GET("/story/:franchiseAddress/:collectionAddress", handler.NewGetStoriesHandler())
+		protocolV1.GET("/story/:franchiseAddress/:collectionAddress", handler.NewGetStoriesHandler(ethClient))
 
 		// Endpoint to get a single story per collection
-		protocolV1.GET("/story/:franchiseAddress/:collectionAddress/:tokenId", handler.NewGetStoryHandler())
+		protocolV1.GET("/story/:franchiseAddress/:collectionAddress/:tokenId", handler.NewGetStoryHandler(ethClient))
 
 		// Endpoint to get a story
 		//protocolV1.GET("/story/:franchiseAddress/:collectionAddress/:storyId", handler.NewGetStoryContentHandler())
