@@ -45,7 +45,7 @@ type ICharacterRegistryCharacterInfo struct {
 
 // CharacterRegistryMetaData contains all meta data concerning the CharacterRegistry contract.
 var CharacterRegistryMetaData = &bind.MetaData{
-	ABI: "[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_canonCollection\",\"type\":\"address\"},{\"internalType\":\"bool\",\"name\":\"_externalCanon\",\"type\":\"bool\"},{\"internalType\":\"address\",\"name\":\"_fanficCollection\",\"type\":\"address\"},{\"internalType\":\"bool\",\"name\":\"_externalFanfic\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"collection\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"charId\",\"type\":\"uint256\"}],\"name\":\"CharacterAdded\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"collection\",\"type\":\"address\"},{\"components\":[{\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"description\",\"type\":\"string\"},{\"components\":[{\"internalType\":\"address\",\"name\":\"feeCollector\",\"type\":\"address\"},{\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"}],\"internalType\":\"structICharacterRegistry.Author\",\"name\":\"author\",\"type\":\"tuple\"},{\"internalType\":\"address\",\"name\":\"licenseModule\",\"type\":\"address\"},{\"internalType\":\"enumICharacterRegistry.CharacterType\",\"name\":\"charType\",\"type\":\"uint8\"}],\"internalType\":\"structICharacterRegistry.CharacterInfo\",\"name\":\"info\",\"type\":\"tuple\"},{\"internalType\":\"uint256\",\"name\":\"externalId\",\"type\":\"uint256\"}],\"name\":\"addCharacter\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"canonCollection\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"collection\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"charInfoId\",\"type\":\"uint256\"}],\"name\":\"character\",\"outputs\":[{\"components\":[{\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"description\",\"type\":\"string\"},{\"components\":[{\"internalType\":\"address\",\"name\":\"feeCollector\",\"type\":\"address\"},{\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"}],\"internalType\":\"structICharacterRegistry.Author\",\"name\":\"author\",\"type\":\"tuple\"},{\"internalType\":\"address\",\"name\":\"licenseModule\",\"type\":\"address\"},{\"internalType\":\"enumICharacterRegistry.CharacterType\",\"name\":\"charType\",\"type\":\"uint8\"}],\"internalType\":\"structICharacterRegistry.CharacterInfo\",\"name\":\"\",\"type\":\"tuple\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"}],\"name\":\"collectionAt\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"externalCanon\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"externalFanfic\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"fanficCollection\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"collection\",\"type\":\"address\"}],\"name\":\"isExternalCollection\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"totalCollections\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"}]",
+	ABI: "[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_canonCollection\",\"type\":\"address\"},{\"internalType\":\"bool\",\"name\":\"_externalCanon\",\"type\":\"bool\"},{\"internalType\":\"address\",\"name\":\"_fanficCollection\",\"type\":\"address\"},{\"internalType\":\"bool\",\"name\":\"_externalFanfic\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"collection\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"charId\",\"type\":\"uint256\"}],\"name\":\"CharacterAdded\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"collection\",\"type\":\"address\"},{\"components\":[{\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"description\",\"type\":\"string\"},{\"components\":[{\"internalType\":\"address\",\"name\":\"feeCollector\",\"type\":\"address\"},{\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"}],\"internalType\":\"structICharacterRegistry.Author\",\"name\":\"author\",\"type\":\"tuple\"},{\"internalType\":\"address\",\"name\":\"licenseModule\",\"type\":\"address\"},{\"internalType\":\"enumICharacterRegistry.CharacterType\",\"name\":\"charType\",\"type\":\"uint8\"}],\"internalType\":\"structICharacterRegistry.CharacterInfo\",\"name\":\"info\",\"type\":\"tuple\"},{\"internalType\":\"uint256\",\"name\":\"externalId\",\"type\":\"uint256\"}],\"name\":\"addCharacter\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"canonCollection\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"collection\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"charInfoId\",\"type\":\"uint256\"}],\"name\":\"character\",\"outputs\":[{\"components\":[{\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"description\",\"type\":\"string\"},{\"components\":[{\"internalType\":\"address\",\"name\":\"feeCollector\",\"type\":\"address\"},{\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"}],\"internalType\":\"structICharacterRegistry.Author\",\"name\":\"author\",\"type\":\"tuple\"},{\"internalType\":\"address\",\"name\":\"licenseModule\",\"type\":\"address\"},{\"internalType\":\"enumICharacterRegistry.CharacterType\",\"name\":\"charType\",\"type\":\"uint8\"}],\"internalType\":\"structICharacterRegistry.CharacterInfo\",\"name\":\"\",\"type\":\"tuple\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"}],\"name\":\"collectionAt\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"externalCanon\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"externalFanfic\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"fanficCollection\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"collection\",\"type\":\"address\"}],\"name\":\"isExternalCollection\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"totalCanonCharacters\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"totalCollections\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"totalFanficCharacters\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"}]",
 }
 
 // CharacterRegistryABI is the input ABI used to generate the binding from.
@@ -411,6 +411,37 @@ func (_CharacterRegistry *CharacterRegistryCallerSession) IsExternalCollection(c
 	return _CharacterRegistry.Contract.IsExternalCollection(&_CharacterRegistry.CallOpts, collection)
 }
 
+// TotalCanonCharacters is a free data retrieval call binding the contract method 0x25f9fe5e.
+//
+// Solidity: function totalCanonCharacters() view returns(uint256)
+func (_CharacterRegistry *CharacterRegistryCaller) TotalCanonCharacters(opts *bind.CallOpts) (*big.Int, error) {
+	var out []interface{}
+	err := _CharacterRegistry.contract.Call(opts, &out, "totalCanonCharacters")
+
+	if err != nil {
+		return *new(*big.Int), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+
+	return out0, err
+
+}
+
+// TotalCanonCharacters is a free data retrieval call binding the contract method 0x25f9fe5e.
+//
+// Solidity: function totalCanonCharacters() view returns(uint256)
+func (_CharacterRegistry *CharacterRegistrySession) TotalCanonCharacters() (*big.Int, error) {
+	return _CharacterRegistry.Contract.TotalCanonCharacters(&_CharacterRegistry.CallOpts)
+}
+
+// TotalCanonCharacters is a free data retrieval call binding the contract method 0x25f9fe5e.
+//
+// Solidity: function totalCanonCharacters() view returns(uint256)
+func (_CharacterRegistry *CharacterRegistryCallerSession) TotalCanonCharacters() (*big.Int, error) {
+	return _CharacterRegistry.Contract.TotalCanonCharacters(&_CharacterRegistry.CallOpts)
+}
+
 // TotalCollections is a free data retrieval call binding the contract method 0x61d9db2d.
 //
 // Solidity: function totalCollections() view returns(uint256)
@@ -440,6 +471,37 @@ func (_CharacterRegistry *CharacterRegistrySession) TotalCollections() (*big.Int
 // Solidity: function totalCollections() view returns(uint256)
 func (_CharacterRegistry *CharacterRegistryCallerSession) TotalCollections() (*big.Int, error) {
 	return _CharacterRegistry.Contract.TotalCollections(&_CharacterRegistry.CallOpts)
+}
+
+// TotalFanficCharacters is a free data retrieval call binding the contract method 0x5bce9a84.
+//
+// Solidity: function totalFanficCharacters() view returns(uint256)
+func (_CharacterRegistry *CharacterRegistryCaller) TotalFanficCharacters(opts *bind.CallOpts) (*big.Int, error) {
+	var out []interface{}
+	err := _CharacterRegistry.contract.Call(opts, &out, "totalFanficCharacters")
+
+	if err != nil {
+		return *new(*big.Int), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+
+	return out0, err
+
+}
+
+// TotalFanficCharacters is a free data retrieval call binding the contract method 0x5bce9a84.
+//
+// Solidity: function totalFanficCharacters() view returns(uint256)
+func (_CharacterRegistry *CharacterRegistrySession) TotalFanficCharacters() (*big.Int, error) {
+	return _CharacterRegistry.Contract.TotalFanficCharacters(&_CharacterRegistry.CallOpts)
+}
+
+// TotalFanficCharacters is a free data retrieval call binding the contract method 0x5bce9a84.
+//
+// Solidity: function totalFanficCharacters() view returns(uint256)
+func (_CharacterRegistry *CharacterRegistryCallerSession) TotalFanficCharacters() (*big.Int, error) {
+	return _CharacterRegistry.Contract.TotalFanficCharacters(&_CharacterRegistry.CallOpts)
 }
 
 // AddCharacter is a paid mutator transaction binding the contract method 0x218ecce9.

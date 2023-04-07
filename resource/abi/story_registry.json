@@ -3,6 +3,11 @@
     "inputs": [
       {
         "internalType": "address",
+        "name": "_franchise",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
         "name": "_canonCollection",
         "type": "address"
       },
@@ -145,14 +150,9 @@
       {
         "components": [
           {
-            "internalType": "address",
+            "internalType": "address[]",
             "name": "author",
-            "type": "address"
-          },
-          {
-            "internalType": "address",
-            "name": "owner",
-            "type": "address"
+            "type": "address[]"
           },
           {
             "internalType": "string",
@@ -172,22 +172,17 @@
                 "type": "uint256"
               }
             ],
-            "internalType": "struct IStoryRegistry.NftToken[]",
+            "internalType": "struct NftToken[]",
             "name": "characters",
             "type": "tuple[]"
           },
           {
             "internalType": "address",
-            "name": "collectPolicy",
-            "type": "address"
-          },
-          {
-            "internalType": "address",
-            "name": "collectNftAddress",
+            "name": "autographModule",
             "type": "address"
           }
         ],
-        "internalType": "struct IStoryRegistry.StoryInfo",
+        "internalType": "struct StoryInfo",
         "name": "info",
         "type": "tuple"
       },
@@ -216,8 +211,44 @@
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "sender",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "collection",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "id",
+        "type": "uint256"
+      }
+    ],
+    "name": "collect",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "fanFictionCollection",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "franchise",
     "outputs": [
       {
         "internalType": "address",
@@ -236,6 +267,30 @@
         "internalType": "address",
         "name": "",
         "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "collection",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "id",
+        "type": "uint256"
+      }
+    ],
+    "name": "getCollectors",
+    "outputs": [
+      {
+        "internalType": "address[]",
+        "name": "",
+        "type": "address[]"
       }
     ],
     "stateMutability": "view",
@@ -412,14 +467,9 @@
       {
         "components": [
           {
-            "internalType": "address",
+            "internalType": "address[]",
             "name": "author",
-            "type": "address"
-          },
-          {
-            "internalType": "address",
-            "name": "owner",
-            "type": "address"
+            "type": "address[]"
           },
           {
             "internalType": "string",
@@ -439,24 +489,43 @@
                 "type": "uint256"
               }
             ],
-            "internalType": "struct IStoryRegistry.NftToken[]",
+            "internalType": "struct NftToken[]",
             "name": "characters",
             "type": "tuple[]"
           },
           {
             "internalType": "address",
-            "name": "collectPolicy",
-            "type": "address"
-          },
-          {
-            "internalType": "address",
-            "name": "collectNftAddress",
+            "name": "autographModule",
             "type": "address"
           }
         ],
-        "internalType": "struct IStoryRegistry.StoryInfo",
+        "internalType": "struct StoryInfo",
         "name": "",
         "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "storyCollections",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "internalType": "address",
+        "name": "autographModule",
+        "type": "address"
       }
     ],
     "stateMutability": "view",

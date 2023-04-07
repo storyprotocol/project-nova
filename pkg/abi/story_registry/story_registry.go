@@ -28,25 +28,23 @@ var (
 	_ = event.NewSubscription
 )
 
-// IStoryRegistryNftToken is an auto generated low-level Go binding around an user-defined struct.
-type IStoryRegistryNftToken struct {
+// NftToken is an auto generated low-level Go binding around an user-defined struct.
+type NftToken struct {
 	Collection common.Address
 	TokenId    *big.Int
 }
 
-// IStoryRegistryStoryInfo is an auto generated low-level Go binding around an user-defined struct.
-type IStoryRegistryStoryInfo struct {
-	Author            common.Address
-	Owner             common.Address
-	Title             string
-	Characters        []IStoryRegistryNftToken
-	CollectPolicy     common.Address
-	CollectNftAddress common.Address
+// StoryInfo is an auto generated low-level Go binding around an user-defined struct.
+type StoryInfo struct {
+	Author          []common.Address
+	Title           string
+	Characters      []NftToken
+	AutographModule common.Address
 }
 
 // StoryRegistryMetaData contains all meta data concerning the StoryRegistry contract.
 var StoryRegistryMetaData = &bind.MetaData{
-	ABI: "[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_canonCollection\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_fanFictionCollection\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"previousAdminRole\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"newAdminRole\",\"type\":\"bytes32\"}],\"name\":\"RoleAdminChanged\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"sender\",\"type\":\"address\"}],\"name\":\"RoleGranted\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"sender\",\"type\":\"address\"}],\"name\":\"RoleRevoked\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"collection\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"}],\"name\":\"StoryAdded\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"DEFAULT_ADMIN_ROLE\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"FRANCHISE_ROLE\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"collection\",\"type\":\"address\"},{\"components\":[{\"internalType\":\"address\",\"name\":\"author\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"},{\"internalType\":\"string\",\"name\":\"title\",\"type\":\"string\"},{\"components\":[{\"internalType\":\"address\",\"name\":\"collection\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"}],\"internalType\":\"structIStoryRegistry.NftToken[]\",\"name\":\"characters\",\"type\":\"tuple[]\"},{\"internalType\":\"address\",\"name\":\"collectPolicy\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"collectNftAddress\",\"type\":\"address\"}],\"internalType\":\"structIStoryRegistry.StoryInfo\",\"name\":\"info\",\"type\":\"tuple\"},{\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"}],\"name\":\"addStory\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"canonCollection\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"fanFictionCollection\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getCannonCollection\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getFanFictionCollection\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"}],\"name\":\"getRoleAdmin\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"}],\"name\":\"getRoleMember\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"}],\"name\":\"getRoleMemberCount\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"grantRole\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"hasRole\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"renounceRole\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"revokeRole\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"collection\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"}],\"name\":\"story\",\"outputs\":[{\"components\":[{\"internalType\":\"address\",\"name\":\"author\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"},{\"internalType\":\"string\",\"name\":\"title\",\"type\":\"string\"},{\"components\":[{\"internalType\":\"address\",\"name\":\"collection\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"}],\"internalType\":\"structIStoryRegistry.NftToken[]\",\"name\":\"characters\",\"type\":\"tuple[]\"},{\"internalType\":\"address\",\"name\":\"collectPolicy\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"collectNftAddress\",\"type\":\"address\"}],\"internalType\":\"structIStoryRegistry.StoryInfo\",\"name\":\"\",\"type\":\"tuple\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes4\",\"name\":\"interfaceId\",\"type\":\"bytes4\"}],\"name\":\"supportsInterface\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"}]",
+	ABI: "[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_franchise\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_canonCollection\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_fanFictionCollection\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"previousAdminRole\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"newAdminRole\",\"type\":\"bytes32\"}],\"name\":\"RoleAdminChanged\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"sender\",\"type\":\"address\"}],\"name\":\"RoleGranted\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"sender\",\"type\":\"address\"}],\"name\":\"RoleRevoked\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"collection\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"}],\"name\":\"StoryAdded\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"DEFAULT_ADMIN_ROLE\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"FRANCHISE_ROLE\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"collection\",\"type\":\"address\"},{\"components\":[{\"internalType\":\"address[]\",\"name\":\"author\",\"type\":\"address[]\"},{\"internalType\":\"string\",\"name\":\"title\",\"type\":\"string\"},{\"components\":[{\"internalType\":\"address\",\"name\":\"collection\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"}],\"internalType\":\"structNftToken[]\",\"name\":\"characters\",\"type\":\"tuple[]\"},{\"internalType\":\"address\",\"name\":\"autographModule\",\"type\":\"address\"}],\"internalType\":\"structStoryInfo\",\"name\":\"info\",\"type\":\"tuple\"},{\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"}],\"name\":\"addStory\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"canonCollection\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"sender\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"collection\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"id\",\"type\":\"uint256\"}],\"name\":\"collect\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"fanFictionCollection\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"franchise\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getCannonCollection\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"collection\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"id\",\"type\":\"uint256\"}],\"name\":\"getCollectors\",\"outputs\":[{\"internalType\":\"address[]\",\"name\":\"\",\"type\":\"address[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getFanFictionCollection\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"}],\"name\":\"getRoleAdmin\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"}],\"name\":\"getRoleMember\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"}],\"name\":\"getRoleMemberCount\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"grantRole\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"hasRole\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"renounceRole\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"revokeRole\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"collection\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"}],\"name\":\"story\",\"outputs\":[{\"components\":[{\"internalType\":\"address[]\",\"name\":\"author\",\"type\":\"address[]\"},{\"internalType\":\"string\",\"name\":\"title\",\"type\":\"string\"},{\"components\":[{\"internalType\":\"address\",\"name\":\"collection\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"}],\"internalType\":\"structNftToken[]\",\"name\":\"characters\",\"type\":\"tuple[]\"},{\"internalType\":\"address\",\"name\":\"autographModule\",\"type\":\"address\"}],\"internalType\":\"structStoryInfo\",\"name\":\"\",\"type\":\"tuple\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"storyCollections\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"title\",\"type\":\"string\"},{\"internalType\":\"address\",\"name\":\"autographModule\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes4\",\"name\":\"interfaceId\",\"type\":\"bytes4\"}],\"name\":\"supportsInterface\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"}]",
 }
 
 // StoryRegistryABI is the input ABI used to generate the binding from.
@@ -319,6 +317,37 @@ func (_StoryRegistry *StoryRegistryCallerSession) FanFictionCollection() (common
 	return _StoryRegistry.Contract.FanFictionCollection(&_StoryRegistry.CallOpts)
 }
 
+// Franchise is a free data retrieval call binding the contract method 0xc9761dd9.
+//
+// Solidity: function franchise() view returns(address)
+func (_StoryRegistry *StoryRegistryCaller) Franchise(opts *bind.CallOpts) (common.Address, error) {
+	var out []interface{}
+	err := _StoryRegistry.contract.Call(opts, &out, "franchise")
+
+	if err != nil {
+		return *new(common.Address), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(common.Address)).(*common.Address)
+
+	return out0, err
+
+}
+
+// Franchise is a free data retrieval call binding the contract method 0xc9761dd9.
+//
+// Solidity: function franchise() view returns(address)
+func (_StoryRegistry *StoryRegistrySession) Franchise() (common.Address, error) {
+	return _StoryRegistry.Contract.Franchise(&_StoryRegistry.CallOpts)
+}
+
+// Franchise is a free data retrieval call binding the contract method 0xc9761dd9.
+//
+// Solidity: function franchise() view returns(address)
+func (_StoryRegistry *StoryRegistryCallerSession) Franchise() (common.Address, error) {
+	return _StoryRegistry.Contract.Franchise(&_StoryRegistry.CallOpts)
+}
+
 // GetCannonCollection is a free data retrieval call binding the contract method 0x5adbcdb5.
 //
 // Solidity: function getCannonCollection() view returns(address)
@@ -348,6 +377,37 @@ func (_StoryRegistry *StoryRegistrySession) GetCannonCollection() (common.Addres
 // Solidity: function getCannonCollection() view returns(address)
 func (_StoryRegistry *StoryRegistryCallerSession) GetCannonCollection() (common.Address, error) {
 	return _StoryRegistry.Contract.GetCannonCollection(&_StoryRegistry.CallOpts)
+}
+
+// GetCollectors is a free data retrieval call binding the contract method 0xca45115a.
+//
+// Solidity: function getCollectors(address collection, uint256 id) view returns(address[])
+func (_StoryRegistry *StoryRegistryCaller) GetCollectors(opts *bind.CallOpts, collection common.Address, id *big.Int) ([]common.Address, error) {
+	var out []interface{}
+	err := _StoryRegistry.contract.Call(opts, &out, "getCollectors", collection, id)
+
+	if err != nil {
+		return *new([]common.Address), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new([]common.Address)).(*[]common.Address)
+
+	return out0, err
+
+}
+
+// GetCollectors is a free data retrieval call binding the contract method 0xca45115a.
+//
+// Solidity: function getCollectors(address collection, uint256 id) view returns(address[])
+func (_StoryRegistry *StoryRegistrySession) GetCollectors(collection common.Address, id *big.Int) ([]common.Address, error) {
+	return _StoryRegistry.Contract.GetCollectors(&_StoryRegistry.CallOpts, collection, id)
+}
+
+// GetCollectors is a free data retrieval call binding the contract method 0xca45115a.
+//
+// Solidity: function getCollectors(address collection, uint256 id) view returns(address[])
+func (_StoryRegistry *StoryRegistryCallerSession) GetCollectors(collection common.Address, id *big.Int) ([]common.Address, error) {
+	return _StoryRegistry.Contract.GetCollectors(&_StoryRegistry.CallOpts, collection, id)
 }
 
 // GetFanFictionCollection is a free data retrieval call binding the contract method 0x6204d173.
@@ -507,16 +567,16 @@ func (_StoryRegistry *StoryRegistryCallerSession) HasRole(role [32]byte, account
 
 // Story is a free data retrieval call binding the contract method 0x0b3b2a67.
 //
-// Solidity: function story(address collection, uint256 tokenId) view returns((address,address,string,(address,uint256)[],address,address))
-func (_StoryRegistry *StoryRegistryCaller) Story(opts *bind.CallOpts, collection common.Address, tokenId *big.Int) (IStoryRegistryStoryInfo, error) {
+// Solidity: function story(address collection, uint256 tokenId) view returns((address[],string,(address,uint256)[],address))
+func (_StoryRegistry *StoryRegistryCaller) Story(opts *bind.CallOpts, collection common.Address, tokenId *big.Int) (StoryInfo, error) {
 	var out []interface{}
 	err := _StoryRegistry.contract.Call(opts, &out, "story", collection, tokenId)
 
 	if err != nil {
-		return *new(IStoryRegistryStoryInfo), err
+		return *new(StoryInfo), err
 	}
 
-	out0 := *abi.ConvertType(out[0], new(IStoryRegistryStoryInfo)).(*IStoryRegistryStoryInfo)
+	out0 := *abi.ConvertType(out[0], new(StoryInfo)).(*StoryInfo)
 
 	return out0, err
 
@@ -524,16 +584,61 @@ func (_StoryRegistry *StoryRegistryCaller) Story(opts *bind.CallOpts, collection
 
 // Story is a free data retrieval call binding the contract method 0x0b3b2a67.
 //
-// Solidity: function story(address collection, uint256 tokenId) view returns((address,address,string,(address,uint256)[],address,address))
-func (_StoryRegistry *StoryRegistrySession) Story(collection common.Address, tokenId *big.Int) (IStoryRegistryStoryInfo, error) {
+// Solidity: function story(address collection, uint256 tokenId) view returns((address[],string,(address,uint256)[],address))
+func (_StoryRegistry *StoryRegistrySession) Story(collection common.Address, tokenId *big.Int) (StoryInfo, error) {
 	return _StoryRegistry.Contract.Story(&_StoryRegistry.CallOpts, collection, tokenId)
 }
 
 // Story is a free data retrieval call binding the contract method 0x0b3b2a67.
 //
-// Solidity: function story(address collection, uint256 tokenId) view returns((address,address,string,(address,uint256)[],address,address))
-func (_StoryRegistry *StoryRegistryCallerSession) Story(collection common.Address, tokenId *big.Int) (IStoryRegistryStoryInfo, error) {
+// Solidity: function story(address collection, uint256 tokenId) view returns((address[],string,(address,uint256)[],address))
+func (_StoryRegistry *StoryRegistryCallerSession) Story(collection common.Address, tokenId *big.Int) (StoryInfo, error) {
 	return _StoryRegistry.Contract.Story(&_StoryRegistry.CallOpts, collection, tokenId)
+}
+
+// StoryCollections is a free data retrieval call binding the contract method 0x05fe7368.
+//
+// Solidity: function storyCollections(address ) view returns(string title, address autographModule)
+func (_StoryRegistry *StoryRegistryCaller) StoryCollections(opts *bind.CallOpts, arg0 common.Address) (struct {
+	Title           string
+	AutographModule common.Address
+}, error) {
+	var out []interface{}
+	err := _StoryRegistry.contract.Call(opts, &out, "storyCollections", arg0)
+
+	outstruct := new(struct {
+		Title           string
+		AutographModule common.Address
+	})
+	if err != nil {
+		return *outstruct, err
+	}
+
+	outstruct.Title = *abi.ConvertType(out[0], new(string)).(*string)
+	outstruct.AutographModule = *abi.ConvertType(out[1], new(common.Address)).(*common.Address)
+
+	return *outstruct, err
+
+}
+
+// StoryCollections is a free data retrieval call binding the contract method 0x05fe7368.
+//
+// Solidity: function storyCollections(address ) view returns(string title, address autographModule)
+func (_StoryRegistry *StoryRegistrySession) StoryCollections(arg0 common.Address) (struct {
+	Title           string
+	AutographModule common.Address
+}, error) {
+	return _StoryRegistry.Contract.StoryCollections(&_StoryRegistry.CallOpts, arg0)
+}
+
+// StoryCollections is a free data retrieval call binding the contract method 0x05fe7368.
+//
+// Solidity: function storyCollections(address ) view returns(string title, address autographModule)
+func (_StoryRegistry *StoryRegistryCallerSession) StoryCollections(arg0 common.Address) (struct {
+	Title           string
+	AutographModule common.Address
+}, error) {
+	return _StoryRegistry.Contract.StoryCollections(&_StoryRegistry.CallOpts, arg0)
 }
 
 // SupportsInterface is a free data retrieval call binding the contract method 0x01ffc9a7.
@@ -567,25 +672,46 @@ func (_StoryRegistry *StoryRegistryCallerSession) SupportsInterface(interfaceId 
 	return _StoryRegistry.Contract.SupportsInterface(&_StoryRegistry.CallOpts, interfaceId)
 }
 
-// AddStory is a paid mutator transaction binding the contract method 0x2505997e.
+// AddStory is a paid mutator transaction binding the contract method 0x65a199af.
 //
-// Solidity: function addStory(address collection, (address,address,string,(address,uint256)[],address,address) info, uint256 tokenId) returns()
-func (_StoryRegistry *StoryRegistryTransactor) AddStory(opts *bind.TransactOpts, collection common.Address, info IStoryRegistryStoryInfo, tokenId *big.Int) (*types.Transaction, error) {
+// Solidity: function addStory(address collection, (address[],string,(address,uint256)[],address) info, uint256 tokenId) returns()
+func (_StoryRegistry *StoryRegistryTransactor) AddStory(opts *bind.TransactOpts, collection common.Address, info StoryInfo, tokenId *big.Int) (*types.Transaction, error) {
 	return _StoryRegistry.contract.Transact(opts, "addStory", collection, info, tokenId)
 }
 
-// AddStory is a paid mutator transaction binding the contract method 0x2505997e.
+// AddStory is a paid mutator transaction binding the contract method 0x65a199af.
 //
-// Solidity: function addStory(address collection, (address,address,string,(address,uint256)[],address,address) info, uint256 tokenId) returns()
-func (_StoryRegistry *StoryRegistrySession) AddStory(collection common.Address, info IStoryRegistryStoryInfo, tokenId *big.Int) (*types.Transaction, error) {
+// Solidity: function addStory(address collection, (address[],string,(address,uint256)[],address) info, uint256 tokenId) returns()
+func (_StoryRegistry *StoryRegistrySession) AddStory(collection common.Address, info StoryInfo, tokenId *big.Int) (*types.Transaction, error) {
 	return _StoryRegistry.Contract.AddStory(&_StoryRegistry.TransactOpts, collection, info, tokenId)
 }
 
-// AddStory is a paid mutator transaction binding the contract method 0x2505997e.
+// AddStory is a paid mutator transaction binding the contract method 0x65a199af.
 //
-// Solidity: function addStory(address collection, (address,address,string,(address,uint256)[],address,address) info, uint256 tokenId) returns()
-func (_StoryRegistry *StoryRegistryTransactorSession) AddStory(collection common.Address, info IStoryRegistryStoryInfo, tokenId *big.Int) (*types.Transaction, error) {
+// Solidity: function addStory(address collection, (address[],string,(address,uint256)[],address) info, uint256 tokenId) returns()
+func (_StoryRegistry *StoryRegistryTransactorSession) AddStory(collection common.Address, info StoryInfo, tokenId *big.Int) (*types.Transaction, error) {
 	return _StoryRegistry.Contract.AddStory(&_StoryRegistry.TransactOpts, collection, info, tokenId)
+}
+
+// Collect is a paid mutator transaction binding the contract method 0xc8fea2fb.
+//
+// Solidity: function collect(address sender, address collection, uint256 id) returns()
+func (_StoryRegistry *StoryRegistryTransactor) Collect(opts *bind.TransactOpts, sender common.Address, collection common.Address, id *big.Int) (*types.Transaction, error) {
+	return _StoryRegistry.contract.Transact(opts, "collect", sender, collection, id)
+}
+
+// Collect is a paid mutator transaction binding the contract method 0xc8fea2fb.
+//
+// Solidity: function collect(address sender, address collection, uint256 id) returns()
+func (_StoryRegistry *StoryRegistrySession) Collect(sender common.Address, collection common.Address, id *big.Int) (*types.Transaction, error) {
+	return _StoryRegistry.Contract.Collect(&_StoryRegistry.TransactOpts, sender, collection, id)
+}
+
+// Collect is a paid mutator transaction binding the contract method 0xc8fea2fb.
+//
+// Solidity: function collect(address sender, address collection, uint256 id) returns()
+func (_StoryRegistry *StoryRegistryTransactorSession) Collect(sender common.Address, collection common.Address, id *big.Int) (*types.Transaction, error) {
+	return _StoryRegistry.Contract.Collect(&_StoryRegistry.TransactOpts, sender, collection, id)
 }
 
 // GrantRole is a paid mutator transaction binding the contract method 0x2f2ff15d.

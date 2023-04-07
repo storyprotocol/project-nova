@@ -11,30 +11,45 @@ type Franchise struct {
 }
 
 var SingleFranchise = &Franchise{
-	Address:           "0x7c50c053f1d7f889c528dab717760a155bf3f543",
+	Address:           "0xd5022d17c9a7768110c47075430ea6284f7e089a",
 	Name:              "Forced Offline",
-	VaultAddress:      "0x7c50c053f1d7f889c528dab717760a155bf3f543",
-	CharacterRegistry: "0x29943be4cc35e5517c10e2917cecab8d96b53eea",
+	VaultAddress:      "0xd5022d17c9a7768110c47075430ea6284f7e089a",
+	CharacterRegistry: "0x1d2660e16164c9ccbdd8ebd8b7b358492c14c8db",
 	CharacterContracts: []*CharacterCollection{
 		{
-			Address: "0xc6dc20dd779136555f6933a90bfd8defe0f6c8de",
+			Address: "0x1751ba3d2b2c928ecdc24925fd8123c913d72873",
 			Name:    "Force Offline Main",
 		},
 		{
-			Address: "0x31ed93fd8c4f656fa3e32693b3b8403687bc5503",
+			Address: "0x3c0b968f786485d2f9df4390de6c3a2360d1c1ff",
 			Name:    "Forced offline FanFic",
 		},
 	},
-	StoryRegistry: "0xbbbe9a2b68f8d2262ff608b615c2958df8b55f69",
+	StoryRegistry: "0xd834353e6a1dbfa94ce8ff3ef5ec9452b86d66eb",
 	StoryContracts: []*StoryCollection{
 		{
-			Address: "0x6ff9cdefdaa8f58de2793b73a51cc6eb20f518da",
+			Address: "0xa0d090dac571a8ef51d10ec93d84d72f1db9552a",
 			IsCanon: true,
 		},
 		{
-			Address: "0x5bcba74072a61c16ef19d966d0ed8c936131c3f0",
+			Address: "0x9f349f397db15b1bc669c420e224f1c694b9d9c6",
 			IsCanon: false,
 		},
+	},
+}
+
+var FranchiseMap = map[string]*Franchise{
+	"0xd5022d17c9a7768110c47075430ea6284f7e089a": SingleFranchise,
+}
+
+var StoryContractMap = map[string]*StoryCollection{
+	"0xa0d090dac571a8ef51d10ec93d84d72f1db9552a": {
+		Address: "0xa0d090dac571a8ef51d10ec93d84d72f1db9552a",
+		IsCanon: true,
+	},
+	"0x9f349f397db15b1bc669c420e224f1c694b9d9c6": {
+		Address: "0x9f349f397db15b1bc669c420e224f1c694b9d9c6",
+		IsCanon: false,
 	},
 }
 
@@ -69,21 +84,6 @@ var Franchises = []*Franchise{
 			},
 		},
 	*/
-}
-
-var FranchiseMap = map[string]*Franchise{
-	"0x7c50c053f1d7f889c528dab717760a155bf3f543": SingleFranchise,
-}
-
-var StoryContractMap = map[string]*StoryCollection{
-	"0x6ff9cdefdaa8f58de2793b73a51cc6eb20f518da": {
-		Address: "0x6ff9cdefdaa8f58de2793b73a51cc6eb20f518da",
-		IsCanon: true,
-	},
-	"0x5bcba74072a61c16ef19d966d0ed8c936131c3f0": {
-		Address: "0x5bcba74072a61c16ef19d966d0ed8c936131c3f0",
-		IsCanon: false,
-	},
 }
 
 type CharacterCollection struct {
@@ -213,7 +213,7 @@ var Collectors = []*Collector{
 
 type CharacterNftOnchainMeta struct {
 	Name        *string     `json:"name"`
-	Description *string     `json:"decription"`
+	Description *string     `json:"description"`
 	Image       *string     `json:"image"`
 	Author      *string     `json:"author"`
 	Attributes  []*NftTrait `json:"attributes"`
