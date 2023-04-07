@@ -424,14 +424,24 @@ func createCharacterReponse(uri string, tokenId int, charInfo *character_registr
 	return character, nil
 }
 
-func createStoryReponse(uri string, tokenId int, storyInfo *story_registry.IStoryRegistryStoryInfo, collectionInfo *entity.StoryCollection, ownerAddress string, collectionAddress string) (*entity.Story, error) {
+func createStoryReponse(uri string, tokenId int, storyInfo *story_registry.StoryInfo, collectionInfo *entity.StoryCollection, ownerAddress string, collectionAddress string) (*entity.Story, error) {
 	story := &entity.Story{
 		TokenId:           tokenId,
 		OwnerAddress:      ownerAddress,
 		CollectionAddress: collectionAddress,
 		Title:             storyInfo.Title,
-		AuthorAddress:     []string{storyInfo.Author.String()},
 		IsCanon:           collectionInfo.IsCanon,
+	}
+
+	for _, author := range storyInfo.Author {
+		story.AuthorAddress = append(story.AuthorAddress, author.String())
+	}
+
+	for _, character := range storyInfo.Characters {
+		story.Characters = append(story.Characters, &entity.Character{
+			CollectionAddress: character.Collection.String(),
+			TokenId:           int(character.TokenId.Int64()),
+		})
 	}
 
 	if uri == "" {

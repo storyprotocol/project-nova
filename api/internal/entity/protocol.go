@@ -221,6 +221,6 @@ type CharacterNftOnchainMeta struct {
 
 type StoryNftOnchainMeta struct {
 	Name        *string `json:"name"`
-	Description *string `json:"decription"`
+	Description *string `json:"description"`
 	Image       *string `json:"image"`
 }
