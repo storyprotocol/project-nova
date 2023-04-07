@@ -15,6 +15,7 @@ import (
 	"github.com/project-nova/backend/api/internal/entity"
 	"github.com/project-nova/backend/pkg/abi/character_registry"
 	"github.com/project-nova/backend/pkg/abi/erc721"
+	"github.com/project-nova/backend/pkg/abi/story_registry"
 	"github.com/project-nova/backend/pkg/logger"
 	"github.com/project-nova/backend/pkg/utils"
 )
@@ -29,7 +30,21 @@ func NewGetFranchisesHandler(client *ethclient.Client) func(c *gin.Context) {
 // GET /franchise/:franchiseAddress
 func NewGetFranchiseCollectionsHandler(client *ethclient.Client) func(c *gin.Context) {
 	return func(c *gin.Context) {
-		c.JSON(http.StatusOK, entity.SingleFranchise)
+		franchiseAddress, err := utils.SanitizeAddress(c.Param("franchiseAddress"))
+		if err != nil {
+			logger.Errorf("Invalid franchise address: %s", c.Param("franchiseAddress"))
+			c.JSON(http.StatusBadRequest, ErrorMessage("Invalid franchise address"))
+			return
+		}
+
+		franchise, ok := entity.FranchiseMap[franchiseAddress]
+		if !ok {
+			logger.Errorf("Unkown franchise address: %s", franchiseAddress)
+			c.JSON(http.StatusBadRequest, ErrorMessage("Invalid franchise address"))
+			return
+		}
+
+		c.JSON(http.StatusOK, franchise)
 	}
 }
 
@@ -139,7 +154,7 @@ func NewGetCharacterHandler(client *ethclient.Client) func(c *gin.Context) {
 		registryAddress := common.HexToAddress(entity.FranchiseMap[franchiseAddress].CharacterRegistry)
 		registryContract, err := character_registry.NewCharacterRegistry(registryAddress, client)
 		if err != nil {
-			logger.Errorf("Failed to instantiate the contract: %v", err)
+			logger.Errorf("Failed to instantiate the character registry contract: %v", err)
 			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
 			return
 		}
@@ -147,7 +162,7 @@ func NewGetCharacterHandler(client *ethclient.Client) func(c *gin.Context) {
 		collectionAddr := common.HexToAddress(collectionAddress)
 		erc721Contract, err := erc721.NewErc721(collectionAddr, client)
 		if err != nil {
-			logger.Errorf("Failed to instantiate the contract: %v", err)
+			logger.Errorf("Failed to instantiate the character collection contract: %v", err)
 			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
 			return
 		}
@@ -194,14 +209,164 @@ func NewGetCollectorsHandler(client *ethclient.Client) func(c *gin.Context) {
 // Get /story/:franchiseAddress/:collectionAddress
 func NewGetStoriesHandler(client *ethclient.Client) func(c *gin.Context) {
 	return func(c *gin.Context) {
-		c.JSON(http.StatusOK, entity.Stories)
+		franchiseAddress, err := utils.SanitizeAddress(c.Param("franchiseAddress"))
+		if err != nil {
+			logger.Errorf("Invalid franchise address: %s", c.Param("franchiseAddress"))
+			c.JSON(http.StatusBadRequest, ErrorMessage("Invalid franchise address"))
+			return
+		}
+
+		collectionAddress, err := utils.SanitizeAddress(c.Param("collectionAddress"))
+		if err != nil {
+			logger.Errorf("Invalid collection address: %s", c.Param("collectionAddress"))
+			c.JSON(http.StatusBadRequest, ErrorMessage("Invalid collection address"))
+			return
+		}
+
+		registryAddress := common.HexToAddress(entity.FranchiseMap[franchiseAddress].StoryRegistry)
+		registryContract, err := story_registry.NewStoryRegistry(registryAddress, client)
+		if err != nil {
+			logger.Errorf("Failed to instantiate the story registry contract: %v", err)
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+			return
+		}
+
+		collectionAddr := common.HexToAddress(collectionAddress)
+		erc721Contract, err := erc721.NewErc721(collectionAddr, client)
+		if err != nil {
+			logger.Errorf("Failed to instantiate the story collection contract: %v", err)
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+			return
+		}
+
+		supply, err := erc721Contract.TotalSupply(nil)
+		if err != nil {
+			logger.Errorf("Failed to get total supply for collection %s: %v", collectionAddress, err)
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+			return
+		}
+
+		collectionInfo, ok := entity.StoryContractMap[collectionAddress]
+		if !ok {
+			logger.Errorf("Failed to get collection info for collection %s: %v", collectionAddress, err)
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+			return
+		}
+
+		var resp []*entity.Story
+
+		supplyInt := supply.Int64()
+		for i := 0; i < int(supplyInt); i++ {
+			storyInfo, err := registryContract.Story(nil, collectionAddr, big.NewInt(int64(i)))
+			if err != nil {
+				logger.Errorf("Failed to get story info: %v", err)
+				c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+				return
+			}
+
+			uri, err := erc721Contract.TokenURI(nil, big.NewInt(int64(i)))
+			if err != nil {
+				logger.Errorf("Failed to get total uri for token %d: %v", i, err)
+				c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+				return
+			}
+
+			ownerAddress, err := erc721Contract.OwnerOf(nil, big.NewInt(int64(i)))
+			if err != nil {
+				logger.Errorf("Failed to get owner address for token %d: %v", i, err)
+				c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+				return
+			}
+
+			story, err := createStoryReponse(uri, i, &storyInfo, collectionInfo, ownerAddress.String(), collectionAddress)
+			if err != nil {
+				logger.Errorf("Failed to create story response for %d: %v", i, err)
+				c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+				return
+			}
+
+			resp = append(resp, story)
+		}
+		c.JSON(http.StatusOK, resp)
 	}
 }
 
 // Get /story/:franchiseAddress/:collectionAddress/:tokenId
 func NewGetStoryHandler(client *ethclient.Client) func(c *gin.Context) {
 	return func(c *gin.Context) {
-		c.JSON(http.StatusOK, entity.SingleStory)
+		franchiseAddress, err := utils.SanitizeAddress(c.Param("franchiseAddress"))
+		if err != nil {
+			logger.Errorf("Invalid franchise address: %s", c.Param("franchiseAddress"))
+			c.JSON(http.StatusBadRequest, ErrorMessage("Invalid franchise address"))
+			return
+		}
+
+		collectionAddress, err := utils.SanitizeAddress(c.Param("collectionAddress"))
+		if err != nil {
+			logger.Errorf("Invalid collection address: %s", c.Param("collectionAddress"))
+			c.JSON(http.StatusBadRequest, ErrorMessage("Invalid collection address"))
+			return
+		}
+
+		tokenId, err := strconv.Atoi(c.Param("tokenId"))
+		if err != nil {
+			logger.Errorf("Invalid token id: %s", c.Param("tokenId"))
+			c.JSON(http.StatusBadRequest, ErrorMessage("Invalid token id"))
+			return
+		}
+
+		registryAddress := common.HexToAddress(entity.FranchiseMap[franchiseAddress].StoryRegistry)
+		registryContract, err := story_registry.NewStoryRegistry(registryAddress, client)
+		if err != nil {
+			logger.Errorf("Failed to instantiate the story registry contract: %v", err)
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+			return
+		}
+
+		collectionAddr := common.HexToAddress(collectionAddress)
+		erc721Contract, err := erc721.NewErc721(collectionAddr, client)
+		if err != nil {
+			logger.Errorf("Failed to instantiate the story collection contract: %v", err)
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+			return
+		}
+
+		collectionInfo, ok := entity.StoryContractMap[collectionAddress]
+		if !ok {
+			logger.Errorf("Failed to get collection info for collection %s: %v", collectionAddress, err)
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+			return
+		}
+
+		storyInfo, err := registryContract.Story(nil, collectionAddr, big.NewInt(int64(tokenId)))
+		if err != nil {
+			logger.Errorf("Failed to get story info: %v", err)
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+			return
+		}
+
+		uri, err := erc721Contract.TokenURI(nil, big.NewInt(int64(tokenId)))
+		if err != nil {
+			logger.Errorf("Failed to get total uri for token %d: %v", tokenId, err)
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+			return
+		}
+
+		ownerAddress, err := erc721Contract.OwnerOf(nil, big.NewInt(int64(tokenId)))
+		if err != nil {
+			logger.Errorf("Failed to get owner address for token %d: %v", tokenId, err)
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+			return
+		}
+
+		story, err := createStoryReponse(uri, tokenId, &storyInfo, collectionInfo, ownerAddress.String(), collectionAddress)
+		if err != nil {
+			logger.Errorf("Failed to create story response for %d: %v", tokenId, err)
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+			return
+		}
+
+		c.JSON(http.StatusOK, story)
 	}
 }
 
@@ -256,4 +421,44 @@ func createCharacterReponse(uri string, tokenId int, charInfo *character_registr
 	}
 
 	return character, nil
+}
+
+func createStoryReponse(uri string, tokenId int, storyInfo *story_registry.IStoryRegistryStoryInfo, collectionInfo *entity.StoryCollection, ownerAddress string, collectionAddress string) (*entity.Story, error) {
+	story := &entity.Story{
+		TokenId:           tokenId,
+		OwnerAddress:      ownerAddress,
+		CollectionAddress: collectionAddress,
+		Title:             storyInfo.Title,
+		AuthorAddress:     []string{storyInfo.Author.String()},
+		IsCanon:           collectionInfo.IsCanon,
+	}
+
+	if uri == "" {
+		return story, nil
+	}
+
+	splittedStr := strings.Split(uri, ",")
+	if len(splittedStr) != 2 {
+		return nil, fmt.Errorf("failed to split uri string to 2 parts. uri: %v", uri)
+	}
+
+	decodedMetadata, err := base64.StdEncoding.DecodeString(splittedStr[1])
+	if err != nil {
+		return nil, fmt.Errorf("failed to decode uri: %v", err)
+	}
+
+	var result entity.StoryNftOnchainMeta
+	err = json.Unmarshal(decodedMetadata, &result)
+	if err != nil {
+		return nil, fmt.Errorf("failed to unmarshal metadata: %v", err)
+	}
+
+	if result.Image != nil {
+		story.ImageUrl = *result.Image
+	}
+	if result.Description != nil {
+		story.ContentUrl = *result.Description
+	}
+
+	return story, nil
 }

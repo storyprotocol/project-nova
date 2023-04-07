@@ -72,7 +72,18 @@ var Franchises = []*Franchise{
 }
 
 var FranchiseMap = map[string]*Franchise{
-	"0xforcedoffline": SingleFranchise,
+	"0x7c50c053f1d7f889c528dab717760a155bf3f543": SingleFranchise,
+}
+
+var StoryContractMap = map[string]*StoryCollection{
+	"0x6ff9cdefdaa8f58de2793b73a51cc6eb20f518da": {
+		Address: "0x6ff9cdefdaa8f58de2793b73a51cc6eb20f518da",
+		IsCanon: true,
+	},
+	"0x5bcba74072a61c16ef19d966d0ed8c936131c3f0": {
+		Address: "0x5bcba74072a61c16ef19d966d0ed8c936131c3f0",
+		IsCanon: false,
+	},
 }
 
 type CharacterCollection struct {
@@ -138,6 +149,7 @@ type Story struct {
 	OwnerAddress      string       `json:"ownerAddress"`
 	Title             string       `json:"title"`
 	ContentUrl        string       `json:"contentUrl"`
+	ImageUrl          string       `json:"imageUrl"`
 	Characters        []*Character `json:"characters"`
 	IsCanon           bool         `json:"isCanon"`
 }
@@ -205,4 +217,10 @@ type CharacterNftOnchainMeta struct {
 	Image       *string     `json:"image"`
 	Author      *string     `json:"author"`
 	Attributes  []*NftTrait `json:"attributes"`
+}
+
+type StoryNftOnchainMeta struct {
+	Name        *string `json:"name"`
+	Description *string `json:"decription"`
+	Image       *string `json:"image"`
 }
