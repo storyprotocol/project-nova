@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"math/big"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -37,14 +38,14 @@ func NewGetCharactersHandler(client *ethclient.Client) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		franchiseAddress, err := utils.SanitizeAddress(c.Param("franchiseAddress"))
 		if err != nil {
-			logger.Errorf("Invalid franchise address: %s", franchiseAddress)
+			logger.Errorf("Invalid franchise address: %s", c.Param("franchiseAddress"))
 			c.JSON(http.StatusBadRequest, ErrorMessage("Invalid franchise address"))
 			return
 		}
 
 		collectionAddress, err := utils.SanitizeAddress(c.Param("collectionAddress"))
 		if err != nil {
-			logger.Errorf("Invalid collection address: %s", collectionAddress)
+			logger.Errorf("Invalid collection address: %s", c.Param("collectionAddress"))
 			c.JSON(http.StatusBadRequest, ErrorMessage("Invalid collection address"))
 			return
 		}
@@ -114,7 +115,72 @@ func NewGetCharactersHandler(client *ethclient.Client) func(c *gin.Context) {
 // GET /character/:franchiseAddress/:collectionAddress/:tokenId
 func NewGetCharacterHandler(client *ethclient.Client) func(c *gin.Context) {
 	return func(c *gin.Context) {
-		c.JSON(http.StatusOK, entity.SingleCharacter)
+		franchiseAddress, err := utils.SanitizeAddress(c.Param("franchiseAddress"))
+		if err != nil {
+			logger.Errorf("Invalid franchise address: %s", c.Param("franchiseAddress"))
+			c.JSON(http.StatusBadRequest, ErrorMessage("Invalid franchise address"))
+			return
+		}
+
+		collectionAddress, err := utils.SanitizeAddress(c.Param("collectionAddress"))
+		if err != nil {
+			logger.Errorf("Invalid collection address: %s", c.Param("collectionAddress"))
+			c.JSON(http.StatusBadRequest, ErrorMessage("Invalid collection address"))
+			return
+		}
+
+		tokenId, err := strconv.Atoi(c.Param("tokenId"))
+		if err != nil {
+			logger.Errorf("Invalid token id: %s", c.Param("tokenId"))
+			c.JSON(http.StatusBadRequest, ErrorMessage("Invalid token id"))
+			return
+		}
+
+		registryAddress := common.HexToAddress(entity.FranchiseMap[franchiseAddress].CharacterRegistry)
+		registryContract, err := character_registry.NewCharacterRegistry(registryAddress, client)
+		if err != nil {
+			logger.Errorf("Failed to instantiate the contract: %v", err)
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+			return
+		}
+
+		collectionAddr := common.HexToAddress(collectionAddress)
+		erc721Contract, err := erc721.NewErc721(collectionAddr, client)
+		if err != nil {
+			logger.Errorf("Failed to instantiate the contract: %v", err)
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+			return
+		}
+
+		charInfo, err := registryContract.Character(nil, collectionAddr, big.NewInt(int64(tokenId)))
+		if err != nil {
+			logger.Errorf("Failed to get character info: %v", err)
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+			return
+		}
+
+		uri, err := erc721Contract.TokenURI(nil, big.NewInt(int64(tokenId)))
+		if err != nil {
+			logger.Errorf("Failed to get total uri for token %d: %v", tokenId, err)
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+			return
+		}
+
+		ownerAddress, err := erc721Contract.OwnerOf(nil, big.NewInt(int64(tokenId)))
+		if err != nil {
+			logger.Errorf("Failed to get owner address for token %d: %v", tokenId, err)
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+			return
+		}
+
+		character, err := createCharacterReponse(uri, tokenId, &charInfo, ownerAddress.String(), collectionAddress)
+		if err != nil {
+			logger.Errorf("Failed to create character response for %d: %v", tokenId, err)
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+			return
+		}
+
+		c.JSON(http.StatusOK, character)
 	}
 }
 
