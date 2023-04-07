@@ -11,44 +11,44 @@ type Franchise struct {
 }
 
 var SingleFranchise = &Franchise{
-	Address:           "0xd5022d17c9a7768110c47075430ea6284f7e089a",
+	Address:           "0x624bdd3b5d4f67fef15880a8f2cb0a0703d6ec0c",
 	Name:              "Forced Offline",
-	VaultAddress:      "0xd5022d17c9a7768110c47075430ea6284f7e089a",
-	CharacterRegistry: "0x1d2660e16164c9ccbdd8ebd8b7b358492c14c8db",
+	VaultAddress:      "0x624bdd3b5d4f67fef15880a8f2cb0a0703d6ec0c",
+	CharacterRegistry: "0x402d3e9c136dfefaae3b04ea086632688951eccd",
 	CharacterContracts: []*CharacterCollection{
 		{
-			Address: "0x1751ba3d2b2c928ecdc24925fd8123c913d72873",
+			Address: "0xf90bf1f50b71baae6bedcaf92a3a63d97200382c",
 			Name:    "Force Offline Main",
 		},
 		{
-			Address: "0x3c0b968f786485d2f9df4390de6c3a2360d1c1ff",
+			Address: "0xd7431ef1cbd4b5bcc568def48d4480f4e08d2224",
 			Name:    "Forced offline FanFic",
 		},
 	},
-	StoryRegistry: "0xd834353e6a1dbfa94ce8ff3ef5ec9452b86d66eb",
+	StoryRegistry: "0x13687aafb5accecb358f207f58614e01b09dec72",
 	StoryContracts: []*StoryCollection{
 		{
-			Address: "0xa0d090dac571a8ef51d10ec93d84d72f1db9552a",
+			Address: "0x6a84bcceebcd42ee0d73fa95f75862f635fd96ca",
 			IsCanon: true,
 		},
 		{
-			Address: "0x9f349f397db15b1bc669c420e224f1c694b9d9c6",
+			Address: "0x72f822e6b4a752b11b4275aad841b86a3f5266ab",
 			IsCanon: false,
 		},
 	},
 }
 
 var FranchiseMap = map[string]*Franchise{
-	"0xd5022d17c9a7768110c47075430ea6284f7e089a": SingleFranchise,
+	"0x624bdd3b5d4f67fef15880a8f2cb0a0703d6ec0c": SingleFranchise,
 }
 
 var StoryContractMap = map[string]*StoryCollection{
-	"0xa0d090dac571a8ef51d10ec93d84d72f1db9552a": {
-		Address: "0xa0d090dac571a8ef51d10ec93d84d72f1db9552a",
+	"0x6a84bcceebcd42ee0d73fa95f75862f635fd96ca": {
+		Address: "0x6a84bcceebcd42ee0d73fa95f75862f635fd96ca",
 		IsCanon: true,
 	},
-	"0x9f349f397db15b1bc669c420e224f1c694b9d9c6": {
-		Address: "0x9f349f397db15b1bc669c420e224f1c694b9d9c6",
+	"0x72f822e6b4a752b11b4275aad841b86a3f5266ab": {
+		Address: "0x72f822e6b4a752b11b4275aad841b86a3f5266ab",
 		IsCanon: false,
 	},
 }
