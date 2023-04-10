@@ -42,6 +42,17 @@ var FranchiseMap = map[string]*Franchise{
 	"0x624bdd3b5d4f67fef15880a8f2cb0a0703d6ec0c": SingleFranchise,
 }
 
+var CharacterContractMap = map[string]*CharacterCollection{
+	"0xf90bf1f50b71baae6bedcaf92a3a63d97200382c": {
+		Address: "0xf90bf1f50b71baae6bedcaf92a3a63d97200382c",
+		Name:    "Force Offline Main",
+	},
+	"0xd7431ef1cbd4b5bcc568def48d4480f4e08d2224": {
+		Address: "0xd7431ef1cbd4b5bcc568def48d4480f4e08d2224",
+		Name:    "Forced offline FanFic",
+	},
+}
+
 var StoryContractMap = map[string]*StoryCollection{
 	"0x6a84bcceebcd42ee0d73fa95f75862f635fd96ca": {
 		Address: "0x6a84bcceebcd42ee0d73fa95f75862f635fd96ca",

@@ -15,6 +15,7 @@ import (
 	"github.com/project-nova/backend/api/internal/entity"
 	"github.com/project-nova/backend/pkg/abi/character_registry"
 	"github.com/project-nova/backend/pkg/abi/erc721"
+	"github.com/project-nova/backend/pkg/abi/franchise"
 	"github.com/project-nova/backend/pkg/abi/story_registry"
 	"github.com/project-nova/backend/pkg/logger"
 	"github.com/project-nova/backend/pkg/utils"
@@ -202,7 +203,66 @@ func NewGetCharacterHandler(client *ethclient.Client) func(c *gin.Context) {
 // GET /character/:franchiseAddress/:collectionAddress/:tokenId/collectors
 func NewGetCollectorsHandler(client *ethclient.Client) func(c *gin.Context) {
 	return func(c *gin.Context) {
-		c.JSON(http.StatusOK, entity.Collectors)
+		franchiseAddress, err := utils.SanitizeAddress(c.Param("franchiseAddress"))
+		if err != nil {
+			logger.Errorf("Invalid franchise address: %s", c.Param("franchiseAddress"))
+			c.JSON(http.StatusBadRequest, ErrorMessage("Invalid franchise address"))
+			return
+		}
+
+		collectionAddress, err := utils.SanitizeAddress(c.Param("collectionAddress"))
+		if err != nil {
+			logger.Errorf("Invalid collection address: %s", c.Param("collectionAddress"))
+			c.JSON(http.StatusBadRequest, ErrorMessage("Invalid collection address"))
+			return
+		}
+		collectionAddr := common.HexToAddress(collectionAddress)
+
+		tokenId, err := strconv.Atoi(c.Param("tokenId"))
+		if err != nil {
+			logger.Errorf("Invalid token id: %s", c.Param("tokenId"))
+			c.JSON(http.StatusBadRequest, ErrorMessage("Invalid token id"))
+			return
+		}
+
+		franchiseAddr := common.HexToAddress(franchiseAddress)
+		franchiseContract, err := franchise.NewFranchise(franchiseAddr, client)
+		if err != nil {
+			logger.Errorf("Failed to instantiate the franchise contract: %v", err)
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+			return
+		}
+
+		var collectors []common.Address
+		_, isCharacter := entity.CharacterContractMap[collectionAddress]
+		if isCharacter {
+			collectors, err = franchiseContract.GetCharacterCollectors(nil, collectionAddr, big.NewInt(int64(tokenId)))
+			if err != nil {
+				logger.Errorf("Failed to get character collectors for id %d: %v", tokenId, err)
+				c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+				return
+			}
+		} else if _, isStory := entity.StoryContractMap[collectionAddress]; isStory {
+			collectors, err = franchiseContract.GetStoryCollectors(nil, collectionAddr, big.NewInt(int64(tokenId)))
+			if err != nil {
+				logger.Errorf("Failed to get story collectors for id %d: %v", tokenId, err)
+				c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+				return
+			}
+		} else {
+			logger.Errorf("Invalid input. franchise %s, collection %s, id %d", franchiseAddress, collectionAddress, tokenId)
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Invalid input"))
+			return
+		}
+
+		var collectorsResp []*entity.Collector
+		for _, c := range collectors {
+			collectorsResp = append(collectorsResp, &entity.Collector{
+				Address: c.String(),
+			})
+		}
+
+		c.JSON(http.StatusOK, collectorsResp)
 	}
 }
 

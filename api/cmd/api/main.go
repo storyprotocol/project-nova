@@ -189,7 +189,7 @@ func main() {
 		protocolV1.GET("/character/:franchiseAddress/:collectionAddress/:tokenId", handler.NewGetCharacterHandler(ethClient))
 
 		// Endpoint to get collectors of a character
-		protocolV1.GET("/character/:franchiseAddress/:collectionAddress/:tokenId/collectors", handler.NewGetCollectorsHandler(ethClient))
+		protocolV1.GET("/collector/:franchiseAddress/:collectionAddress/:tokenId", handler.NewGetCollectorsHandler(ethClient))
 
 		// Endpoint to get stories per collection
 		protocolV1.GET("/story/:franchiseAddress/:collectionAddress", handler.NewGetStoriesHandler(ethClient))
