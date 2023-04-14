@@ -1,5 +1,14 @@
 package entity
 
+import (
+	"encoding/json"
+	"fmt"
+	"time"
+
+	"github.com/google/uuid"
+	"github.com/project-nova/backend/pkg/model"
+)
+
 type Franchise struct {
 	Address            string                 `json:"address"`
 	Name               string                 `json:"name"`
@@ -234,4 +243,55 @@ type StoryNftOnchainMeta struct {
 	Name        *string `json:"name"`
 	Description *string `json:"description"`
 	Image       *string `json:"image"`
+}
+
+type ProtocolStoryContentModel struct {
+	ID          string    `gorm:"primaryKey;column:id" json:"id"`
+	ContentJson string    `json:"contentJson"`
+	CreatedAt   time.Time `json:"createdAt"`
+	UpdatedAt   time.Time `json:"updatedAt"`
+}
+
+func (ProtocolStoryContentModel) TableName() string {
+	return "story_content"
+}
+
+func (p *ProtocolStoryContentModel) ToStoryContentModel() (*model.StoryContentModel, error) {
+	var model *model.StoryContentModel
+	err := json.Unmarshal([]byte(p.ContentJson), &model)
+	if err != nil {
+		return nil, fmt.Errorf("failed to unmarshal content json: %v", err)
+	}
+
+	return model, nil
+}
+
+type UploadProtocolStoryRequestBody struct {
+	Text string `json:"text"`
+}
+
+func (u *UploadProtocolStoryRequestBody) ToProtocolContentModel() (*ProtocolStoryContentModel, error) {
+	model := &model.StoryContentModel{
+		Content: []*model.StorySectionModel{
+			{
+				Type: "paragraph",
+				Data: []*model.StoryMediaModel{
+					{
+						Type:    "text",
+						Content: u.Text,
+					},
+				},
+			},
+		},
+	}
+
+	modelBytes, err := json.Marshal(model)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal the story model: %v", err)
+	}
+
+	return &ProtocolStoryContentModel{
+		ID:          uuid.New().String(),
+		ContentJson: string(modelBytes),
+	}, nil
 }

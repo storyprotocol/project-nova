@@ -12,7 +12,9 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/project-nova/backend/api/internal/entity"
+	"github.com/project-nova/backend/api/internal/repository"
 	"github.com/project-nova/backend/pkg/abi/character_registry"
 	"github.com/project-nova/backend/pkg/abi/erc721"
 	"github.com/project-nova/backend/pkg/abi/franchise"
@@ -428,6 +430,70 @@ func NewGetStoryHandler(client *ethclient.Client) func(c *gin.Context) {
 		}
 
 		c.JSON(http.StatusOK, story)
+	}
+}
+
+// GET /story/content/:contentId
+func NewGetStoryContentHandler(contentRepo repository.ProtocolStoryContentRepository) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		contentId := c.Param("contentId")
+		if _, err := uuid.Parse(contentId); err != nil {
+			logger.Errorf("Invalid content id: %s", contentId)
+			c.JSON(http.StatusBadRequest, ErrorMessage("Invalid content id"))
+			return
+		}
+
+		content, err := contentRepo.GetContentByID(contentId)
+		if err != nil {
+			logger.Errorf("Failed to get content from content repo: %v", err)
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+			return
+		}
+
+		response, err := content.ToStoryContentModel()
+		if err != nil {
+			logger.Errorf("Failed to convert story content response from story content model: %v", err)
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+			return
+		}
+
+		c.JSON(http.StatusOK, response)
+	}
+}
+
+// POST /story/:franchiseAddress/:collectionAddress/content
+func NewPostStoryContentHandler(contentRepo repository.ProtocolStoryContentRepository) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		var requestBody entity.UploadProtocolStoryRequestBody
+		if err := c.BindJSON(&requestBody); err != nil {
+			logger.Errorf("Failed to read request body: %v", err)
+			c.JSON(http.StatusBadRequest, ErrorMessage("invalid request body"))
+			return
+		}
+
+		if requestBody.Text == "" {
+			logger.Error("Failed to read request body: The text field is empty")
+			c.JSON(http.StatusBadRequest, ErrorMessage("invalid request body"))
+			return
+		}
+
+		content, err := requestBody.ToProtocolContentModel()
+		if err != nil {
+			logger.Errorf("Failed to convert request content to protocol content model: %v", err)
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+			return
+		}
+
+		err = contentRepo.CreateContent(content)
+		if err != nil {
+			logger.Errorf("Failed to create content in repo: %v", err)
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"contentUri": "https://stag.api.storyprotocol.net/protocol/v1/story/content/" + content.ID,
+		})
 	}
 }
 

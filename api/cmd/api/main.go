@@ -105,6 +105,8 @@ func main() {
 		logger.Fatalf("Failed to init story content s3 implementation: %v", err)
 	}
 
+	protocolStoryContentRepository := repository.NewProtocolStoryContentDbImpl(db)
+
 	franchiseCollectionRepository := repository.NewFranchiseCollectionDbImpl(db)
 	err = franchiseCollectionRepository.GetAndLoadFranchiseCollections()
 	if err != nil {
@@ -197,8 +199,11 @@ func main() {
 		// Endpoint to get a single story per collection
 		protocolV1.GET("/story/:franchiseAddress/:collectionAddress/:tokenId", handler.NewGetStoryHandler(ethClient))
 
-		// Endpoint to get a story
-		//protocolV1.GET("/story/:franchiseAddress/:collectionAddress/:storyId", handler.NewGetStoryContentHandler())
+		// Endpoint to get a story content
+		protocolV1.GET("/story/content/:contentId", handler.NewGetStoryContentHandler(protocolStoryContentRepository))
+
+		// Endpoint to post story content
+		protocolV1.POST("/story/:franchiseAddress/:collectionAddress/content", handler.NewPostStoryContentHandler(protocolStoryContentRepository))
 
 		// Endpoint to get derivative stories of a story
 		protocolV1.GET("/story/:franchiseAddress/:collectionAddress/:tokenId/derivatives", handler.NewGetDerivativesHandler())
