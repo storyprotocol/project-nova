@@ -310,7 +310,7 @@ func NewGetStoriesHandler(client *ethclient.Client) func(c *gin.Context) {
 
 		collectionInfo, ok := entity.StoryContractMap[collectionAddress]
 		if !ok {
-			logger.Errorf("Failed to get collection info for collection %s: %v", collectionAddress, err)
+			logger.Errorf("Failed to get collection info for collection %s", collectionAddress)
 			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
 			return
 		}
