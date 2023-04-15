@@ -354,7 +354,7 @@ type LicenseResponse struct {
 type LicenseInfo struct {
 	Type     string `json:"type"`
 	Term     string `json:"term"`
-	Fee      string `json:"fee"`
+	Fee      int64  `json:"fee"`
 	Currency string `json:"currency"`
 }
 

@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/gin-gonic/gin"
@@ -568,6 +569,33 @@ func NewGetAssetLicensesHandler(client *ethclient.Client) func(c *gin.Context) {
 			return
 		}
 
+		const abiJSON = `[
+			{
+				"type": "function",
+				"name": "licenseFee",
+				"outputs": [
+					{
+						"type": "int256",
+						"name": "output"
+					}
+				]
+			}
+		]`
+		parsedABI, err := abi.JSON(strings.NewReader(abiJSON))
+		if err != nil {
+			logger.Errorf("Failed to parsed the abi for token %d: %v", tokenId, err)
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+			return
+		}
+
+		var licenseFee *big.Int
+		err = parsedABI.UnpackIntoInterface(&licenseFee, "licenseFee", licenseInfo.PolicyData)
+		if err != nil {
+			logger.Errorf("Failed to unpack license policy data for token %d: %v", tokenId, err)
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+			return
+		}
+
 		licenseTerm, err := repositoryContract.LicenseTemplateAt(nil, licenseId)
 		if err != nil {
 			logger.Errorf("Failed to get  license term for license %d, token %d: %v", licenseId.Int64(), tokenId, err)
@@ -582,7 +610,7 @@ func NewGetAssetLicensesHandler(client *ethclient.Client) func(c *gin.Context) {
 			return
 		}
 
-		var nfts []*entity.NftInfo
+		nfts := []*entity.NftInfo{}
 		for i := 0; i < int(totalNfts.Int64()); i++ {
 			grantId, err := registryContract.GrantedLicenseForAssetAt(nil, assetCollectionAddr, big.NewInt(int64(tokenId)), big.NewInt(int64(i)))
 			if err != nil {
@@ -606,7 +634,7 @@ func NewGetAssetLicensesHandler(client *ethclient.Client) func(c *gin.Context) {
 			Right: &entity.LicenseInfo{
 				Type:     entity.LicenseRightsMap[licenseTerm.Rights],
 				Term:     licenseTerm.TermsURI,
-				Fee:      string(licenseInfo.PolicyData),
+				Fee:      utils.ToDecimal(licenseFee, 18).BigInt().Int64(),
 				Currency: "PEN",
 			},
 			Nfts: nfts,
