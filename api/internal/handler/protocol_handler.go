@@ -18,6 +18,8 @@ import (
 	"github.com/project-nova/backend/pkg/abi/character_registry"
 	"github.com/project-nova/backend/pkg/abi/erc721"
 	"github.com/project-nova/backend/pkg/abi/franchise"
+	"github.com/project-nova/backend/pkg/abi/license_registry"
+	"github.com/project-nova/backend/pkg/abi/license_repository"
 	"github.com/project-nova/backend/pkg/abi/story_registry"
 	"github.com/project-nova/backend/pkg/logger"
 	"github.com/project-nova/backend/pkg/utils"
@@ -501,6 +503,116 @@ func NewPostStoryContentHandler(contentRepo repository.ProtocolStoryContentRepos
 func NewGetDerivativesHandler() func(c *gin.Context) {
 	return func(c *gin.Context) {
 
+	}
+}
+
+// GET /license/:franchiseAddress/:collectionAddress/:tokenId
+func NewGetAssetLicensesHandler(client *ethclient.Client) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		franchiseAddress, err := utils.SanitizeAddress(c.Param("franchiseAddress"))
+		if err != nil {
+			logger.Errorf("Invalid franchise address: %s", c.Param("franchiseAddress"))
+			c.JSON(http.StatusBadRequest, ErrorMessage("Invalid franchise address"))
+			return
+		}
+
+		collectionAddress, err := utils.SanitizeAddress(c.Param("collectionAddress"))
+		if err != nil {
+			logger.Errorf("Invalid collection address: %s", c.Param("collectionAddress"))
+			c.JSON(http.StatusBadRequest, ErrorMessage("Invalid collection address"))
+			return
+		}
+
+		tokenId, err := strconv.Atoi(c.Param("tokenId"))
+		if err != nil {
+			logger.Errorf("Invalid token id: %s", c.Param("tokenId"))
+			c.JSON(http.StatusBadRequest, ErrorMessage("Invalid token id"))
+			return
+		}
+
+		licenseRepository := entity.FranchiseMap[franchiseAddress].LicenseRepository
+		if licenseRepository == "" {
+			logger.Error("The franchise doesn't support licensing")
+			c.JSON(http.StatusBadRequest, ErrorMessage("The franchise doesn't support licensing"))
+			return
+		}
+
+		repositoryAddress := common.HexToAddress(licenseRepository)
+		repositoryContract, err := license_repository.NewLicenseRepository(repositoryAddress, client)
+		if err != nil {
+			logger.Errorf("Failed to instantiate the license repository contract: %v", err)
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+			return
+		}
+
+		licenseRegistry := entity.FranchiseMap[franchiseAddress].LicenseRegistry
+		if licenseRegistry == "" {
+			logger.Error("The franchise doesn't support licensing")
+			c.JSON(http.StatusBadRequest, ErrorMessage("The franchise doesn't support licensing"))
+			return
+		}
+
+		registryAddress := common.HexToAddress(licenseRegistry)
+		registryContract, err := license_registry.NewLicenseRegistry(registryAddress, client)
+		if err != nil {
+			logger.Errorf("Failed to instantiate the license registry contract: %v", err)
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+			return
+		}
+
+		assetCollectionAddr := common.HexToAddress(collectionAddress)
+		licenseId, licenseInfo, err := registryContract.AssignedLicenseFor(nil, assetCollectionAddr, big.NewInt(int64(tokenId)))
+		if err != nil {
+			logger.Errorf("Failed to get assigned license for token %d: %v", tokenId, err)
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+			return
+		}
+
+		licenseTerm, err := repositoryContract.LicenseTemplateAt(nil, licenseId)
+		if err != nil {
+			logger.Errorf("Failed to get  license term for license %d, token %d: %v", licenseId.Int64(), tokenId, err)
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+			return
+		}
+
+		totalNfts, err := registryContract.GrantedLicensesForAsset(nil, assetCollectionAddr, big.NewInt(int64(tokenId)))
+		if err != nil {
+			logger.Errorf("Failed to get total licenses for token %d: %v", tokenId, err)
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+			return
+		}
+
+		var nfts []*entity.NftInfo
+		for i := 0; i < int(totalNfts.Int64()); i++ {
+			grantId, err := registryContract.GrantedLicenseForAssetAt(nil, assetCollectionAddr, big.NewInt(int64(tokenId)), big.NewInt(int64(i)))
+			if err != nil {
+				logger.Errorf("Failed to get license %d for token %d: %v", i, tokenId, err)
+				c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+				return
+			}
+			ownerAddress, err := registryContract.OwnerOf(nil, grantId)
+			if err != nil {
+				logger.Errorf("Failed to get owner of license %d for token %d: %v", i, tokenId, err)
+				c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+				return
+			}
+			nfts = append(nfts, &entity.NftInfo{
+				Address: ownerAddress.String(),
+				TokenId: int(grantId.Int64()),
+			})
+		}
+
+		licenseResponse := &entity.LicenseResponse{
+			Right: &entity.LicenseInfo{
+				Type:     entity.LicenseRightsMap[licenseTerm.Rights],
+				Term:     licenseTerm.TermsURI,
+				Fee:      string(licenseInfo.PolicyData),
+				Currency: "PEN",
+			},
+			Nfts: nfts,
+		}
+
+		c.JSON(http.StatusOK, licenseResponse)
 	}
 }
 

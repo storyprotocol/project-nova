@@ -207,6 +207,9 @@ func main() {
 
 		// Endpoint to get derivative stories of a story
 		protocolV1.GET("/story/:franchiseAddress/:collectionAddress/:tokenId/derivatives", handler.NewGetDerivativesHandler())
+
+		// Endpoint to get license information for an asset
+		protocolV1.GET("/license/:franchiseAddress/:collectionAddress/:tokenId", handler.NewGetAssetLicensesHandler(ethClient))
 	}
 
 	port := fmt.Sprintf(":%d", cfg.Port)

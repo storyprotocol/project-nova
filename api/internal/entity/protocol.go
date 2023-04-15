@@ -345,3 +345,32 @@ func (u *UploadProtocolStoryRequestBody) ToProtocolContentModel() (*ProtocolStor
 		ContentJson: string(modelBytes),
 	}, nil
 }
+
+type LicenseResponse struct {
+	Right *LicenseInfo `json:"right"`
+	Nfts  []*NftInfo   `json:"nfts"`
+}
+
+type LicenseInfo struct {
+	Type     string `json:"type"`
+	Term     string `json:"term"`
+	Fee      string `json:"fee"`
+	Currency string `json:"currency"`
+}
+
+type NftInfo struct {
+	Address string `json:"address"`
+	TokenId int    `json:"tokenId"`
+}
+
+var LicenseRightsMap = map[uint8]string{
+	0: "Unset",
+	1: "TheatricalRelease",
+	2: "HomeVideo",
+	3: "Streaming",
+	4: "TV",
+	5: "Merchandising",
+	6: "ComicBook",
+	7: "Game",
+	8: "SpinOff",
+}
