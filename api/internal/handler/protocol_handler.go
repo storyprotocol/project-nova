@@ -239,23 +239,30 @@ func NewGetCollectorsHandler(client *ethclient.Client) func(c *gin.Context) {
 		}
 
 		var collectors []common.Address
-		_, isCharacter := entity.CharacterContractMap[collectionAddress]
-		if isCharacter {
+		contractInfo, ok := entity.ContractInfoMap[collectionAddress]
+		if !ok {
+			logger.Errorf("Invalid collection address. franchise %s, collection %s, id %d", franchiseAddress, collectionAddress, tokenId)
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Invalid input"))
+			return
+		}
+
+		switch contractInfo.Type {
+		case entity.ContractTypes.Character:
 			collectors, err = franchiseContract.GetCharacterCollectors(nil, collectionAddr, big.NewInt(int64(tokenId)))
 			if err != nil {
 				logger.Errorf("Failed to get character collectors for id %d: %v", tokenId, err)
 				c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
 				return
 			}
-		} else if _, isStory := entity.StoryContractMap[collectionAddress]; isStory {
+		case entity.ContractTypes.Story:
 			collectors, err = franchiseContract.GetStoryCollectors(nil, collectionAddr, big.NewInt(int64(tokenId)))
 			if err != nil {
 				logger.Errorf("Failed to get story collectors for id %d: %v", tokenId, err)
 				c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
 				return
 			}
-		} else {
-			logger.Errorf("Invalid input. franchise %s, collection %s, id %d", franchiseAddress, collectionAddress, tokenId)
+		default:
+			logger.Errorf("Invalid contract type. franchise %s, collection %s, id %d", franchiseAddress, collectionAddress, tokenId)
 			c.JSON(http.StatusInternalServerError, ErrorMessage("Invalid input"))
 			return
 		}
@@ -311,7 +318,7 @@ func NewGetStoriesHandler(client *ethclient.Client) func(c *gin.Context) {
 			return
 		}
 
-		collectionInfo, ok := entity.StoryContractMap[collectionAddress]
+		collectionInfo, ok := entity.ContractInfoMap[collectionAddress]
 		if !ok {
 			logger.Errorf("Failed to get collection info for collection %s", collectionAddress)
 			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
@@ -344,7 +351,7 @@ func NewGetStoriesHandler(client *ethclient.Client) func(c *gin.Context) {
 				return
 			}
 
-			story, err := createStoryReponse(uri, i, &storyInfo, collectionInfo, ownerAddress.String(), collectionAddress)
+			story, err := createStoryReponse(uri, i, &storyInfo, collectionInfo.IsCanon, ownerAddress.String(), collectionAddress)
 			if err != nil {
 				logger.Errorf("Failed to create story response for %d: %v", i, err)
 				c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
@@ -397,7 +404,7 @@ func NewGetStoryHandler(client *ethclient.Client) func(c *gin.Context) {
 			return
 		}
 
-		collectionInfo, ok := entity.StoryContractMap[collectionAddress]
+		collectionInfo, ok := entity.ContractInfoMap[collectionAddress]
 		if !ok {
 			logger.Errorf("Failed to get collection info for collection %s: %v", collectionAddress, err)
 			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
@@ -425,7 +432,7 @@ func NewGetStoryHandler(client *ethclient.Client) func(c *gin.Context) {
 			return
 		}
 
-		story, err := createStoryReponse(uri, tokenId, &storyInfo, collectionInfo, ownerAddress.String(), collectionAddress)
+		story, err := createStoryReponse(uri, tokenId, &storyInfo, collectionInfo.IsCanon, ownerAddress.String(), collectionAddress)
 		if err != nil {
 			logger.Errorf("Failed to create story response for %d: %v", tokenId, err)
 			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
@@ -690,13 +697,13 @@ func createCharacterReponse(uri string, tokenId int, charInfo *character_registr
 	return character, nil
 }
 
-func createStoryReponse(uri string, tokenId int, storyInfo *story_registry.StoryInfo, collectionInfo *entity.StoryCollection, ownerAddress string, collectionAddress string) (*entity.Story, error) {
+func createStoryReponse(uri string, tokenId int, storyInfo *story_registry.StoryInfo, isCanon bool, ownerAddress string, collectionAddress string) (*entity.Story, error) {
 	story := &entity.Story{
 		TokenId:           tokenId,
 		OwnerAddress:      ownerAddress,
 		CollectionAddress: collectionAddress,
 		Title:             storyInfo.Title,
-		IsCanon:           collectionInfo.IsCanon,
+		IsCanon:           isCanon,
 	}
 
 	for _, author := range storyInfo.Author {
