@@ -4,7 +4,6 @@ import (
 	"flag"
 	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -19,40 +18,17 @@ import (
 	"github.com/project-nova/backend/pkg/logger"
 	"github.com/project-nova/backend/pkg/middleware"
 	"github.com/project-nova/backend/pkg/s3"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
-type WhitelistWalletModel struct {
-	ID          string `gorm:"primaryKey;column:id"`
-	Address     string
-	MerkleProof string
-	CreatedAt   time.Time
-}
+var cpuTemp = prometheus.NewGauge(prometheus.GaugeOpts{
+	Name: "cpu_temperature_celsius",
+	Help: "Current temperature of the CPU.",
+})
 
-func (WhitelistWalletModel) TableName() string {
-	return "whitelist_wallet"
-}
-
-type MembershipModel struct {
-	ID        string
-	Address   string
-	Logins    uint64
-	CreatedAt time.Time
-	Username  string
-}
-
-func (MembershipModel) TableName() string {
-	return "membership"
-}
-
-type MembershipResp struct {
-	Name     string
-	Symbol   string
-	UserName string
-	Grade    string
-	Count    uint64
-	URI      string
-	LogIns   uint64
-	JoinedAt time.Time
+func init() {
+	prometheus.MustRegister(cpuTemp)
 }
 
 func main() {
@@ -119,6 +95,9 @@ func main() {
 		c.JSON(http.StatusOK, "Healthy")
 	})
 
+	r.GET("/metrics", prometheusHandler())
+	cpuTemp.Set(65.3)
+
 	publicV1 := r.Group("/v1")
 	publicV1.Use(cors.Default())
 	{
@@ -175,4 +154,12 @@ func main() {
 
 	port := fmt.Sprintf(":%d", cfg.Port)
 	_ = r.Run(port)
+}
+
+func prometheusHandler() gin.HandlerFunc {
+	h := promhttp.Handler()
+
+	return func(c *gin.Context) {
+		h.ServeHTTP(c.Writer, c.Request)
+	}
 }
