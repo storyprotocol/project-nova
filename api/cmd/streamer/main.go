@@ -80,7 +80,13 @@ func main() {
 	for {
 		select {
 		case err := <-sub.Err():
-			logger.Fatal(err)
+			logger.Errorf("subscription error: %v", err)
+			sub.Unsubscribe()
+			sub, err = client.SubscribeFilterLogs(context.Background(), query, logs)
+			if err != nil {
+				logger.Fatal(err)
+			}
+			logger.Info("Resubscribed")
 		case vlog := <-logs:
 			/* Sample log
 			{
