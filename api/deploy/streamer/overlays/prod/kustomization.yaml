@@ -9,3 +9,6 @@ images:
 - name: 243963068353.dkr.ecr.us-east-1.amazonaws.com/streamer
   newName: 243963068353.dkr.ecr.us-east-1.amazonaws.com/streamer
   newTag: latest
+- name: 243963068353.dkr.ecr.us-east-2.amazonaws.com/streamer
+  newName: 243963068353.dkr.ecr.us-east-2.amazonaws.com/streamer
+  newTag: latest
