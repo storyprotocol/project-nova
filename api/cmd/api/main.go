@@ -13,23 +13,14 @@ import (
 	"github.com/project-nova/backend/api/internal/config"
 	"github.com/project-nova/backend/api/internal/handler"
 	"github.com/project-nova/backend/api/internal/repository"
+	"github.com/project-nova/backend/pkg/constant"
 	"github.com/project-nova/backend/pkg/database"
 	"github.com/project-nova/backend/pkg/keymanagement"
 	"github.com/project-nova/backend/pkg/logger"
 	"github.com/project-nova/backend/pkg/middleware"
 	"github.com/project-nova/backend/pkg/s3"
-	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
-
-var cpuTemp = prometheus.NewGauge(prometheus.GaugeOpts{
-	Name: "cpu_temperature_celsius",
-	Help: "Current temperature of the CPU.",
-})
-
-func init() {
-	prometheus.MustRegister(cpuTemp)
-}
 
 func main() {
 	r := gin.Default()
@@ -95,11 +86,11 @@ func main() {
 		c.JSON(http.StatusOK, "Healthy")
 	})
 
-	r.GET("/metrics", prometheusHandler())
-	cpuTemp.Set(65.3)
+	r.GET(constant.MetricsPath, prometheusHandler())
 
 	publicV1 := r.Group("/v1")
 	publicV1.Use(cors.Default())
+	publicV1.Use(middleware.Prometheus(cfg.AppID))
 	{
 		// Endpoint to get the merkle proof for the wallet address per allowlist
 		publicV1.GET("/wallet/:walletAddress/proof", handler.NewGetWalletProofHandler(walletMerkleProofRepository))
