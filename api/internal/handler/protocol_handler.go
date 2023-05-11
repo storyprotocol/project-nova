@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"math/big"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 
@@ -14,6 +15,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/project-nova/backend/api/internal/config"
 	"github.com/project-nova/backend/api/internal/entity"
 	"github.com/project-nova/backend/api/internal/repository"
 	"github.com/project-nova/backend/pkg/abi/character_registry"
@@ -27,14 +29,18 @@ import (
 )
 
 // GET /franchise
-func NewGetFranchisesHandler(client *ethclient.Client) func(c *gin.Context) {
+func NewGetFranchisesHandler(client *ethclient.Client, franchiseMap map[string]*config.FranchiseConfig) func(c *gin.Context) {
 	return func(c *gin.Context) {
-		c.JSON(http.StatusOK, entity.Franchises)
+		var franchise []*config.Franchise
+		for _, franchiseCfg := range franchiseMap {
+			franchise = append(franchise, franchiseCfg.FranchiseInfo)
+		}
+		c.JSON(http.StatusOK, franchise)
 	}
 }
 
 // GET /franchise/:franchiseAddress
-func NewGetFranchiseCollectionsHandler(client *ethclient.Client) func(c *gin.Context) {
+func NewGetFranchiseCollectionsHandler(client *ethclient.Client, franchiseMap map[string]*config.FranchiseConfig) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		franchiseAddress, err := utils.SanitizeAddress(c.Param("franchiseAddress"))
 		if err != nil {
@@ -43,19 +49,19 @@ func NewGetFranchiseCollectionsHandler(client *ethclient.Client) func(c *gin.Con
 			return
 		}
 
-		franchise, ok := entity.FranchiseMap[franchiseAddress]
+		franchise, ok := franchiseMap[franchiseAddress]
 		if !ok {
 			logger.Errorf("Unkown franchise address: %s", franchiseAddress)
 			c.JSON(http.StatusBadRequest, ErrorMessage("Invalid franchise address"))
 			return
 		}
 
-		c.JSON(http.StatusOK, franchise)
+		c.JSON(http.StatusOK, franchise.FranchiseInfo)
 	}
 }
 
 // GET /character/:franchiseAddress/:collectionAddress
-func NewGetCharactersHandler(client *ethclient.Client) func(c *gin.Context) {
+func NewGetCharactersHandler(client *ethclient.Client, franchiseMap map[string]*config.FranchiseConfig) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		franchiseAddress, err := utils.SanitizeAddress(c.Param("franchiseAddress"))
 		if err != nil {
@@ -71,7 +77,7 @@ func NewGetCharactersHandler(client *ethclient.Client) func(c *gin.Context) {
 			return
 		}
 
-		registryAddress := common.HexToAddress(entity.FranchiseMap[franchiseAddress].CharacterRegistry)
+		registryAddress := common.HexToAddress(franchiseMap[franchiseAddress].FranchiseInfo.CharacterRegistry)
 		registryContract, err := character_registry.NewCharacterRegistry(registryAddress, client)
 		if err != nil {
 			logger.Errorf("Failed to instantiate the contract: %v", err)
@@ -134,7 +140,7 @@ func NewGetCharactersHandler(client *ethclient.Client) func(c *gin.Context) {
 }
 
 // GET /character/:franchiseAddress/:collectionAddress/:tokenId
-func NewGetCharacterHandler(client *ethclient.Client) func(c *gin.Context) {
+func NewGetCharacterHandler(client *ethclient.Client, franchiseMap map[string]*config.FranchiseConfig) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		franchiseAddress, err := utils.SanitizeAddress(c.Param("franchiseAddress"))
 		if err != nil {
@@ -157,7 +163,7 @@ func NewGetCharacterHandler(client *ethclient.Client) func(c *gin.Context) {
 			return
 		}
 
-		registryAddress := common.HexToAddress(entity.FranchiseMap[franchiseAddress].CharacterRegistry)
+		registryAddress := common.HexToAddress(franchiseMap[franchiseAddress].FranchiseInfo.CharacterRegistry)
 		registryContract, err := character_registry.NewCharacterRegistry(registryAddress, client)
 		if err != nil {
 			logger.Errorf("Failed to instantiate the character registry contract: %v", err)
@@ -205,8 +211,8 @@ func NewGetCharacterHandler(client *ethclient.Client) func(c *gin.Context) {
 	}
 }
 
-// GET /character/:franchiseAddress/:collectionAddress/:tokenId/collectors
-func NewGetCollectorsHandler(client *ethclient.Client) func(c *gin.Context) {
+// GET /collector/:franchiseAddress/:collectionAddress/:tokenId
+func NewGetCollectorsHandler(client *ethclient.Client, franchiseMap map[string]*config.FranchiseConfig) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		franchiseAddress, err := utils.SanitizeAddress(c.Param("franchiseAddress"))
 		if err != nil {
@@ -239,7 +245,7 @@ func NewGetCollectorsHandler(client *ethclient.Client) func(c *gin.Context) {
 		}
 
 		var collectors []common.Address
-		contractInfo, ok := entity.ContractInfoMap[collectionAddress]
+		contractInfo, ok := franchiseMap[franchiseAddress].ContractInfoMap[collectionAddress]
 		if !ok {
 			logger.Errorf("Invalid collection address. franchise %s, collection %s, id %d", franchiseAddress, collectionAddress, tokenId)
 			c.JSON(http.StatusInternalServerError, ErrorMessage("Invalid input"))
@@ -247,14 +253,14 @@ func NewGetCollectorsHandler(client *ethclient.Client) func(c *gin.Context) {
 		}
 
 		switch contractInfo.Type {
-		case entity.ContractTypes.Character:
+		case config.ContractTypes.Character:
 			collectors, err = franchiseContract.GetCharacterCollectors(nil, collectionAddr, big.NewInt(int64(tokenId)))
 			if err != nil {
 				logger.Errorf("Failed to get character collectors for id %d: %v", tokenId, err)
 				c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
 				return
 			}
-		case entity.ContractTypes.Story:
+		case config.ContractTypes.Story:
 			collectors, err = franchiseContract.GetStoryCollectors(nil, collectionAddr, big.NewInt(int64(tokenId)))
 			if err != nil {
 				logger.Errorf("Failed to get story collectors for id %d: %v", tokenId, err)
@@ -279,7 +285,7 @@ func NewGetCollectorsHandler(client *ethclient.Client) func(c *gin.Context) {
 }
 
 // Get /story/:franchiseAddress/:collectionAddress
-func NewGetStoriesHandler(client *ethclient.Client) func(c *gin.Context) {
+func NewGetStoriesHandler(client *ethclient.Client, franchiseMap map[string]*config.FranchiseConfig) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		franchiseAddress, err := utils.SanitizeAddress(c.Param("franchiseAddress"))
 		if err != nil {
@@ -295,7 +301,7 @@ func NewGetStoriesHandler(client *ethclient.Client) func(c *gin.Context) {
 			return
 		}
 
-		registryAddress := common.HexToAddress(entity.FranchiseMap[franchiseAddress].StoryRegistry)
+		registryAddress := common.HexToAddress(franchiseMap[franchiseAddress].FranchiseInfo.StoryRegistry)
 		registryContract, err := story_registry.NewStoryRegistry(registryAddress, client)
 		if err != nil {
 			logger.Errorf("Failed to instantiate the story registry contract: %v", err)
@@ -318,7 +324,7 @@ func NewGetStoriesHandler(client *ethclient.Client) func(c *gin.Context) {
 			return
 		}
 
-		collectionInfo, ok := entity.ContractInfoMap[collectionAddress]
+		collectionInfo, ok := franchiseMap[franchiseAddress].ContractInfoMap[collectionAddress]
 		if !ok {
 			logger.Errorf("Failed to get collection info for collection %s", collectionAddress)
 			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
@@ -365,7 +371,7 @@ func NewGetStoriesHandler(client *ethclient.Client) func(c *gin.Context) {
 }
 
 // Get /story/:franchiseAddress/:collectionAddress/:tokenId
-func NewGetStoryHandler(client *ethclient.Client) func(c *gin.Context) {
+func NewGetStoryHandler(client *ethclient.Client, franchiseMap map[string]*config.FranchiseConfig) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		franchiseAddress, err := utils.SanitizeAddress(c.Param("franchiseAddress"))
 		if err != nil {
@@ -388,7 +394,7 @@ func NewGetStoryHandler(client *ethclient.Client) func(c *gin.Context) {
 			return
 		}
 
-		registryAddress := common.HexToAddress(entity.FranchiseMap[franchiseAddress].StoryRegistry)
+		registryAddress := common.HexToAddress(franchiseMap[franchiseAddress].FranchiseInfo.StoryRegistry)
 		registryContract, err := story_registry.NewStoryRegistry(registryAddress, client)
 		if err != nil {
 			logger.Errorf("Failed to instantiate the story registry contract: %v", err)
@@ -404,7 +410,7 @@ func NewGetStoryHandler(client *ethclient.Client) func(c *gin.Context) {
 			return
 		}
 
-		collectionInfo, ok := entity.ContractInfoMap[collectionAddress]
+		collectionInfo, ok := franchiseMap[franchiseAddress].ContractInfoMap[collectionAddress]
 		if !ok {
 			logger.Errorf("Failed to get collection info for collection %s: %v", collectionAddress, err)
 			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
@@ -472,7 +478,7 @@ func NewGetStoryContentHandler(contentRepo repository.ProtocolStoryContentReposi
 }
 
 // POST /story/:franchiseAddress/:collectionAddress/content
-func NewPostStoryContentHandler(contentRepo repository.ProtocolStoryContentRepository) func(c *gin.Context) {
+func NewPostStoryContentHandler(contentRepo repository.ProtocolStoryContentRepository, contentUri string) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		var requestBody entity.UploadProtocolStoryRequestBody
 		if err := c.BindJSON(&requestBody); err != nil {
@@ -502,7 +508,7 @@ func NewPostStoryContentHandler(contentRepo repository.ProtocolStoryContentRepos
 		}
 
 		c.JSON(http.StatusOK, gin.H{
-			"contentUri": "https://stag.api.storyprotocol.net/protocol/v1/story/content/" + content.ID,
+			"contentUri": contentUri + content.ID,
 		})
 	}
 }
@@ -514,8 +520,9 @@ func NewGetDerivativesHandler() func(c *gin.Context) {
 	}
 }
 
+// Test
 // GET /license/:franchiseAddress/:collectionAddress/:tokenId
-func NewGetAssetLicensesHandler(client *ethclient.Client) func(c *gin.Context) {
+func NewGetAssetLicensesHandler(client *ethclient.Client, franchiseMap map[string]*config.FranchiseConfig, abiPath string) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		franchiseAddress, err := utils.SanitizeAddress(c.Param("franchiseAddress"))
 		if err != nil {
@@ -538,7 +545,7 @@ func NewGetAssetLicensesHandler(client *ethclient.Client) func(c *gin.Context) {
 			return
 		}
 
-		licenseRepository := entity.FranchiseMap[franchiseAddress].LicenseRepository
+		licenseRepository := franchiseMap[franchiseAddress].FranchiseInfo.LicenseRepository
 		if licenseRepository == "" {
 			logger.Error("The franchise doesn't support licensing")
 			c.JSON(http.StatusBadRequest, ErrorMessage("The franchise doesn't support licensing"))
@@ -553,7 +560,7 @@ func NewGetAssetLicensesHandler(client *ethclient.Client) func(c *gin.Context) {
 			return
 		}
 
-		licenseRegistry := entity.FranchiseMap[franchiseAddress].LicenseRegistry
+		licenseRegistry := franchiseMap[franchiseAddress].FranchiseInfo.LicenseRegistry
 		if licenseRegistry == "" {
 			logger.Error("The franchise doesn't support licensing")
 			c.JSON(http.StatusBadRequest, ErrorMessage("The franchise doesn't support licensing"))
@@ -576,19 +583,16 @@ func NewGetAssetLicensesHandler(client *ethclient.Client) func(c *gin.Context) {
 			return
 		}
 
-		const abiJSON = `[
-			{
-				"type": "function",
-				"name": "licenseFee",
-				"outputs": [
-					{
-						"type": "int256",
-						"name": "output"
-					}
-				]
-			}
-		]`
-		parsedABI, err := abi.JSON(strings.NewReader(abiJSON))
+		// the lincenseFee is abi encoded in smart contract as an integer. Go Ethereum doesn't have native support
+		// for abi decoding a primitive type. So below is a hack solution in golang to abi decode an integer
+		// using a fake abi json file.
+		abiBytes, err := os.ReadFile(abiPath)
+		if err != nil {
+			logger.Errorf("Failed to read the abi file for token %d: %v", tokenId, err)
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+			return
+		}
+		parsedABI, err := abi.JSON(strings.NewReader(string(abiBytes)))
 		if err != nil {
 			logger.Errorf("Failed to parsed the abi for token %d: %v", tokenId, err)
 			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
@@ -596,7 +600,7 @@ func NewGetAssetLicensesHandler(client *ethclient.Client) func(c *gin.Context) {
 		}
 
 		var licenseFee *big.Int
-		err = parsedABI.UnpackIntoInterface(&licenseFee, "licenseFee", licenseInfo.PolicyData)
+		err = parsedABI.UnpackIntoInterface(&licenseFee, "int256Type", licenseInfo.PolicyData)
 		if err != nil {
 			logger.Errorf("Failed to unpack license policy data for token %d: %v", tokenId, err)
 			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
