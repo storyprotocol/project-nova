@@ -163,52 +163,58 @@ func NewGetCharacterHandler(client *ethclient.Client, franchiseMap map[string]*c
 			return
 		}
 
-		registryAddress := common.HexToAddress(franchiseMap[franchiseAddress].FranchiseInfo.CharacterRegistry)
-		registryContract, err := character_registry.NewCharacterRegistry(registryAddress, client)
+		character, err := getCharacterOnchain(client, franchiseMap, franchiseAddress, collectionAddress, tokenId)
 		if err != nil {
-			logger.Errorf("Failed to instantiate the character registry contract: %v", err)
-			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
-			return
-		}
-
-		collectionAddr := common.HexToAddress(collectionAddress)
-		erc721Contract, err := erc721.NewErc721(collectionAddr, client)
-		if err != nil {
-			logger.Errorf("Failed to instantiate the character collection contract: %v", err)
-			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
-			return
-		}
-
-		charInfo, err := registryContract.Character(nil, collectionAddr, big.NewInt(int64(tokenId)))
-		if err != nil {
-			logger.Errorf("Failed to get character info: %v", err)
-			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
-			return
-		}
-
-		uri, err := erc721Contract.TokenURI(nil, big.NewInt(int64(tokenId)))
-		if err != nil {
-			logger.Errorf("Failed to get total uri for token %d: %v", tokenId, err)
-			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
-			return
-		}
-
-		ownerAddress, err := erc721Contract.OwnerOf(nil, big.NewInt(int64(tokenId)))
-		if err != nil {
-			logger.Errorf("Failed to get owner address for token %d: %v", tokenId, err)
-			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
-			return
-		}
-
-		character, err := createCharacterReponse(uri, tokenId, &charInfo, ownerAddress.String(), collectionAddress)
-		if err != nil {
-			logger.Errorf("Failed to create character response for %d: %v", tokenId, err)
+			logger.Errorf("Failed to get character onchain, id %s: %v", c.Param("tokenId"), err)
 			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
 			return
 		}
 
 		c.JSON(http.StatusOK, character)
 	}
+}
+
+func getCharacterOnchain(
+	client *ethclient.Client,
+	franchiseMap map[string]*config.FranchiseConfig,
+	franchiseAddress string,
+	collectionAddress string,
+	tokenId int,
+) (*entity.Character, error) {
+	registryAddress := common.HexToAddress(franchiseMap[franchiseAddress].FranchiseInfo.CharacterRegistry)
+	registryContract, err := character_registry.NewCharacterRegistry(registryAddress, client)
+	if err != nil {
+		return nil, fmt.Errorf("failed to instantiate the character registry contract: %v", err)
+	}
+
+	collectionAddr := common.HexToAddress(collectionAddress)
+	erc721Contract, err := erc721.NewErc721(collectionAddr, client)
+	if err != nil {
+		return nil, fmt.Errorf("failed to instantiate the character collection contract: %v", err)
+	}
+
+	charInfo, err := registryContract.Character(nil, collectionAddr, big.NewInt(int64(tokenId)))
+	if err != nil {
+		logger.Errorf("Failed to get character info: %v", err)
+		return nil, fmt.Errorf("failed to get character info: %v", err)
+	}
+
+	uri, err := erc721Contract.TokenURI(nil, big.NewInt(int64(tokenId)))
+	if err != nil {
+		return nil, fmt.Errorf("failed to get total uri for token %d: %v", tokenId, err)
+	}
+
+	ownerAddress, err := erc721Contract.OwnerOf(nil, big.NewInt(int64(tokenId)))
+	if err != nil {
+		return nil, fmt.Errorf("failed to get owner address for token %d: %v", tokenId, err)
+	}
+
+	character, err := createCharacterReponse(uri, tokenId, &charInfo, ownerAddress.String(), collectionAddress)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create character response for %d: %v", tokenId, err)
+	}
+
+	return character, nil
 }
 
 // GET /collector/:franchiseAddress/:collectionAddress/:tokenId
@@ -357,7 +363,16 @@ func NewGetStoriesHandler(client *ethclient.Client, franchiseMap map[string]*con
 				return
 			}
 
-			story, err := createStoryReponse(uri, i, &storyInfo, collectionInfo.IsCanon, ownerAddress.String(), collectionAddress)
+			var characters []*entity.Character
+			for _, character := range storyInfo.Characters {
+				characterOnchain, err := getCharacterOnchain(client, franchiseMap, franchiseAddress, character.Collection.String(), int(character.TokenId.Int64()))
+				if err != nil { // Don't fail the call here since the error is not fatal
+					logger.Errorf("Failed to get character onchain, id %d: %v", character.TokenId.Int64(), err)
+				}
+				characters = append(characters, characterOnchain)
+			}
+
+			story, err := createStoryReponse(uri, i, &storyInfo, characters, collectionInfo.IsCanon, ownerAddress.String(), collectionAddress)
 			if err != nil {
 				logger.Errorf("Failed to create story response for %d: %v", i, err)
 				c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
@@ -438,7 +453,16 @@ func NewGetStoryHandler(client *ethclient.Client, franchiseMap map[string]*confi
 			return
 		}
 
-		story, err := createStoryReponse(uri, tokenId, &storyInfo, collectionInfo.IsCanon, ownerAddress.String(), collectionAddress)
+		var characters []*entity.Character
+		for _, character := range storyInfo.Characters {
+			characterOnchain, err := getCharacterOnchain(client, franchiseMap, franchiseAddress, character.Collection.String(), int(character.TokenId.Int64()))
+			if err != nil { // Don't fail the call here since the error is not fatal
+				logger.Errorf("Failed to get character onchain, id %d: %v", character.TokenId.Int64(), err)
+			}
+			characters = append(characters, characterOnchain)
+		}
+
+		story, err := createStoryReponse(uri, tokenId, &storyInfo, characters, collectionInfo.IsCanon, ownerAddress.String(), collectionAddress)
 		if err != nil {
 			logger.Errorf("Failed to create story response for %d: %v", tokenId, err)
 			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
@@ -701,24 +725,18 @@ func createCharacterReponse(uri string, tokenId int, charInfo *character_registr
 	return character, nil
 }
 
-func createStoryReponse(uri string, tokenId int, storyInfo *story_registry.StoryInfo, isCanon bool, ownerAddress string, collectionAddress string) (*entity.Story, error) {
+func createStoryReponse(uri string, tokenId int, storyInfo *story_registry.StoryInfo, characters []*entity.Character, isCanon bool, ownerAddress string, collectionAddress string) (*entity.Story, error) {
 	story := &entity.Story{
 		TokenId:           tokenId,
 		OwnerAddress:      ownerAddress,
 		CollectionAddress: collectionAddress,
 		Title:             storyInfo.Title,
 		IsCanon:           isCanon,
+		Characters:        characters,
 	}
 
 	for _, author := range storyInfo.Author {
 		story.AuthorAddress = append(story.AuthorAddress, author.String())
-	}
-
-	for _, character := range storyInfo.Characters {
-		story.Characters = append(story.Characters, &entity.Character{
-			CollectionAddress: character.Collection.String(),
-			TokenId:           int(character.TokenId.Int64()),
-		})
 	}
 
 	if uri == "" {
