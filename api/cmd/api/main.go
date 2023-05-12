@@ -40,6 +40,11 @@ func main() {
 		logger.Fatalf("Failed to init config, error: %v", err)
 	}
 
+	franchiseMap := map[string]*config.FranchiseConfig{}
+	for _, franchise := range cfg.Protocol.FranchiseMap {
+		franchiseMap[franchise.FranchiseInfo.Address] = franchise
+	}
+
 	db, err := database.NewGormDB(cfg.DatabaseURI)
 	if err != nil {
 		logger.Fatalf("Failed to connect to DB, error: %v", err)
@@ -71,6 +76,8 @@ func main() {
 	if err != nil {
 		logger.Fatalf("Failed to init story content s3 implementation: %v", err)
 	}
+
+	protocolStoryContentRepository := repository.NewProtocolStoryContentDbImpl(db)
 
 	franchiseCollectionRepository := repository.NewFranchiseCollectionDbImpl(db)
 	err = franchiseCollectionRepository.GetAndLoadFranchiseCollections()
@@ -141,6 +148,43 @@ func main() {
 
 		// Admin Endpoint to update chapter content to cache
 		adminV1.POST("/story/:franchiseId/:storyNum/:chapterNum/cache", handler.NewAdminUpdateStoryChapterCacheHandler(storyContentRepository))
+	}
+
+	protocolV1 := r.Group("/protocol/v1")
+	protocolV1.Use(cors.Default())
+	{
+		// Endpoint to list all franchise
+		protocolV1.GET("/franchise", handler.NewGetFranchisesHandler(ethClient, franchiseMap))
+
+		// Endpoint to get franchise collections
+		protocolV1.GET("/franchise/:franchiseAddress", handler.NewGetFranchiseCollectionsHandler(ethClient, franchiseMap))
+
+		// Endpoint to get characters per collection
+		protocolV1.GET("/character/:franchiseAddress/:collectionAddress", handler.NewGetCharactersHandler(ethClient, franchiseMap))
+
+		// Endpoint to get a single character per collection
+		protocolV1.GET("/character/:franchiseAddress/:collectionAddress/:tokenId", handler.NewGetCharacterHandler(ethClient, franchiseMap))
+
+		// Endpoint to get collectors of a character
+		protocolV1.GET("/collector/:franchiseAddress/:collectionAddress/:tokenId", handler.NewGetCollectorsHandler(ethClient, franchiseMap))
+
+		// Endpoint to get stories per collection
+		protocolV1.GET("/story/:franchiseAddress/:collectionAddress", handler.NewGetStoriesHandler(ethClient, franchiseMap))
+
+		// Endpoint to get a single story per collection
+		protocolV1.GET("/story/:franchiseAddress/:collectionAddress/:tokenId", handler.NewGetStoryHandler(ethClient, franchiseMap))
+
+		// Endpoint to get a story content
+		protocolV1.GET("/story/content/:contentId", handler.NewGetStoryContentHandler(protocolStoryContentRepository))
+
+		// Endpoint to post story content
+		protocolV1.POST("/story/:franchiseAddress/:collectionAddress/content", handler.NewPostStoryContentHandler(protocolStoryContentRepository, cfg.Protocol.ContentUri))
+
+		// Endpoint to get derivative stories of a story
+		protocolV1.GET("/story/:franchiseAddress/:collectionAddress/:tokenId/derivatives", handler.NewGetDerivativesHandler())
+
+		// Endpoint to get license information for an asset
+		protocolV1.GET("/license/:franchiseAddress/:collectionAddress/:tokenId", handler.NewGetAssetLicensesHandler(ethClient, franchiseMap, cfg.PrimitiveTpeAbiPath))
 	}
 
 	port := fmt.Sprintf(":%d", cfg.Port)

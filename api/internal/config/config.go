@@ -10,16 +10,18 @@ import (
 )
 
 type AppConfig struct {
-	AppID               string `yaml:"app_id"`
-	Region              string `yaml:"region"`
-	Port                int64  `yaml:"port"`
-	Env                 string `yaml:"env"`
-	DatabaseURI         string `yaml:"database_uri"`
-	ProviderURL         string `yaml:"provider_url"`
-	ContentPath         string `yaml:"content_path"`
-	AdminAuthMessage    string `yaml:"admin_auth_message"`
-	AuthKeyId           string `yaml:"auth_key_id"`
-	S3ContentBucketName string `yaml:"s3_content_bucket_name"`
+	AppID               string          `yaml:"app_id"`
+	Region              string          `yaml:"region"`
+	Port                int64           `yaml:"port"`
+	Env                 string          `yaml:"env"`
+	DatabaseURI         string          `yaml:"database_uri"`
+	ProviderURL         string          `yaml:"provider_url"`
+	ContentPath         string          `yaml:"content_path"`
+	PrimitiveTpeAbiPath string          `yaml:"primitive_type_abi_path"`
+	AdminAuthMessage    string          `yaml:"admin_auth_message"`
+	AuthKeyId           string          `yaml:"auth_key_id"`
+	S3ContentBucketName string          `yaml:"s3_content_bucket_name"`
+	Protocol            *ProtocolConfig `yaml:"protocol"`
 }
 
 type StreamerConfig struct {
@@ -29,6 +31,53 @@ type StreamerConfig struct {
 	ApiGatewayUrl     string `yaml:"api_gateway_url"`
 	AdminAuthMessage  string `yaml:"admin_auth_message"`
 	AuthKeyId         string `yaml:"auth_key_id"`
+}
+
+type ProtocolConfig struct {
+	ContentUri   string             `yaml:"content_uri"`
+	FranchiseMap []*FranchiseConfig `yaml:"franchise_map"`
+}
+
+type FranchiseConfig struct {
+	FranchiseInfo   *Franchise               `yaml:"franchise_info"`
+	ContractInfoMap map[string]*ContractInfo `yaml:"contract_info_map"`
+}
+
+type Franchise struct {
+	Address            string                 `json:"address" yaml:"address"`
+	Name               string                 `json:"name" yaml:"name"`
+	VaultAddress       string                 `json:"vaultAddress" yaml:"vault_address"`
+	CharacterRegistry  string                 `json:"characterRegistry" yaml:"character_registry"`
+	CharacterContracts []*CharacterCollection `json:"characterContract" yaml:"character_contracts"`
+	StoryRegistry      string                 `json:"storyRegistry" yaml:"story_registry"`
+	StoryContracts     []*StoryCollection     `json:"storyContract" yaml:"story_contracts"`
+	LicenseRepository  string                 `json:"licenseRepository" yaml:"license_repository"`
+	LicenseRegistry    string                 `json:"licenseRegistry" yaml:"license_registry"`
+}
+
+type CharacterCollection struct {
+	Name    string `json:"name" yaml:"name"`
+	Address string `json:"address" yaml:"address"`
+}
+
+type StoryCollection struct {
+	Address string `json:"address" yaml:"address"`
+	IsCanon bool   `json:"isCanon" yaml:"is_canon"`
+}
+
+type ContractType string
+
+var ContractTypes = struct {
+	Character ContractType
+	Story     ContractType
+}{
+	Character: "character",
+	Story:     "story",
+}
+
+type ContractInfo struct {
+	Type    ContractType `yaml:"type"`
+	IsCanon bool         `yaml:"is_canon"`
 }
 
 var (
