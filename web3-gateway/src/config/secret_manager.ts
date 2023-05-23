@@ -3,13 +3,14 @@ import {
   GetSecretValueCommand,
 } from '@aws-sdk/client-secrets-manager';
 
-const REGION = 'us-east-1';
-
 export class SecretsManager {
-  private static readonly smClient: SecretsManagerClient =
-    new SecretsManagerClient({ region: REGION });
+  private readonly smClient: SecretsManagerClient
 
-  public static async fetchSecrets(appID: string): Promise<string> {
+  constructor(smClient: SecretsManagerClient) {
+    this.smClient = smClient
+  }
+  
+  public async fetchSecrets(appID: string): Promise<string> {
     try {
       const params = {
         SecretId: appID,

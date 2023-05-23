@@ -9,7 +9,8 @@ import {
   Equals,
   IsNotEmpty,
 } from 'class-validator';
-import { SecretsManager } from './secret_manager';
+import { SecretsManagerClient } from '@aws-sdk/client-secrets-manager';
+import { SecretsManager } from './secret_manager'; 
 
 const YAML_CONFIG_FILENAME = './base.yaml';
 
@@ -40,6 +41,9 @@ export class Config {
   @IsIn(['local', 'dev', 'staging', 'prod'])
   env: string;
 
+  @IsIn(['us-east-2', 'us-east-1'])
+  region: string;
+
   @Equals('web3-gateway')
   app_id: string;
 
@@ -66,7 +70,9 @@ export const initializeConfig = async (): Promise<Config> => {
 
     let mergedCfg = plainToInstance(Config, { ...baseCfg, ...extendCfg });
     if (mergedCfg.env !== Env.Local) {
-      const secret = await SecretsManager.fetchSecrets(mergedCfg.app_id);
+      const secretManagerClient = new SecretsManagerClient({ region: mergedCfg.region });
+      const secretManager = new SecretsManager(secretManagerClient) 
+      const secret = await secretManager.fetchSecrets(mergedCfg.app_id);
       mergedCfg = plainToClassFromExist(mergedCfg, JSON.parse(secret));
     }
 
