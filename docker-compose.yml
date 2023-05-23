@@ -15,6 +15,17 @@ services:
       - api-database
     ports:
       - "20005:20005"
+  web3-gateway:
+    build:
+      context: .
+      dockerfile: dockerfile/web3-gateway/Dockerfile
+      args:
+        - DOCKERHUB_URL=243963068353.dkr.ecr.us-east-2.amazonaws.com/
+    image: web3-gateway:latest
+    ports:
+      - "20006:20006"
+    environment:
+      SERVER_ENV: ${SERVER_ENV:-local}
   streamer:
     build:
       context: .

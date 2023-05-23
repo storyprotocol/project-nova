@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package web3_gateway;
+
+option go_package = "github.com/project-nova/backend/proto/v1/web3_gateway";
+
+enum StorageType {
+    UNSPECIFIED_STORAGE_TYPE = 0;
+    ARWEAVE = 1;
+    IPFS = 2;
+}
+
+enum ContentType {
+    UNSPECIFIED_CONTENT_TYPE = 0;
+    MARKDOWN = 1;
+}
+
+message Tag {
+    string name = 1;
+    string value = 2;
+}
+
+message UploadContentReq {	
+  StorageType storage = 1;
+  bytes content = 2;
+  ContentType content_type = 3;   
+  repeated Tag tags = 4;
+}
+
+message UploadContentResp {
+  string content_url = 1;
+}

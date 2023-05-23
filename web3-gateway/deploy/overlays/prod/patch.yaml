@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: web3
+  name: web3-gateway
+spec:
+  replicas: 2
+  template:
+    spec:
+      containers:
+      - name: web3-gateway
+        env:
+          - name: SERVER_ENV
+            value: "prod"
+        resources:
+          requests:
+            cpu: "300m"
+            memory: "800Mi"
+          limits:
+            cpu: "500m"
+            memory: "1000Mi"
