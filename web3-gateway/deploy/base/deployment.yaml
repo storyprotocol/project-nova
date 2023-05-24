@@ -1,0 +1,30 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: web3 
+  name: web3-gateway
+  labels:
+    app: storyprotocol
+    service: web3-gateway-service 
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: web3-gateway-service 
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+  minReadySeconds: 2
+  template:
+    metadata:
+      labels:
+        service: web3-gateway-service 
+    spec:
+      containers:
+      - image: 243963068353.dkr.ecr.us-east-2.amazonaws.com/web3-gateway:latest
+        imagePullPolicy: "Always"
+        name: web3-gateway
+        ports:
+        - containerPort: 8090

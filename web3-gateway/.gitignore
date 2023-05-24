@@ -1,0 +1,10 @@
+# compiled output
+/dist
+/node_modules
+
+
+# local config
+/config/local.yaml
+
+# deployment output
+/_output

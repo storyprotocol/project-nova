@@ -24,6 +24,7 @@ help:
 	@echo '  server:              - Build and then run api server locally'
 	@echo '  buildstreamer:       - Build streamer locally'
 	@echo '  runstreamer:         - Run streamer locally'
+	@echo '  runweb3gateway:      - Build and then run web3-gateway locally'
 	@echo '  streamer:            - Build and then run streamer locally'
 	@echo ''
 	@echo '  db_new:              - Create new DB migration script for api server'
@@ -61,6 +62,9 @@ buildstreamer:
 
 runstreamer:
 	cd api && ./build/streamer --config=config/streamer/local.yaml,config/streamer/secrets.yaml
+
+runweb3gateway:
+	cd web3-gateway && make run-server-local
 
 .PHONY: streamer
 streamer:
