@@ -1,4 +1,4 @@
-Web3 gateway is the gatway layer for web3 services
+Web3 gateway is the gateway layer for web3 services
 
 ## API Examples
 

@@ -27,7 +27,7 @@ RUN curl -OL https://github.com/protocolbuffers/protobuf/releases/download/v3.7.
 # Golang related.
 # https://maelvls.dev/go111module-everywhere/
 ENV GO111MODULE=on
-RUN go install github.com/golang/protobuf/protoc-gen-go@latest && \
-    go install github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger@latest
+RUN go install github.com/golang/protobuf/protoc-gen-go@v1.5.3 && \
+    go install github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger@v1.16.0
 
-RUN npm install -g typescript@latest
+RUN npm install -g typescript@5.0.4
