@@ -16,6 +16,8 @@ DOCKER_BUILD=docker build --cache-from
 
 DEVELOPMENT_DB_URI = postgresql://postgres:@api-database:5432/postgres?sslmode=disable
 
+GOOGLEAPIS_DIR=./proto/third_party/googleapis
+
 help:
 	@echo '  ecr-auth:            - Authenticate ECR'
 	@echo '  builder:             - Build and push builder image'
@@ -43,6 +45,7 @@ help:
 	@echo '  s3-download:         - S3 download based on the project and chapter and env passed in.'
 	@echo '                         For example: make s3 dowload project=project-nova chapter=1:1:1 env=staging' 
 	@echo '  s3-upload:           - S3 upload based on the project and chapter and env passed in.'
+	@echo '  build-proto:         - generate codes based on protobuf definition'
 
 ecr-auth:
 	aws ecr get-login-password --region ${REGION} | docker login --username AWS --password-stdin ${ECR}
@@ -129,3 +132,10 @@ s3-upload:
 .PHONY: s3-download
 s3-download:
 	aws s3 cp s3://${project}-content-${env}/${chapter}/content.json api/resource/content/${project}/${chapter}/content.json  
+
+.PHONY: build-proto
+build-proto:
+	protoc -I. \
+	    -I${GOOGLEAPIS_DIR} \
+		--go_out=plugins=grpc,paths=source_relative:. \
+		./proto/v1/web3_gateway/*.proto

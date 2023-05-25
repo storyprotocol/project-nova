@@ -3,3 +3,4 @@ region: us-east-2
 port: 8090
 content_path: api/resource/content
 primitive_type_abi_path: api/resource/abi/primitive_type.json
+grpc_web3_gateway: web3-gateway-service.web3:8090

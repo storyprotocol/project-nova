@@ -19,7 +19,7 @@ export class ArweaveService {
     try {
       switch (contentType) {
         case ContentType.MARKDOWN: {
-          const contentDecoded = content.toString('binary');
+          const contentDecoded = atob(content.toString());
           const response = await this.bundler.upload(contentDecoded, { tags });
           return `${this.cfg.base_url}` + `${response.id}`;
         }

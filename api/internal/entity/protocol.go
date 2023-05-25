@@ -51,10 +51,14 @@ type StoryNftOnchainMeta struct {
 }
 
 type ProtocolStoryContentModel struct {
-	ID          string    `gorm:"primaryKey;column:id" json:"id"`
-	ContentJson string    `json:"contentJson"`
-	CreatedAt   time.Time `json:"createdAt"`
-	UpdatedAt   time.Time `json:"updatedAt"`
+	ID                string    `gorm:"primaryKey;column:id" json:"id"`
+	FranchiseAddress  *string   `json:"franchiseAddress"`
+	CollectionAddress *string   `json:"collectionAddress"`
+	TokenId           *int      `json:"tokenId"`
+	ContentJson       string    `json:"contentJson"`
+	ContentUri        *string   `json:"contentUri"`
+	CreatedAt         time.Time `json:"createdAt"`
+	UpdatedAt         time.Time `json:"updatedAt"`
 }
 
 func (ProtocolStoryContentModel) TableName() string {
