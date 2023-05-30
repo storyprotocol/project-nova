@@ -6,7 +6,8 @@ WORKDIR /build/
 ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install --no-install-recommends -y \
-  postgresql-client
+  postgresql-client \
+  vim
 
 # Install grpcurl
 RUN apt-get install wget && \ 
@@ -29,6 +30,7 @@ COPY api/migrations api/migrations
 COPY script/dropdb.sh script/dropdb.sh
 COPY bastion bastion
 COPY pkg pkg
+COPY proto proto
 
 # Build task runner app 
 RUN cd bastion && make build-task

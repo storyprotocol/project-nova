@@ -39,7 +39,7 @@ func (s *protocolStoryContentDbImpl) GetContentByID(contentId string) (*entity.P
 
 func (s *protocolStoryContentDbImpl) GetContentByAddresses(franchiseAddress string, collectionAddress string, tokenId int) (*entity.ProtocolStoryContentModel, error) {
 	result := &entity.ProtocolStoryContentModel{}
-	r := s.db.Where("franchise_address = ? AND collection_address = ? AND token_id = ?", franchiseAddress, collectionAddress, tokenId).Find(result)
+	r := s.db.Where("franchise_address = ? AND collection_address = ? AND token_id = ?", franchiseAddress, collectionAddress, tokenId).Order("created_at desc").First(result)
 	if errors.Is(r.Error, gorm.ErrRecordNotFound) {
 		return nil, r.Error
 	}

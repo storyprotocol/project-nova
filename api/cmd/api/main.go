@@ -16,6 +16,7 @@ import (
 	"github.com/project-nova/backend/pkg/constant"
 	"github.com/project-nova/backend/pkg/database"
 	"github.com/project-nova/backend/pkg/gateway"
+	xhttp "github.com/project-nova/backend/pkg/http"
 	"github.com/project-nova/backend/pkg/keymanagement"
 	"github.com/project-nova/backend/pkg/logger"
 	"github.com/project-nova/backend/pkg/middleware"
@@ -91,6 +92,8 @@ func main() {
 		logger.Fatalf("Failed to init web3 gateway client: %v", err)
 	}
 
+	httpClient := xhttp.NewClient(&xhttp.ClientConfig{})
+
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, "Hello")
 	})
@@ -132,7 +135,7 @@ func main() {
 	publicV2.Use(middleware.Prometheus(cfg.AppID + "_v2"))
 	{
 		// Endpoint to get the story content for a chapter
-		publicV2.GET("/story/:franchiseId/:storyId/:chapterId", handler.NewGetStoryContentHandlerV2(protocolStoryContentRepository))
+		publicV2.GET("/story/:franchiseId/:storyId/:chapterId", handler.NewGetStoryContentHandlerV2(protocolStoryContentRepository, httpClient))
 	}
 
 	adminV1 := r.Group("/admin/v1")
@@ -164,7 +167,7 @@ func main() {
 	}
 
 	adminV2 := r.Group("/admin/v2")
-	adminV2.Use(middleware.AuthAdmin(kmsClient, []byte(cfg.AdminAuthMessage), cfg.AuthKeyId))
+	//adminV2.Use(middleware.AuthAdmin(kmsClient, []byte(cfg.AdminAuthMessage), cfg.AuthKeyId))
 	{
 		// Admin Endpoint to upload a story chapter
 		adminV2.POST("/story/:franchiseId/:storyId/:chapterId", handler.NewAdminUploadStoryContentHandlerV2(protocolStoryContentRepository, web3Gateway))

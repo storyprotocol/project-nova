@@ -10,34 +10,37 @@ import (
 	"github.com/project-nova/backend/api/internal/entity"
 	"github.com/project-nova/backend/api/internal/repository"
 	"github.com/project-nova/backend/pkg/gateway"
+	xhttp "github.com/project-nova/backend/pkg/http"
 	"github.com/project-nova/backend/pkg/logger"
 	"github.com/project-nova/backend/pkg/utils"
 	"github.com/project-nova/backend/proto/v1/web3_gateway"
 )
 
+// GET /story/:franchiseId/:storyId/:chapterId
 func NewGetStoryContentHandlerV2(
 	contentRepo repository.ProtocolStoryContentRepository,
+	httpClient xhttp.Client,
 ) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		// 1. verify addresses
-		franchiseAddress, err := utils.SanitizeAddress(c.Param("franchiseAddress"))
+		franchiseAddress, err := utils.SanitizeAddress(c.Param("franchiseId"))
 		if err != nil {
-			logger.Errorf("Invalid franchise address: %s", c.Param("franchiseAddress"))
+			logger.Errorf("Invalid franchise address: %s", c.Param("franchiseId"))
 			c.JSON(http.StatusBadRequest, ErrorMessage("Invalid franchise address"))
 			return
 		}
 
-		collectionAddress, err := utils.SanitizeAddress(c.Param("collectionAddress"))
+		collectionAddress, err := utils.SanitizeAddress(c.Param("storyId"))
 		if err != nil {
-			logger.Errorf("Invalid collection address: %s", c.Param("collectionAddress"))
-			c.JSON(http.StatusBadRequest, ErrorMessage("Invalid collection address"))
+			logger.Errorf("Invalid story address: %s", c.Param("storyId"))
+			c.JSON(http.StatusBadRequest, ErrorMessage("Invalid story address"))
 			return
 		}
 
-		tokenId, err := strconv.Atoi(c.Param("tokenId"))
+		tokenId, err := strconv.Atoi(c.Param("chapterId"))
 		if err != nil {
-			logger.Errorf("Invalid token id: %s", c.Param("tokenId"))
-			c.JSON(http.StatusBadRequest, ErrorMessage("Invalid token id"))
+			logger.Errorf("Invalid chapter id: %s", c.Param("chapterId"))
+			c.JSON(http.StatusBadRequest, ErrorMessage("Invalid chapter id"))
 			return
 		}
 
@@ -50,8 +53,18 @@ func NewGetStoryContentHandlerV2(
 		}
 
 		// 3. call the uri to get the content
+		var result struct {
+			Content string `json:"content"`
+		}
+		_, err = httpClient.Request("GET", *content.ContentUri, nil, &result)
+		if err != nil {
+			logger.Errorf("Failed to read content from remote storage: %v", err)
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+			return
+		}
+
 		c.JSON(http.StatusOK, gin.H{
-			"content": content.ContentJson,
+			"content": result.Content,
 		})
 	}
 }
