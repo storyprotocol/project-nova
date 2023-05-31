@@ -53,9 +53,7 @@ func NewGetStoryContentHandlerV2(
 		}
 
 		// 3. call the uri to get the content
-		var result struct {
-			Content string `json:"content"`
-		}
+		var result entity.ContentV2
 		_, err = httpClient.Request("GET", *content.ContentUri, nil, &result)
 		if err != nil {
 			logger.Errorf("Failed to read content from remote storage: %v", err)
@@ -63,9 +61,7 @@ func NewGetStoryContentHandlerV2(
 			return
 		}
 
-		c.JSON(http.StatusOK, gin.H{
-			"content": result.Content,
-		})
+		c.JSON(http.StatusOK, result)
 	}
 }
 
