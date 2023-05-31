@@ -167,7 +167,7 @@ func main() {
 	}
 
 	adminV2 := r.Group("/admin/v2")
-	//adminV2.Use(middleware.AuthAdmin(kmsClient, []byte(cfg.AdminAuthMessage), cfg.AuthKeyId))
+	adminV2.Use(middleware.AuthAdmin(kmsClient, []byte(cfg.AdminAuthMessage), cfg.AuthKeyId))
 	{
 		// Admin Endpoint to upload a story chapter
 		adminV2.POST("/story/:franchiseId/:storyId/:chapterId", handler.NewAdminUploadStoryContentHandlerV2(protocolStoryContentRepository, web3Gateway))
