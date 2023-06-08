@@ -136,6 +136,5 @@ s3-download:
 .PHONY: build-proto
 build-proto:
 	protoc -I. \
-	    -I${GOOGLEAPIS_DIR} \
 		--go_out=plugins=grpc,paths=source_relative:. \
 		./proto/v1/web3_gateway/*.proto
