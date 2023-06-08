@@ -16,8 +16,6 @@ DOCKER_BUILD=docker build --cache-from
 
 DEVELOPMENT_DB_URI = postgresql://postgres:@api-database:5432/postgres?sslmode=disable
 
-GOOGLEAPIS_DIR=./proto/third_party/googleapis
-
 help:
 	@echo '  ecr-auth:            - Authenticate ECR'
 	@echo '  builder:             - Build and push builder image'
