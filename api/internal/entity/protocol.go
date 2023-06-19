@@ -51,10 +51,14 @@ type StoryNftOnchainMeta struct {
 }
 
 type ProtocolStoryContentModel struct {
-	ID          string    `gorm:"primaryKey;column:id" json:"id"`
-	ContentJson string    `json:"contentJson"`
-	CreatedAt   time.Time `json:"createdAt"`
-	UpdatedAt   time.Time `json:"updatedAt"`
+	ID                string    `gorm:"primaryKey;column:id" json:"id"`
+	FranchiseAddress  *string   `json:"franchiseAddress"`
+	CollectionAddress *string   `json:"collectionAddress"`
+	TokenId           *int      `json:"tokenId"`
+	ContentJson       string    `json:"contentJson"`
+	ContentUri        *string   `json:"contentUri"`
+	CreatedAt         time.Time `json:"createdAt"`
+	UpdatedAt         time.Time `json:"updatedAt"`
 }
 
 func (ProtocolStoryContentModel) TableName() string {
@@ -130,4 +134,42 @@ var LicenseRightsMap = map[uint8]string{
 	6: "ComicBook",
 	7: "Game",
 	8: "SpinOff",
+}
+
+type ContentV2 struct {
+	Metadata   *ContentMetaDataV2         `json:"metadata"`
+	Data       *ContentDataV2             `json:"data"`
+	Reference  map[string]*ContentAssetV2 `json:"ref"`
+	Pagination *ContentPaginationV2       `json:"pagination"`
+}
+
+type ContentMetaDataV2 struct {
+	Type          *string `json:"type"`
+	TxnHash       *string `json:"txnHash"`
+	AuthorAddress *string `json:"authorAddress"`
+}
+
+type ContentDataV2 struct {
+	Chapter *int    `json:"chapter"`
+	Title   *string `json:"title"`
+	Banner  *string `json:"banner"`
+	Content *string `json:"content"`
+}
+
+type ContentAssetV2 struct {
+	Type    *string `json:"type"`
+	Address *string `json:"address"`
+	Image   *string `json:"image"`
+	Content *string `json:"content"`
+}
+
+type ContentPaginationV2 struct {
+	Prev *ContentPageInfoV2 `json:"prev"`
+	Next *ContentPageInfoV2 `json:"next"`
+}
+
+type ContentPageInfoV2 struct {
+	Chapter *int    `json:"chapter"`
+	Title   *string `json:"title"`
+	Banner  *string `json:"banner"`
 }

@@ -15,6 +15,8 @@ import (
 	"github.com/project-nova/backend/api/internal/repository"
 	"github.com/project-nova/backend/pkg/constant"
 	"github.com/project-nova/backend/pkg/database"
+	"github.com/project-nova/backend/pkg/gateway"
+	xhttp "github.com/project-nova/backend/pkg/http"
 	"github.com/project-nova/backend/pkg/keymanagement"
 	"github.com/project-nova/backend/pkg/logger"
 	"github.com/project-nova/backend/pkg/middleware"
@@ -85,6 +87,13 @@ func main() {
 		logger.Errorf("Failed to get and load franchise collections: %v", err)
 	}
 
+	web3Gateway, err := gateway.NewWeb3GatewayClient(cfg.GrpcWeb3Gateway)
+	if err != nil {
+		logger.Fatalf("Failed to init web3 gateway client: %v", err)
+	}
+
+	httpClient := xhttp.NewClient(&xhttp.ClientConfig{})
+
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, "Hello")
 	})
@@ -97,7 +106,7 @@ func main() {
 
 	publicV1 := r.Group("/v1")
 	publicV1.Use(cors.Default())
-	publicV1.Use(middleware.Prometheus(cfg.AppID))
+	publicV1.Use(middleware.Prometheus(cfg.AppID + "_v1"))
 	{
 		// Endpoint to get the merkle proof for the wallet address per allowlist
 		publicV1.GET("/wallet/:walletAddress/proof", handler.NewGetWalletProofHandler(walletMerkleProofRepository))
@@ -119,7 +128,14 @@ func main() {
 
 		// Endpoint to get the metadata of nft collection
 		publicV1.GET("/nft/collections", handler.NewGetNftCollectionsHandler(nftCollectionRepository, franchiseCollectionRepository))
+	}
 
+	publicV2 := r.Group("v2")
+	publicV2.Use(cors.Default())
+	publicV2.Use(middleware.Prometheus(cfg.AppID + "_v2"))
+	{
+		// Endpoint to get the story content for a chapter
+		publicV2.GET("/story/:franchiseId/:storyId/:chapterId", handler.NewGetStoryContentHandlerV2(protocolStoryContentRepository, httpClient))
 	}
 
 	adminV1 := r.Group("/admin/v1")
@@ -148,6 +164,13 @@ func main() {
 
 		// Admin Endpoint to update chapter content to cache
 		adminV1.POST("/story/:franchiseId/:storyNum/:chapterNum/cache", handler.NewAdminUpdateStoryChapterCacheHandler(storyContentRepository))
+	}
+
+	adminV2 := r.Group("/admin/v2")
+	adminV2.Use(middleware.AuthAdmin(kmsClient, []byte(cfg.AdminAuthMessage), cfg.AuthKeyId))
+	{
+		// Admin Endpoint to upload a story chapter
+		adminV2.POST("/story/:franchiseId/:storyId/:chapterId", handler.NewAdminUploadStoryContentHandlerV2(protocolStoryContentRepository, web3Gateway))
 	}
 
 	protocolV1 := r.Group("/protocol/v1")

@@ -22,6 +22,7 @@ type AppConfig struct {
 	AuthKeyId           string          `yaml:"auth_key_id"`
 	S3ContentBucketName string          `yaml:"s3_content_bucket_name"`
 	Protocol            *ProtocolConfig `yaml:"protocol"`
+	GrpcWeb3Gateway     string          `yaml:"grpc_web3_gateway"`
 }
 
 type StreamerConfig struct {

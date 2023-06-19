@@ -10,6 +10,7 @@ import (
 
 type ProtocolStoryContentRepository interface {
 	GetContentByID(contentId string) (*entity.ProtocolStoryContentModel, error)
+	GetContentByAddresses(franchiseAddress string, collectionAddress string, tokenId int) (*entity.ProtocolStoryContentModel, error)
 	CreateContent(chapter *entity.ProtocolStoryContentModel) error
 }
 
@@ -26,6 +27,19 @@ type protocolStoryContentDbImpl struct {
 func (s *protocolStoryContentDbImpl) GetContentByID(contentId string) (*entity.ProtocolStoryContentModel, error) {
 	result := &entity.ProtocolStoryContentModel{}
 	r := s.db.Where("id = ?", contentId).Find(result)
+	if errors.Is(r.Error, gorm.ErrRecordNotFound) {
+		return nil, r.Error
+	}
+	if r.Error != nil {
+		return nil, fmt.Errorf("failed to query db: %v", r.Error)
+	}
+
+	return result, nil
+}
+
+func (s *protocolStoryContentDbImpl) GetContentByAddresses(franchiseAddress string, collectionAddress string, tokenId int) (*entity.ProtocolStoryContentModel, error) {
+	result := &entity.ProtocolStoryContentModel{}
+	r := s.db.Where("franchise_address = ? AND collection_address = ? AND token_id = ?", franchiseAddress, collectionAddress, tokenId).Order("created_at desc").First(result)
 	if errors.Is(r.Error, gorm.ErrRecordNotFound) {
 		return nil, r.Error
 	}
