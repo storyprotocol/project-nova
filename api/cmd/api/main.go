@@ -3,7 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
+	"math/rand"
 	"net/http"
+	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -28,6 +30,7 @@ func main() {
 	r := gin.Default()
 
 	flag.Parse()
+	rand.Seed(time.Now().UnixNano())
 
 	Logger, err := logger.InitLogger(logger.Levels.Info)
 	if err != nil {
@@ -73,6 +76,7 @@ func main() {
 	nftAllowlistRepository := repository.NewNftAllowlistDbImpl(db)
 	storyChapterRepository := repository.NewStoryChapterDbImpl(db)
 	storyInfoRepository := repository.NewStoryInfoDbImpl(db)
+	characterInfoRepository := repository.NewCharacterInfoDbImpl(db)
 
 	storyContentRepository, err := repository.NewStoryContentS3Impl(s3Client, cfg.S3ContentBucketName)
 	if err != nil {
@@ -208,6 +212,19 @@ func main() {
 
 		// Endpoint to get license information for an asset
 		protocolV1.GET("/license/:franchiseAddress/:collectionAddress/:tokenId", handler.NewGetAssetLicensesHandler(ethClient, franchiseMap, cfg.PrimitiveTpeAbiPath))
+	}
+
+	protocolV2 := r.Group("/protocol/v2")
+	protocolV2.Use(cors.Default())
+	{
+		// Endpoint to get characters from a franchise
+		protocolV2.GET("/character/:franchiseAddress", handler.NewGetCharactersHandlerV2(characterInfoRepository))
+
+		// Endpoint to get a single character from a franchise
+		protocolV2.GET("/character/:franchiseAddress/:tokenId", handler.NewGetCharacterHandlerV2(characterInfoRepository))
+
+		// Endpoint to create a character in a franchise
+		protocolV2.POST("/character/:franchiseAddress", handler.NewCreateCharacterHandlerV2(characterInfoRepository, web3Gateway))
 	}
 
 	port := fmt.Sprintf(":%d", cfg.Port)
