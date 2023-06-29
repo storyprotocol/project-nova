@@ -88,7 +88,7 @@ db_down: preparedb
 	docker exec project-nova-bastion-1 migrate -database ${DEVELOPMENT_DB_URI} -path /build/api/migrations -verbose up 1	
 
 .PHONY: db_drop
-db_down: preparedb
+db_drop: preparedb
 	docker exec -e DATABASE_URI=${DEVELOPMENT_DB_URI} project-nova-bastion-1 sh /build/script/dropdb.sh 	
 
 PHONY: db_shell

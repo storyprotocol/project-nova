@@ -77,6 +77,7 @@ func main() {
 	storyChapterRepository := repository.NewStoryChapterDbImpl(db)
 	storyInfoRepository := repository.NewStoryInfoDbImpl(db)
 	characterInfoRepository := repository.NewCharacterInfoDbImpl(db)
+	storyInfoV2Repository := repository.NewStoryInfoV2DbImpl(db)
 
 	storyContentRepository, err := repository.NewStoryContentS3Impl(s3Client, cfg.S3ContentBucketName)
 	if err != nil {
@@ -224,7 +225,16 @@ func main() {
 		protocolV2.GET("/character/:franchiseId/:tokenId", handler.NewGetCharacterHandlerV2(characterInfoRepository))
 
 		// Endpoint to create a character in a franchise
-		protocolV2.POST("/character/:franchiseId", handler.NewCreateCharacterHandlerV2(characterInfoRepository, web3Gateway))
+		protocolV2.POST("/character/:franchiseId", handler.NewCreateCharacterHandlerV2(characterInfoRepository, storyInfoV2Repository, web3Gateway))
+
+		// Endpoint to get stories from a franchise
+		protocolV2.GET("/story/:franchiseId", handler.NewGetStoriesHandlerV2(storyInfoV2Repository))
+
+		// Endpoint to get a single story from a franchise
+		protocolV2.GET("/story/:franchiseId/:tokenId", handler.NewGetStoryHandlerV2(storyInfoV2Repository))
+
+		// Endpoint to create a story in a franchise
+		protocolV2.POST("/story/:franchiseId", handler.NewCreateStoryHandlerV2(storyInfoV2Repository, web3Gateway))
 	}
 
 	port := fmt.Sprintf(":%d", cfg.Port)

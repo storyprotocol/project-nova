@@ -14,7 +14,8 @@ type CharacterMetadata struct {
 }
 
 type CreateCharacterResp struct {
-	MediaUri string `json:"arweaveURI"`
+	CharacterMediaUri string `json:"characterUrl"`
+	BackstoryMediaUri string `json:"backstoryUrl"`
 }
 
 type GetCharactersResp struct {
