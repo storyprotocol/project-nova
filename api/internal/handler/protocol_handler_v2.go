@@ -11,23 +11,22 @@ import (
 	"github.com/project-nova/backend/api/internal/repository"
 	"github.com/project-nova/backend/pkg/gateway"
 	"github.com/project-nova/backend/pkg/logger"
-	"github.com/project-nova/backend/pkg/utils"
 	"github.com/project-nova/backend/proto/v1/web3_gateway"
 )
 
-// GET /character/:franchiseAddress
+// GET /character/:franchiseId
 func NewGetCharactersHandlerV2(
 	characterInfoRepository repository.CharacterInfoRepository,
 ) func(c *gin.Context) {
 	return func(c *gin.Context) {
-		franchiseAddress, err := utils.SanitizeAddress(c.Param("franchiseAddress"))
+		franchiseId, err := strconv.ParseInt(c.Param("franchiseId"), 10, 64)
 		if err != nil {
-			logger.Errorf("Invalid franchise address: %s", c.Param("franchiseAddress"))
-			c.JSON(http.StatusBadRequest, ErrorMessage("Invalid franchise address"))
+			logger.Errorf("Invalid franchise id: %s", c.Param("franchiseId"))
+			c.JSON(http.StatusBadRequest, ErrorMessage("Invalid franchise id"))
 			return
 		}
 
-		characters, err := characterInfoRepository.GetCharacters(franchiseAddress)
+		characters, err := characterInfoRepository.GetCharacters(franchiseId)
 		if err != nil {
 			logger.Errorf("Failed to get characters: %v", err)
 			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
@@ -48,15 +47,15 @@ func NewGetCharactersHandlerV2(
 	}
 }
 
-// GET /character/:franchiseAddress/:tokenId
+// GET /character/:franchiseId/:tokenId
 func NewGetCharacterHandlerV2(
 	characterInfoRepository repository.CharacterInfoRepository,
 ) func(c *gin.Context) {
 	return func(c *gin.Context) {
-		franchiseAddress, err := utils.SanitizeAddress(c.Param("franchiseAddress"))
+		franchiseId, err := strconv.ParseInt(c.Param("franchiseId"), 10, 64)
 		if err != nil {
-			logger.Errorf("Invalid franchise address: %s", c.Param("franchiseAddress"))
-			c.JSON(http.StatusBadRequest, ErrorMessage("Invalid franchise address"))
+			logger.Errorf("Invalid franchise id: %s", c.Param("franchiseId"))
+			c.JSON(http.StatusBadRequest, ErrorMessage("Invalid franchise id"))
 			return
 		}
 
@@ -67,7 +66,7 @@ func NewGetCharacterHandlerV2(
 			return
 		}
 
-		character, err := characterInfoRepository.GetCharacter(franchiseAddress, int64(tokenId))
+		character, err := characterInfoRepository.GetCharacter(franchiseId, int64(tokenId))
 		if err != nil {
 			logger.Errorf("Failed to get character, id %s: %v", c.Param("tokenId"), err)
 			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
@@ -79,16 +78,16 @@ func NewGetCharacterHandlerV2(
 	}
 }
 
-// POST /character/:franchiseAddress
+// POST /character/:franchiseId
 func NewCreateCharacterHandlerV2(
 	characterInfoRepository repository.CharacterInfoRepository,
 	web3Gateway gateway.Web3GatewayClient,
 ) func(c *gin.Context) {
 	return func(c *gin.Context) {
-		franchiseAddress, err := utils.SanitizeAddress(c.Param("franchiseAddress"))
+		franchiseId, err := strconv.ParseInt(c.Param("franchiseId"), 10, 64)
 		if err != nil {
-			logger.Errorf("Invalid franchise address: %s", c.Param("franchiseAddress"))
-			c.JSON(http.StatusBadRequest, ErrorMessage("Invalid franchise address"))
+			logger.Errorf("Invalid franchise id: %s", c.Param("franchiseId"))
+			c.JSON(http.StatusBadRequest, ErrorMessage("Invalid franchise id"))
 			return
 		}
 
@@ -105,7 +104,7 @@ func NewCreateCharacterHandlerV2(
 		}
 
 		characterInfo := requestBody.ToCharacterInfoModel()
-		characterInfo.FranchiseAddress = franchiseAddress
+		characterInfo.FranchiseId = franchiseId
 
 		storyMeta := &entity.CharacterMetadata{
 			Name:      characterInfo.CharacterName,

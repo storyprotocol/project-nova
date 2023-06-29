@@ -2,7 +2,7 @@ BEGIN;
 
 CREATE TABLE IF NOT EXISTS character_info (
     id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-    franchise_address VARCHAR NOT NULL,
+    franchise_id BIGINT NOT NULL,
     character_id BIGINT,
     character_name VARCHAR NOT NULL,
     owner_address VARCHAR NOT NULL,
@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS character_info (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX idx_character_info_on_franchise_address ON character_info(franchise_address);
+CREATE INDEX idx_character_info_on_franchise_id ON character_info(franchise_id);
 CREATE INDEX idx_character_info_on_character_id ON character_info(character_id);
 
 CREATE TRIGGER set_updated_at

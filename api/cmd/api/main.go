@@ -218,13 +218,13 @@ func main() {
 	protocolV2.Use(cors.Default())
 	{
 		// Endpoint to get characters from a franchise
-		protocolV2.GET("/character/:franchiseAddress", handler.NewGetCharactersHandlerV2(characterInfoRepository))
+		protocolV2.GET("/character/:franchiseId", handler.NewGetCharactersHandlerV2(characterInfoRepository))
 
 		// Endpoint to get a single character from a franchise
-		protocolV2.GET("/character/:franchiseAddress/:tokenId", handler.NewGetCharacterHandlerV2(characterInfoRepository))
+		protocolV2.GET("/character/:franchiseId/:tokenId", handler.NewGetCharacterHandlerV2(characterInfoRepository))
 
 		// Endpoint to create a character in a franchise
-		protocolV2.POST("/character/:franchiseAddress", handler.NewCreateCharacterHandlerV2(characterInfoRepository, web3Gateway))
+		protocolV2.POST("/character/:franchiseId", handler.NewCreateCharacterHandlerV2(characterInfoRepository, web3Gateway))
 	}
 
 	port := fmt.Sprintf(":%d", cfg.Port)

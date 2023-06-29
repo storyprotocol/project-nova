@@ -29,7 +29,8 @@ help:
 	@echo ''
 	@echo '  db_new:              - Create new DB migration script for api server'
 	@echo '  db_up:               - Apply new DB migration script to local Postgres DB for testing'
-	@echo '  db_down:             - Tear down local Postgres DB tables'
+	@echo '  db_down:             - Drop the latest DB migration sql script to local Postgres DB for testing'
+	@echo '  db_drop:             - Tear down local Postgres DB tables'
 	@echo '  db_shell:            - Open local Postgres DB console'
 	@echo ''
 	@echo '  build-{service}:     - Build specific service'
@@ -83,6 +84,10 @@ db_up: preparedb
 	docker exec project-nova-bastion-1 migrate -database ${DEVELOPMENT_DB_URI} -path /build/api/migrations -verbose up
 
 .PHONY: db_down
+db_down: preparedb
+	docker exec project-nova-bastion-1 migrate -database ${DEVELOPMENT_DB_URI} -path /build/api/migrations -verbose up 1	
+
+.PHONY: db_drop
 db_down: preparedb
 	docker exec -e DATABASE_URI=${DEVELOPMENT_DB_URI} project-nova-bastion-1 sh /build/script/dropdb.sh 	
 
