@@ -10,8 +10,8 @@ import (
 
 type CharacterInfoRepository interface {
 	CreateCharacter(character *entity.CharacterInfoModel) error
-	GetCharacter(franchiseAddress string, characterId int64) (*entity.CharacterInfoModel, error)
-	GetCharacters(franchiseAddress string) ([]*entity.CharacterInfoModel, error)
+	GetCharacter(franchiseId int64, characterId int64) (*entity.CharacterInfoModel, error)
+	GetCharacters(franchiseId int64) ([]*entity.CharacterInfoModel, error)
 }
 
 func NewCharacterInfoDbImpl(db *gorm.DB) CharacterInfoRepository {
@@ -36,9 +36,9 @@ func (c *characterInfoDbImpl) CreateCharacter(character *entity.CharacterInfoMod
 	return nil
 }
 
-func (c *characterInfoDbImpl) GetCharacter(franchiseAddress string, characterId int64) (*entity.CharacterInfoModel, error) {
+func (c *characterInfoDbImpl) GetCharacter(franchiseId int64, characterId int64) (*entity.CharacterInfoModel, error) {
 	result := &entity.CharacterInfoModel{}
-	r := c.db.Where("franchise_address = ? and character_id = ?", franchiseAddress, characterId).First(result)
+	r := c.db.Where("franchise_id = ? and character_id = ?", franchiseId, characterId).First(result)
 	if errors.Is(r.Error, gorm.ErrRecordNotFound) {
 		return nil, r.Error
 	}
@@ -49,9 +49,9 @@ func (c *characterInfoDbImpl) GetCharacter(franchiseAddress string, characterId 
 	return result, nil
 }
 
-func (c *characterInfoDbImpl) GetCharacters(franchiseAddress string) ([]*entity.CharacterInfoModel, error) {
+func (c *characterInfoDbImpl) GetCharacters(franchiseId int64) ([]*entity.CharacterInfoModel, error) {
 	results := []*entity.CharacterInfoModel{}
-	r := c.db.Where("franchise_address = ?", franchiseAddress).Order("character_id asc").Find(&results)
+	r := c.db.Where("franchise_id = ?", franchiseId).Order("character_id asc").Find(&results)
 	if errors.Is(r.Error, gorm.ErrRecordNotFound) {
 		return nil, r.Error
 	}

@@ -14,7 +14,8 @@ type CharacterMetadata struct {
 }
 
 type CreateCharacterResp struct {
-	MediaUri string `json:"arweaveURI"`
+	CharacterMediaUri string `json:"characterUrl"`
+	BackstoryMediaUri string `json:"backstoryUrl"`
 }
 
 type GetCharactersResp struct {
@@ -81,16 +82,16 @@ func (c *CreateCharacterRequestBody) ToCharacterInfoModel() *CharacterInfoModel 
 }
 
 type CharacterInfoModel struct {
-	ID               string    `gorm:"primaryKey;column:id" json:"id"`
-	FranchiseAddress string    `json:"franchiseAddress"`
-	CharacterId      *int64    `json:"CharacterId"`
-	CharacterName    string    `json:"CharacterName"`
-	OwnerAddress     string    `json:"OwnerAddress"`
-	ImageUrl         *string   `json:"ImageUrl"`
-	Backstory        *string   `json:"backstory"`
-	MediaUri         *string   `json:"mediaUri"`
-	CreatedAt        time.Time `json:"createdAt"`
-	UpdatedAt        time.Time `json:"updatedAt"`
+	ID            string    `gorm:"primaryKey;column:id" json:"id"`
+	FranchiseId   int64     `json:"franchiseId"`
+	CharacterId   *int64    `json:"characterId"`
+	CharacterName string    `json:"characterName"`
+	OwnerAddress  string    `json:"ownerAddress"`
+	ImageUrl      *string   `json:"imageUrl"`
+	Backstory     *string   `json:"backstory"`
+	MediaUri      *string   `json:"mediaUri"`
+	CreatedAt     time.Time `json:"createdAt"`
+	UpdatedAt     time.Time `json:"updatedAt"`
 }
 
 func (CharacterInfoModel) TableName() string {

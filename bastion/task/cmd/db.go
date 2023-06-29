@@ -60,7 +60,33 @@ var dbUpCmd = &cobra.Command{
 	},
 }
 
+var dbDownCmd = &cobra.Command{
+	Use:   "db-down",
+	Short: "db down task runs db migration to downgrade db by one version",
+	Long:  `db down task runs db migration to downgrade db by one version`,
+	Run: func(cmd *cobra.Command, args []string) {
+		cfg, err := config.GetConfig()
+		if err != nil {
+			logger.Fatalf("Failed to get configs: %v", err)
+		}
+
+		binary, err := exec.LookPath("migrate")
+		if err != nil {
+			logger.Fatalf("Failed to find psql path: %v", err)
+		}
+
+		cmdArgs := []string{"migrate", "-database", cfg.DatabaseURI, "-path", "/build/api/migrations", "-verbose", "down", "1"}
+		env := os.Environ()
+
+		execErr := syscall.Exec(binary, cmdArgs, env)
+		if execErr != nil {
+			logger.Fatalf("Failed to execute the command: %v", execErr)
+		}
+	},
+}
+
 func init() {
 	rootCmd.AddCommand(dbShellCmd)
 	rootCmd.AddCommand(dbUpCmd)
+	rootCmd.AddCommand(dbDownCmd)
 }

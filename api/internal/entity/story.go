@@ -1,6 +1,8 @@
 package entity
 
 import (
+	"fmt"
+	"math/rand"
 	"time"
 
 	"github.com/google/uuid"
@@ -87,4 +89,136 @@ func ToStoryChapterModel(request *gateway.CreateStoryChapterRequestBody, storyId
 	storyChapterModel.ReleaseAt = *request.ReleaseAt
 
 	return storyChapterModel
+}
+
+type StoryInfoV2Model struct {
+	ID               string    `gorm:"primaryKey;column:id" json:"id"`
+	FranchiseId      int64     `json:"franchiseId"`
+	StoryId          *int64    `json:"storyId"`
+	StoryName        string    `json:"storyName"`
+	StoryDescription *string   `json:"storyDescription"`
+	OwnerAddress     *string   `json:"ownerAddress"`
+	CoverUrl         *string   `json:"coverUrl"`
+	Content          *string   `json:"content"`
+	MediaUri         *string   `json:"mediaUri"`
+	CreatedAt        time.Time `json:"createdAt"`
+	UpdatedAt        time.Time `json:"updatedAt"`
+}
+
+func (StoryInfoV2Model) TableName() string {
+	return "story_info_v2"
+}
+
+func (s *StoryInfoV2Model) ToGetStoryResp() (*GetStoryResp, error) {
+	if s.StoryId == nil {
+		return nil, fmt.Errorf("story id is nil")
+	}
+	resp := &GetStoryResp{
+		StoryId: *s.StoryId,
+	}
+	if len(s.StoryName) > 0 {
+		resp.StoryName = &s.StoryName
+	}
+	if s.StoryDescription != nil {
+		resp.StoryDescription = s.StoryDescription
+	}
+	if s.OwnerAddress != nil {
+		resp.OwnerAddress = s.OwnerAddress
+	}
+	if s.MediaUri != nil {
+		resp.MediaUri = s.MediaUri
+	}
+
+	return resp, nil
+}
+
+func (s *StoryInfoV2Model) ToGetStoryDetailsResp() (*GetStoryDetailsResp, error) {
+	if s.StoryId == nil {
+		return nil, fmt.Errorf("story id is nil")
+	}
+	resp := &GetStoryDetailsResp{
+		StoryId: *s.StoryId,
+	}
+	if len(s.StoryName) > 0 {
+		resp.StoryName = &s.StoryName
+	}
+	if s.StoryDescription != nil {
+		resp.StoryDescription = s.StoryDescription
+	}
+	if s.OwnerAddress != nil {
+		resp.OwnerAddress = s.OwnerAddress
+	}
+	if s.MediaUri != nil {
+		resp.MediaUri = s.MediaUri
+	}
+	if s.Content != nil {
+		resp.Content = s.Content
+	}
+
+	return resp, nil
+}
+
+type GetStoryResp struct {
+	StoryId          int64   `json:"storyId"`
+	StoryName        *string `json:"storyName"`
+	StoryDescription *string `json:"storyDescription"`
+	OwnerAddress     *string `json:"ownerAddress"`
+	MediaUri         *string `json:"arweaveUrl"`
+}
+
+type GetStoryDetailsResp struct {
+	StoryId          int64   `json:"storyId"`
+	StoryName        *string `json:"storyName"`
+	StoryDescription *string `json:"storyDescription"`
+	OwnerAddress     *string `json:"ownerAddress"`
+	Content          *string `json:"content"`
+	MediaUri         *string `json:"arweaveUrl"`
+}
+
+type CreateStoryRequestBody struct {
+	StoryName        *string `json:"name"`
+	StoryDescription *string `json:"description"`
+	OwnerAddress     *string `json:"owner"`
+	Content          *string `json:"content"`
+}
+
+func (c *CreateStoryRequestBody) Validate() error {
+	if c.Content == nil || len(*c.Content) == 0 {
+		return fmt.Errorf("Story content is empty")
+	}
+	if c.OwnerAddress == nil {
+		return fmt.Errorf("owner address is empty")
+	}
+	return nil
+}
+
+func (c *CreateStoryRequestBody) ToStoryInfoV2Model() *StoryInfoV2Model {
+	storyInfo := &StoryInfoV2Model{
+		ID: uuid.New().String(),
+	}
+	// Temporary: Add story id for FE testing
+	storyId := int64(rand.Uint32())
+	storyInfo.StoryId = &storyId
+
+	if c.StoryName != nil {
+		storyInfo.StoryName = *c.StoryName
+	}
+	if c.StoryDescription != nil {
+		storyInfo.StoryDescription = c.StoryDescription
+	}
+	if c.OwnerAddress != nil {
+		storyInfo.OwnerAddress = c.OwnerAddress
+	}
+	if c.Content != nil {
+		storyInfo.Content = c.Content
+	}
+	return storyInfo
+}
+
+type StoryMetadata struct {
+	Content string `json:"content"`
+}
+
+type CreateStoryResp struct {
+	MediaUri string `json:"arweaveURI"`
 }
