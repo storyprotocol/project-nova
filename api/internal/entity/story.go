@@ -186,9 +186,6 @@ func (c *CreateStoryRequestBody) Validate() error {
 	if c.Content == nil || len(*c.Content) == 0 {
 		return fmt.Errorf("Story content is empty")
 	}
-	if c.OwnerAddress == nil {
-		return fmt.Errorf("owner address is empty")
-	}
 	return nil
 }
 

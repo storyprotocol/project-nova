@@ -138,7 +138,7 @@ func (c *httpClient) request(method string, url string,
 	}
 	defer res.Body.Close()
 
-	if res.StatusCode != 200 {
+	if res.StatusCode != 200 && res.StatusCode != 202 {
 		defer res.Body.Close()
 		e := Error{}
 		decoder := json.NewDecoder(res.Body)

@@ -9,8 +9,9 @@ import (
 )
 
 type CharacterMetadata struct {
-	Name      string `json:"name"`
-	Backstory string `json:"backstory"`
+	Name      string  `json:"name"`
+	ImageUrl  *string `json:"image"`
+	Backstory string  `json:"backstory"`
 }
 
 type CreateCharacterResp struct {
@@ -55,6 +56,21 @@ func (c *CreateCharacterRequestBody) Validate() error {
 		return fmt.Errorf("backstory is empty")
 	}
 	return nil
+}
+
+func (c *CreateCharacterRequestBody) ToCharacterMetadata() *CharacterMetadata {
+	characterMeta := &CharacterMetadata{}
+	if c.CharacterName != nil {
+		characterMeta.Name = *c.CharacterName
+	}
+	if c.Backstory != nil {
+		characterMeta.Backstory = *c.Backstory
+	}
+	if c.ImageUrl != nil {
+		characterMeta.ImageUrl = c.ImageUrl
+	}
+
+	return characterMeta
 }
 
 func (c *CreateCharacterRequestBody) ToCharacterInfoModel() *CharacterInfoModel {
