@@ -85,7 +85,7 @@ db_up: preparedb
 
 .PHONY: db_down
 db_down: preparedb
-	docker exec project-nova-bastion-1 migrate -database ${DEVELOPMENT_DB_URI} -path /build/api/migrations -verbose up 1	
+	docker exec project-nova-bastion-1 migrate -database ${DEVELOPMENT_DB_URI} -path /build/api/migrations -verbose down 1	
 
 .PHONY: db_drop
 db_drop: preparedb

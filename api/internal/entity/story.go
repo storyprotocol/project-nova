@@ -101,6 +101,7 @@ type StoryInfoV2Model struct {
 	CoverUrl         *string   `json:"coverUrl"`
 	Content          *string   `json:"content"`
 	MediaUri         *string   `json:"mediaUri"`
+	Txhash           *string   `json:"txhash"`
 	CreatedAt        time.Time `json:"createdAt"`
 	UpdatedAt        time.Time `json:"updatedAt"`
 }
@@ -154,6 +155,9 @@ func (s *StoryInfoV2Model) ToGetStoryDetailsResp() (*GetStoryDetailsResp, error)
 	if s.Content != nil {
 		resp.Content = s.Content
 	}
+	if s.Txhash != nil {
+		resp.Txhash = s.Txhash
+	}
 
 	return resp, nil
 }
@@ -173,6 +177,7 @@ type GetStoryDetailsResp struct {
 	OwnerAddress     *string `json:"ownerAddress"`
 	Content          *string `json:"content"`
 	MediaUri         *string `json:"arweaveUrl"`
+	Txhash           *string `json:"txhash"`
 }
 
 type CreateStoryRequestBody struct {

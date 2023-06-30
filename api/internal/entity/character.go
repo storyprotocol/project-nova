@@ -33,6 +33,7 @@ type GetCharacterResp struct {
 	ImageUrl     *string `json:"img"`
 	Backstory    *string `json:"backstory"`
 	MediaUri     *string `json:"arweaveURI"`
+	Txhash       *string `json:"txhash"`
 }
 
 type CreateCharacterRequestBody struct {
@@ -106,6 +107,7 @@ type CharacterInfoModel struct {
 	ImageUrl      *string   `json:"imageUrl"`
 	Backstory     *string   `json:"backstory"`
 	MediaUri      *string   `json:"mediaUri"`
+	Txhash        *string   `json:"txhash"`
 	CreatedAt     time.Time `json:"createdAt"`
 	UpdatedAt     time.Time `json:"updatedAt"`
 }
@@ -146,5 +148,9 @@ func (c *CharacterInfoModel) ToGetCharacterResp() *GetCharacterResp {
 	if c.MediaUri != nil {
 		resp.MediaUri = c.MediaUri
 	}
+	if c.Txhash != nil {
+		resp.Txhash = c.Txhash
+	}
+
 	return resp
 }

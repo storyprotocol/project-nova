@@ -17,7 +17,7 @@ type ApiGateway interface {
 	CreateProof(address *string, proof *string, allowlistId *string, authMessage string) error
 	CreateStoryChapter(franchiseId string, storyNum string, chapterNum string, requestBody *CreateStoryChapterRequestBody, authMessage string) error
 	UpdateContentCache(franchiseId string, storyNum string, chapterNum string, authMessage string) error
-	CreateCharacterWithBackstory(franchiseId int64, characterId int64, storyId int64, authMessage string) error
+	CreateCharacterWithBackstory(franchiseId int64, characterId int64, storyId int64, txHash string, authMessage string) error
 }
 
 func NewApiHttpGateway(url string) ApiGateway {
@@ -140,14 +140,17 @@ func (s *apiHttpGateway) UpdateContentCache(franchiseId string, storyNum string,
 	return nil
 }
 
-func (s *apiHttpGateway) CreateCharacterWithBackstory(franchiseId int64, characterId int64, storyId int64, authMessage string) error {
+func (s *apiHttpGateway) CreateCharacterWithBackstory(franchiseId int64, characterId int64, storyId int64, txHash string, authMessage string) error {
 	requestURL := fmt.Sprintf("/admin/v2/character/%s/%s/%s", strconv.FormatInt(franchiseId, 10), strconv.FormatInt(characterId, 10), strconv.FormatInt(storyId, 10))
 
 	headers := &map[string]string{
 		middleware.AuthMessageHeaderKey: authMessage,
 	}
+	requestBody := &CreateCharacterWithBackstoryRequestBody{
+		TxHash: txHash,
+	}
 
-	_, err := s.client.RequestAddHeaders("POST", requestURL, headers, nil, nil)
+	_, err := s.client.RequestAddHeaders("POST", requestURL, headers, requestBody, nil)
 	if err != nil {
 		return fmt.Errorf("http request to create character with backstory. error: %v ", err)
 	}

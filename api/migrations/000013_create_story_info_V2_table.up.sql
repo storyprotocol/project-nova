@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS story_info_v2 (
     cover_url VARCHAR,
     content VARCHAR,
     media_uri VARCHAR, 
+    txhash VARCHAR,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

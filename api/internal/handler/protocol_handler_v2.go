@@ -291,6 +291,13 @@ func NewAdminCreateCharacterWithBackstoryHandler(
 			return
 		}
 
+		var requestBody gateway.CreateCharacterWithBackstoryRequestBody
+		if err := c.BindJSON(&requestBody); err != nil {
+			logger.Errorf("Failed to read request body: %v", err)
+			c.JSON(http.StatusBadRequest, ErrorMessage("invalid request body"))
+			return
+		}
+
 		// 1. Get story data from protocol
 		storyBlocksRegistry, err := story_blocks_registry.NewStoryBlocksRegistry(
 			common.HexToAddress("0x69FF21Cc61713D1Cbdd9b1d3d7Feeb188520b7dF"),
@@ -330,6 +337,7 @@ func NewAdminCreateCharacterWithBackstoryHandler(
 			StoryDescription: &storyBlock.Description,
 			OwnerAddress:     &storyOwnerStr,
 			MediaUri:         &storyBlock.MediaUrl,
+			Txhash:           &requestBody.TxHash,
 		}
 		// 2. Use the mediaURL to fetch story content from Arweave
 		var storyMetaData entity.StoryMetadata
@@ -378,6 +386,7 @@ func NewAdminCreateCharacterWithBackstoryHandler(
 			OwnerAddress:  characterOwnerStr,
 			Backstory:     storyInfo.Content,
 			MediaUri:      &characterBlock.MediaUrl,
+			Txhash:        &requestBody.TxHash,
 		}
 
 		var characterMetaData entity.CharacterMetadata

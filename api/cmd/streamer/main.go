@@ -132,8 +132,9 @@ func main() {
 			franchiseId := vlog.Topics[1].Big().Int64()
 			characterId := vlog.Topics[2].Big().Int64()
 			storyId := vlog.Topics[3].Big().Int64()
+			txHash := vlog.TxHash.String()
 
-			err = apiGateway.CreateCharacterWithBackstory(franchiseId, characterId, storyId, encryptedBase64)
+			err = apiGateway.CreateCharacterWithBackstory(franchiseId, characterId, storyId, txHash, encryptedBase64)
 			if err != nil {
 				logger.Errorf("Failed to create character with backstory: %v", err)
 			}
