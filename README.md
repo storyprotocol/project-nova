@@ -43,6 +43,40 @@ To connect to the db shell
 
 - make db_shell
 
+## Data Model
+
+The definition of the postgres data schema is [here](/api/migrations)
+
+V1 tables (For prototype)
+
+***nft_allowlist***: Store the allowlist information for a nft collection
+
+***wallet_merkle_proof***: Store the whitelist proof for a specific allowlist 
+
+***story_franchise***: Store the story franchise information
+
+***story_info***: Store the story information
+
+***story_chapter***: Store the story chapter information
+
+***franchise_collection***: Store the relationship between the franchise and the nft collection
+
+***nft_collection***: Index the information of the nft collection
+
+***nft_token***: Index the information of a specific nft
+
+
+Demo tables 
+
+***story_content***: Store the story content for a specific story 
+
+
+V2 tables (Connected to the protocol)
+
+***story_info_v2***: Index the story information for a specific story in the protocol
+
+***character_info***: Index the character information for a specific character in the protocol 
+
 ## Contributing
 
 Pull requests are welcome. For major changes, please open an issue first
