@@ -47,7 +47,7 @@ To connect to the db shell
 
 The definition of the postgres data schema is [here](/api/migrations)
 
-V1 tables (For prototype)
+### V1 tables (For prototype)
 
 ***nft_allowlist***: Store the allowlist information for a nft collection
 
@@ -65,17 +65,15 @@ V1 tables (For prototype)
 
 ***nft_token***: Index the information of a specific nft
 
+### Demo tables 
 
-Demo tables 
+***story_content***: Store the story content for a specific story   
 
-***story_content***: Store the story content for a specific story 
-
-
-V2 tables (Connected to the protocol)
+### V2 tables (Connected to the protocol)
 
 ***story_info_v2***: Index the story information for a specific story in the protocol
 
-***character_info***: Index the character information for a specific character in the protocol 
+***character_info***: Index the character information for a specific character in the protocol   
 
 ## Contributing
 
