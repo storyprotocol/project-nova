@@ -9,12 +9,14 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/project-nova/backend/api/internal/config"
 	"github.com/project-nova/backend/api/internal/handler"
 	"github.com/project-nova/backend/api/internal/repository"
+	"github.com/project-nova/backend/pkg/abi/story_blocks_registry"
 	"github.com/project-nova/backend/pkg/constant"
 	"github.com/project-nova/backend/pkg/database"
 	"github.com/project-nova/backend/pkg/gateway"
@@ -99,6 +101,14 @@ func main() {
 
 	httpClient := xhttp.NewClient(&xhttp.ClientConfig{})
 
+	storyBlocksRegistry, err := story_blocks_registry.NewStoryBlocksRegistry(
+		common.HexToAddress(cfg.StoryBlocksRegistry),
+		ethClient,
+	)
+	if err != nil {
+		logger.Fatalf("Failed to create story blocks registry client: %v", err)
+	}
+
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, "Hello")
 	})
@@ -179,7 +189,7 @@ func main() {
 
 		// Admin Endpoint to create character and its backstory
 		adminV2.POST("/character/:franchiseId/:characterId/:storyId",
-			handler.NewAdminCreateCharacterWithBackstoryHandler(characterInfoRepository, storyInfoV2Repository, web3Gateway, ethClient, httpClient),
+			handler.NewAdminCreateCharacterWithBackstoryHandler(characterInfoRepository, storyInfoV2Repository, web3Gateway, httpClient, storyBlocksRegistry),
 		)
 	}
 

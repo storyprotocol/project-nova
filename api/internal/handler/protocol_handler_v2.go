@@ -8,8 +8,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/project-nova/backend/api/internal/entity"
@@ -266,8 +264,8 @@ func NewAdminCreateCharacterWithBackstoryHandler(
 	characterInfoRepository repository.CharacterInfoRepository,
 	storyInfoV2Repository repository.StoryInfoV2Repository,
 	web3Gateway gateway.Web3GatewayClient,
-	ethClient *ethclient.Client,
 	httpClient xhttp.Client,
+	storyBlocksRegistry *story_blocks_registry.StoryBlocksRegistry,
 ) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		franchiseId, err := strconv.ParseInt(c.Param("franchiseId"), 10, 64)
@@ -299,16 +297,6 @@ func NewAdminCreateCharacterWithBackstoryHandler(
 		}
 
 		// 1. Get story data from protocol
-		storyBlocksRegistry, err := story_blocks_registry.NewStoryBlocksRegistry(
-			common.HexToAddress("0x69FF21Cc61713D1Cbdd9b1d3d7Feeb188520b7dF"),
-			ethClient,
-		)
-		if err != nil {
-			logger.Errorf("Failed to create story blocks registry client: %v", err)
-			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
-			return
-		}
-
 		storyOwner, err := storyBlocksRegistry.OwnerOf(nil, big.NewInt(storyId))
 		if err != nil {
 			logger.Errorf("Failed to create get the owner of the story %d: %v", storyId, err)
@@ -339,6 +327,7 @@ func NewAdminCreateCharacterWithBackstoryHandler(
 			MediaUri:         &storyBlock.MediaUrl,
 			Txhash:           &requestBody.TxHash,
 		}
+
 		// 2. Use the mediaURL to fetch story content from Arweave
 		var storyMetaData entity.StoryMetadata
 		_, err = httpClient.Request("GET", storyBlock.MediaUrl, nil, &storyMetaData)

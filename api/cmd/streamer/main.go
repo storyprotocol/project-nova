@@ -80,7 +80,7 @@ func main() {
 
 	// Monitor story block
 	orchestratorContractAddresses := []common.Address{
-		common.HexToAddress("0x318C47f07a25C7a3EeA5534948FBA2d7a2b4e63c"),
+		common.HexToAddress(cfg.OrchestratorContract),
 	}
 
 	orchestratorQuery := ethereum.FilterQuery{
