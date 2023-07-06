@@ -4,13 +4,17 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"math/big"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/project-nova/backend/api/internal/entity"
 	"github.com/project-nova/backend/api/internal/repository"
+	"github.com/project-nova/backend/pkg/abi/story_blocks_registry"
 	"github.com/project-nova/backend/pkg/gateway"
+	xhttp "github.com/project-nova/backend/pkg/http"
 	"github.com/project-nova/backend/pkg/logger"
 	"github.com/project-nova/backend/proto/v1/web3_gateway"
 )
@@ -81,8 +85,6 @@ func NewGetCharacterHandlerV2(
 
 // POST /character/:franchiseId
 func NewCreateCharacterHandlerV2(
-	characterInfoRepository repository.CharacterInfoRepository,
-	storyInfoV2Repository repository.StoryInfoV2Repository,
 	web3Gateway gateway.Web3GatewayClient,
 ) func(c *gin.Context) {
 	return func(c *gin.Context) {
@@ -105,21 +107,16 @@ func NewCreateCharacterHandlerV2(
 			return
 		}
 
-		characterInfo := requestBody.ToCharacterInfoModel()
-		characterInfo.FranchiseId = franchiseId
+		characterMetadata := requestBody.ToCharacterMetadata()
 
-		storyMeta := &entity.CharacterMetadata{
-			Name:      characterInfo.CharacterName,
-			Backstory: *characterInfo.Backstory,
-		}
-		storyMetaBytes, err := json.Marshal(storyMeta)
+		characterMetaBytes, err := json.Marshal(characterMetadata)
 		if err != nil {
-			logger.Errorf("Failed to marshal the story meta: %v", err)
+			logger.Errorf("Failed to marshal the character metadata: %v", err)
 			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
 			return
 		}
 
-		contentBase64 := base64.StdEncoding.EncodeToString(storyMetaBytes)
+		contentBase64 := base64.StdEncoding.EncodeToString(characterMetaBytes)
 		resp, err := web3Gateway.UploadContent(&web3_gateway.UploadContentReq{
 			Storage:     web3_gateway.StorageType_ARWEAVE,
 			Content:     []byte(contentBase64),
@@ -137,19 +134,11 @@ func NewCreateCharacterHandlerV2(
 			return
 		}
 
-		characterInfo.MediaUri = &resp.ContentUrl
-		err = characterInfoRepository.CreateCharacter(characterInfo)
-		if err != nil {
-			logger.Errorf("Failed to create character info in db: %v", err)
-			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
-			return
-		}
-
 		createStoryReq := &entity.CreateStoryRequestBody{
-			OwnerAddress: &characterInfo.OwnerAddress,
-			Content:      characterInfo.Backstory,
+			OwnerAddress: requestBody.OwnerAddress,
+			Content:      requestBody.Backstory,
 		}
-		storyMediaUrl, err := createStoryV2(franchiseId, createStoryReq, storyInfoV2Repository, web3Gateway)
+		storyMediaUrl, err := createStoryV2(franchiseId, createStoryReq, web3Gateway)
 		if err != nil {
 			logger.Errorf("Failed to create story: %v", err)
 			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
@@ -235,7 +224,6 @@ func NewGetStoryHandlerV2(
 
 // POST /story/:franchiseId
 func NewCreateStoryHandlerV2(
-	storyInfoV2Repository repository.StoryInfoV2Repository,
 	web3Gateway gateway.Web3GatewayClient,
 ) func(c *gin.Context) {
 	return func(c *gin.Context) {
@@ -258,7 +246,7 @@ func NewCreateStoryHandlerV2(
 			return
 		}
 
-		contentUrl, err := createStoryV2(franchiseId, &requestBody, storyInfoV2Repository, web3Gateway)
+		contentUrl, err := createStoryV2(franchiseId, &requestBody, web3Gateway)
 		if err != nil {
 			logger.Errorf("Failed to create story: %v", err)
 			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
@@ -271,17 +259,154 @@ func NewCreateStoryHandlerV2(
 	}
 }
 
+// POST /character/:franchiseId/:characterId/:storyId
+func NewAdminCreateCharacterWithBackstoryHandler(
+	characterInfoRepository repository.CharacterInfoRepository,
+	storyInfoV2Repository repository.StoryInfoV2Repository,
+	web3Gateway gateway.Web3GatewayClient,
+	httpClient xhttp.Client,
+	storyBlocksRegistry *story_blocks_registry.StoryBlocksRegistry,
+) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		franchiseId, err := strconv.ParseInt(c.Param("franchiseId"), 10, 64)
+		if err != nil {
+			logger.Errorf("Invalid franchise id: %s", c.Param("franchiseId"))
+			c.JSON(http.StatusBadRequest, ErrorMessage("Invalid franchise id"))
+			return
+		}
+
+		characterId, err := strconv.ParseInt(c.Param("characterId"), 10, 64)
+		if err != nil {
+			logger.Errorf("Invalid character id: %s", c.Param("characterId"))
+			c.JSON(http.StatusBadRequest, ErrorMessage("Invalid character id"))
+			return
+		}
+
+		storyId, err := strconv.ParseInt(c.Param("storyId"), 10, 64)
+		if err != nil {
+			logger.Errorf("Invalid story id: %s", c.Param("storyId"))
+			c.JSON(http.StatusBadRequest, ErrorMessage("Invalid story id"))
+			return
+		}
+
+		var requestBody gateway.CreateCharacterWithBackstoryRequestBody
+		if err := c.BindJSON(&requestBody); err != nil {
+			logger.Errorf("Failed to read request body: %v", err)
+			c.JSON(http.StatusBadRequest, ErrorMessage("invalid request body"))
+			return
+		}
+
+		// 1. Get story data from protocol
+		storyOwner, err := storyBlocksRegistry.OwnerOf(nil, big.NewInt(storyId))
+		if err != nil {
+			logger.Errorf("Failed to create get the owner of the story %d: %v", storyId, err)
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+			return
+		}
+		storyOwnerStr := storyOwner.String()
+
+		storyBlock, err := storyBlocksRegistry.ReadStoryBlock(nil, big.NewInt(storyId))
+		if err != nil {
+			logger.Errorf("Failed to create get the story block for the story %d: %v", storyId, err)
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+			return
+		}
+		if storyBlock.BlockType != 1 {
+			logger.Errorf("Invalid block type for story. type: %d, id: %s", storyBlock.BlockType, storyId)
+			c.JSON(http.StatusBadRequest, ErrorMessage("Invalid story id"))
+			return
+		}
+
+		storyInfo := &entity.StoryInfoV2Model{
+			ID:               uuid.New().String(),
+			FranchiseId:      franchiseId,
+			StoryId:          &storyId,
+			StoryName:        storyBlock.Name,
+			StoryDescription: &storyBlock.Description,
+			OwnerAddress:     &storyOwnerStr,
+			MediaUri:         &storyBlock.MediaUrl,
+			Txhash:           &requestBody.TxHash,
+		}
+
+		// 2. Use the mediaURL to fetch story content from Arweave
+		var storyMetaData entity.StoryMetadata
+		_, err = httpClient.Request("GET", storyBlock.MediaUrl, nil, &storyMetaData)
+		if err != nil {
+			logger.Errorf("Failed to get story metadata from remote storage. url: %s, error: %v", storyBlock.MediaUrl, err)
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+			return
+		}
+
+		// 3. Populate all story data to DB
+		storyInfo.Content = &storyMetaData.Content
+		err = storyInfoV2Repository.CreateStory(storyInfo)
+		if err != nil {
+			logger.Errorf("Failed to create the story: %v", err)
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+			return
+		}
+
+		// 4. Do the same for character
+		characterOwner, err := storyBlocksRegistry.OwnerOf(nil, big.NewInt(characterId))
+		if err != nil {
+			logger.Errorf("Failed to create get the owner of the character %d: %v", characterId, err)
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+			return
+		}
+		characterOwnerStr := characterOwner.String()
+
+		characterBlock, err := storyBlocksRegistry.ReadStoryBlock(nil, big.NewInt(characterId))
+		if err != nil {
+			logger.Errorf("Failed to create get the story block for the character %d: %v", characterId, err)
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+			return
+		}
+		if characterBlock.BlockType != 2 {
+			logger.Errorf("Invalid block type for character. type: %d, id: %s", storyBlock.BlockType, characterId)
+			c.JSON(http.StatusBadRequest, ErrorMessage("Invalid character id"))
+			return
+		}
+
+		characterInfo := &entity.CharacterInfoModel{
+			ID:            uuid.New().String(),
+			FranchiseId:   franchiseId,
+			CharacterId:   &characterId,
+			CharacterName: characterBlock.Name,
+			OwnerAddress:  characterOwnerStr,
+			Backstory:     storyInfo.Content,
+			MediaUri:      &characterBlock.MediaUrl,
+			Txhash:        &requestBody.TxHash,
+		}
+
+		var characterMetaData entity.CharacterMetadata
+		_, err = httpClient.Request("GET", characterBlock.MediaUrl, nil, &characterMetaData)
+		if err != nil {
+			logger.Errorf("Failed to get character metadata from remote storage. url: %s, error: %s", characterBlock.MediaUrl, err)
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+			return
+		}
+		if characterMetaData.ImageUrl != nil {
+			characterInfo.ImageUrl = characterMetaData.ImageUrl
+		}
+
+		err = characterInfoRepository.CreateCharacter(characterInfo)
+		if err != nil {
+			logger.Errorf("Failed to create the character: %v", err)
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+			return
+		}
+
+		c.JSON(http.StatusOK, nil)
+	}
+}
+
 func createStoryV2(
 	franchiseId int64,
 	request *entity.CreateStoryRequestBody,
-	storyInfoV2Repository repository.StoryInfoV2Repository,
 	web3Gateway gateway.Web3GatewayClient,
 ) (*string, error) {
-	storyInfoV2 := request.ToStoryInfoV2Model()
-	storyInfoV2.FranchiseId = franchiseId
-
 	storyMeta := &entity.StoryMetadata{
-		Content: *storyInfoV2.Content,
+		Content: *request.Content,
 	}
 	storyMetaBytes, err := json.Marshal(storyMeta)
 	if err != nil {
@@ -302,12 +427,6 @@ func createStoryV2(
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to upload content to web3-gateway: %v", err)
-	}
-
-	storyInfoV2.MediaUri = &resp.ContentUrl
-	err = storyInfoV2Repository.CreateStory(storyInfoV2)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create story info v2 in db: %v", err)
 	}
 
 	return &resp.ContentUrl, nil

@@ -1,5 +1,6 @@
 env: staging
 grpc_web3_gateway: web3-gateway-service.web3:8090
+story_blocks_registry: 0x69FF21Cc61713D1Cbdd9b1d3d7Feeb188520b7dF
 
 protocol:
   content_uri: https://stag.api.storyprotocol.net/protocol/v1/story/content/

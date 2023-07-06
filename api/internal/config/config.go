@@ -23,15 +23,17 @@ type AppConfig struct {
 	S3ContentBucketName string          `yaml:"s3_content_bucket_name"`
 	Protocol            *ProtocolConfig `yaml:"protocol"`
 	GrpcWeb3Gateway     string          `yaml:"grpc_web3_gateway"`
+	StoryBlocksRegistry string          `yaml:"story_blocks_registry"`
 }
 
 type StreamerConfig struct {
-	AppID             string `yaml:"app_id"`
-	Region            string `yaml:"region"`
-	ProviderWebsocket string `yaml:"provider_websocket"`
-	ApiGatewayUrl     string `yaml:"api_gateway_url"`
-	AdminAuthMessage  string `yaml:"admin_auth_message"`
-	AuthKeyId         string `yaml:"auth_key_id"`
+	AppID                string `yaml:"app_id"`
+	Region               string `yaml:"region"`
+	ProviderWebsocket    string `yaml:"provider_websocket"`
+	ApiGatewayUrl        string `yaml:"api_gateway_url"`
+	AdminAuthMessage     string `yaml:"admin_auth_message"`
+	AuthKeyId            string `yaml:"auth_key_id"`
+	OrchestratorContract string `yaml:"orchestrator_contract"`
 }
 
 type ProtocolConfig struct {

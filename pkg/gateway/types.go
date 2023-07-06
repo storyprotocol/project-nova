@@ -28,3 +28,8 @@ func FromStoryChapterModel(model *model.StoryContentModel) *CreateStoryChapterRe
 
 	return requestBody
 }
+
+// CreateCharacterWithBackstory contains the data for CreateCharacterWithBackstory request
+type CreateCharacterWithBackstoryRequestBody struct {
+	TxHash string
+}

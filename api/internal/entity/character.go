@@ -9,8 +9,9 @@ import (
 )
 
 type CharacterMetadata struct {
-	Name      string `json:"name"`
-	Backstory string `json:"backstory"`
+	Name      string  `json:"name"`
+	ImageUrl  *string `json:"image"`
+	Backstory string  `json:"backstory"`
 }
 
 type CreateCharacterResp struct {
@@ -32,6 +33,7 @@ type GetCharacterResp struct {
 	ImageUrl     *string `json:"img"`
 	Backstory    *string `json:"backstory"`
 	MediaUri     *string `json:"arweaveURI"`
+	Txhash       *string `json:"txhash"`
 }
 
 type CreateCharacterRequestBody struct {
@@ -55,6 +57,21 @@ func (c *CreateCharacterRequestBody) Validate() error {
 		return fmt.Errorf("backstory is empty")
 	}
 	return nil
+}
+
+func (c *CreateCharacterRequestBody) ToCharacterMetadata() *CharacterMetadata {
+	characterMeta := &CharacterMetadata{}
+	if c.CharacterName != nil {
+		characterMeta.Name = *c.CharacterName
+	}
+	if c.Backstory != nil {
+		characterMeta.Backstory = *c.Backstory
+	}
+	if c.ImageUrl != nil {
+		characterMeta.ImageUrl = c.ImageUrl
+	}
+
+	return characterMeta
 }
 
 func (c *CreateCharacterRequestBody) ToCharacterInfoModel() *CharacterInfoModel {
@@ -90,6 +107,7 @@ type CharacterInfoModel struct {
 	ImageUrl      *string   `json:"imageUrl"`
 	Backstory     *string   `json:"backstory"`
 	MediaUri      *string   `json:"mediaUri"`
+	Txhash        *string   `json:"txhash"`
 	CreatedAt     time.Time `json:"createdAt"`
 	UpdatedAt     time.Time `json:"updatedAt"`
 }
@@ -130,5 +148,9 @@ func (c *CharacterInfoModel) ToGetCharacterResp() *GetCharacterResp {
 	if c.MediaUri != nil {
 		resp.MediaUri = c.MediaUri
 	}
+	if c.Txhash != nil {
+		resp.Txhash = c.Txhash
+	}
+
 	return resp
 }

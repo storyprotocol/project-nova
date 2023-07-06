@@ -19,6 +19,9 @@ import (
 const (
 	// Transfer Topic's Hash Identifier
 	TransferTopic = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"
+
+	// BackstoryCreated's Hash Identifier
+	BackstoryCreatedTopic = "0x45633e1dbbfb9daee5c3fef4d7e2f7956f7ebe21ef019d7d73891807f373233f"
 )
 
 func main() {
@@ -56,7 +59,7 @@ func main() {
 	if err != nil {
 		logger.Fatalf("Failed to get monitor addresses: %v", err)
 	}
-
+	// Monitor pfp collections
 	contractAddresses := []common.Address{}
 	for _, address := range monitorAddresses {
 		contractAddresses = append(contractAddresses, common.HexToAddress(address))
@@ -75,10 +78,66 @@ func main() {
 		logger.Fatal(err)
 	}
 
+	// Monitor story block
+	orchestratorContractAddresses := []common.Address{
+		common.HexToAddress(cfg.OrchestratorContract),
+	}
+
+	orchestratorQuery := ethereum.FilterQuery{
+		Addresses: orchestratorContractAddresses,
+		Topics: [][]common.Hash{
+			{common.HexToHash(BackstoryCreatedTopic)},
+		},
+	}
+
+	orchestratorLogs := make(chan types.Log)
+	orchestratorSub, err := client.SubscribeFilterLogs(context.Background(), orchestratorQuery, orchestratorLogs)
+	if err != nil {
+		logger.Fatal(err)
+	}
+
 	logger.Info("Streamer starting")
 
 	for {
 		select {
+		case err := <-orchestratorSub.Err():
+			logger.Errorf("subscription error: %v", err)
+			orchestratorSub.Unsubscribe()
+			orchestratorSub, err = client.SubscribeFilterLogs(context.Background(), orchestratorQuery, orchestratorLogs)
+			if err != nil {
+				logger.Fatal(err)
+			}
+			logger.Info("Resubscribed")
+		case vlog := <-orchestratorLogs:
+			/* Sample log
+			{
+			  "address": "0x001c1fb84f8673f1fc40be20d45b3b012d300000",
+			  "topics": [
+			    "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+			    "0x0000000000000000000000000000000000000000000000000000000000000000",
+			    "0x000000000000000000000000000b179bfd31635a387fc205f341d1fac6797327",
+			    "0x0000000000000000000000000000000000000000000000000000000000000022"
+			  ],
+			  "data": "0x",
+			  "blockNumber": "0x818800",
+			  "transactionHash": "0x09165dec5964fce09e35c4f7a83caf49b9b3018935f9158b60f6512daae00000",
+			  "transactionIndex": "0xc",
+			  "blockHash": "0x0f2bf435e82f9772e9611c1f7918130587c6fc0d5b21e2eb8d5e88d918f00000",
+			  "logIndex": "0x1a",
+			  "removed": false
+			}
+			*/
+			logger.Infof("vlog: %+v", vlog)
+
+			franchiseId := vlog.Topics[1].Big().Int64()
+			characterId := vlog.Topics[2].Big().Int64()
+			storyId := vlog.Topics[3].Big().Int64()
+			txHash := vlog.TxHash.String()
+
+			err = apiGateway.CreateCharacterWithBackstory(franchiseId, characterId, storyId, txHash, encryptedBase64)
+			if err != nil {
+				logger.Errorf("Failed to create character with backstory: %v", err)
+			}
 		case err := <-sub.Err():
 			logger.Errorf("subscription error: %v", err)
 			sub.Unsubscribe()
@@ -106,7 +165,7 @@ func main() {
 			  "removed": false
 			}
 			*/
-			logger.Infof("vlog: %v", vlog)
+			logger.Infof("vlog: %+v", vlog)
 			collectionAddress := vlog.Address.String()
 			fromAddress := vlog.Topics[1].String()
 			toAddress := vlog.Topics[2].String()

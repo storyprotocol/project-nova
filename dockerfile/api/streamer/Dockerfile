@@ -8,6 +8,7 @@ RUN go mod download
 
 COPY pkg pkg
 COPY api api
+COPY proto proto
 COPY Makefile ./
 
 RUN make buildstreamer

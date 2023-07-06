@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS character_info (
     image_url VARCHAR,
     backstory VARCHAR,
     media_uri VARCHAR, 
+    txhash VARCHAR,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

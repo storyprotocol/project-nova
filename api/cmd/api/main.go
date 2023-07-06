@@ -9,12 +9,14 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/project-nova/backend/api/internal/config"
 	"github.com/project-nova/backend/api/internal/handler"
 	"github.com/project-nova/backend/api/internal/repository"
+	"github.com/project-nova/backend/pkg/abi/story_blocks_registry"
 	"github.com/project-nova/backend/pkg/constant"
 	"github.com/project-nova/backend/pkg/database"
 	"github.com/project-nova/backend/pkg/gateway"
@@ -99,6 +101,14 @@ func main() {
 
 	httpClient := xhttp.NewClient(&xhttp.ClientConfig{})
 
+	storyBlocksRegistry, err := story_blocks_registry.NewStoryBlocksRegistry(
+		common.HexToAddress(cfg.StoryBlocksRegistry),
+		ethClient,
+	)
+	if err != nil {
+		logger.Fatalf("Failed to create story blocks registry client: %v", err)
+	}
+
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, "Hello")
 	})
@@ -176,6 +186,11 @@ func main() {
 	{
 		// Admin Endpoint to upload a story chapter
 		adminV2.POST("/story/:franchiseId/:storyId/:chapterId", handler.NewAdminUploadStoryContentHandlerV2(protocolStoryContentRepository, web3Gateway))
+
+		// Admin Endpoint to create character and its backstory
+		adminV2.POST("/character/:franchiseId/:characterId/:storyId",
+			handler.NewAdminCreateCharacterWithBackstoryHandler(characterInfoRepository, storyInfoV2Repository, web3Gateway, httpClient, storyBlocksRegistry),
+		)
 	}
 
 	protocolV1 := r.Group("/protocol/v1")
@@ -225,7 +240,7 @@ func main() {
 		protocolV2.GET("/character/:franchiseId/:tokenId", handler.NewGetCharacterHandlerV2(characterInfoRepository))
 
 		// Endpoint to create a character in a franchise
-		protocolV2.POST("/character/:franchiseId", handler.NewCreateCharacterHandlerV2(characterInfoRepository, storyInfoV2Repository, web3Gateway))
+		protocolV2.POST("/character/:franchiseId", handler.NewCreateCharacterHandlerV2(web3Gateway))
 
 		// Endpoint to get stories from a franchise
 		protocolV2.GET("/story/:franchiseId", handler.NewGetStoriesHandlerV2(storyInfoV2Repository))
@@ -234,7 +249,7 @@ func main() {
 		protocolV2.GET("/story/:franchiseId/:tokenId", handler.NewGetStoryHandlerV2(storyInfoV2Repository))
 
 		// Endpoint to create a story in a franchise
-		protocolV2.POST("/story/:franchiseId", handler.NewCreateStoryHandlerV2(storyInfoV2Repository, web3Gateway))
+		protocolV2.POST("/story/:franchiseId", handler.NewCreateStoryHandlerV2(web3Gateway))
 	}
 
 	port := fmt.Sprintf(":%d", cfg.Port)
