@@ -47,7 +47,7 @@ func getEncoder() zapcore.Encoder {
 func Default() *zap.SugaredLogger {
 	doLoggerOnce.Do(func() {
 		if Log == nil {
-			_, _ = InitLogger(Levels.Info)
+			_, _ = InitDefaultLogger()
 		}
 	})
 	return Log
