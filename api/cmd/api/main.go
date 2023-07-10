@@ -85,7 +85,7 @@ func main() {
 	var storyContentRepository repository.StoryContentRepository
 	var storyError error
 
-	if xconfig.GetEnv() == xconfig.Environments.Local {
+	if xconfig.Environment(cfg.Env) == xconfig.Environments.Local {
 		fmt.Println("local reached")
 		storyContentRepository, storyError = repository.NewStoryContentFsImpl(cfg.ContentPath)
 	} else {
