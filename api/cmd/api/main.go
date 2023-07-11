@@ -17,6 +17,7 @@ import (
 	"github.com/project-nova/backend/api/internal/handler"
 	"github.com/project-nova/backend/api/internal/repository"
 	"github.com/project-nova/backend/pkg/abi/story_blocks_registry"
+	xconfig "github.com/project-nova/backend/pkg/config"
 	"github.com/project-nova/backend/pkg/constant"
 	"github.com/project-nova/backend/pkg/database"
 	"github.com/project-nova/backend/pkg/gateway"
@@ -81,9 +82,17 @@ func main() {
 	characterInfoRepository := repository.NewCharacterInfoDbImpl(db)
 	storyInfoV2Repository := repository.NewStoryInfoV2DbImpl(db)
 
-	storyContentRepository, err := repository.NewStoryContentS3Impl(s3Client, cfg.S3ContentBucketName)
-	if err != nil {
-		logger.Fatalf("Failed to init story content s3 implementation: %v", err)
+	var storyContentRepository repository.StoryContentRepository
+	var storyError error
+
+	if xconfig.Environment(cfg.Env) == xconfig.Environments.Local {
+		storyContentRepository, storyError = repository.NewStoryContentFsImpl(cfg.ContentPath)
+	} else {
+		storyContentRepository, storyError = repository.NewStoryContentS3Impl(s3Client, cfg.S3ContentBucketName)
+	}
+
+	if storyError != nil {
+		logger.Fatalf("Failed to init story content: %v", err)
 	}
 
 	protocolStoryContentRepository := repository.NewProtocolStoryContentDbImpl(db)
