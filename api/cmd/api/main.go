@@ -86,14 +86,13 @@ func main() {
 	var storyError error
 
 	if xconfig.Environment(cfg.Env) == xconfig.Environments.Local {
-		fmt.Println("local reached")
 		storyContentRepository, storyError = repository.NewStoryContentFsImpl(cfg.ContentPath)
 	} else {
-		fmt.Println(xconfig.GetEnv())
 		storyContentRepository, storyError = repository.NewStoryContentS3Impl(s3Client, cfg.S3ContentBucketName)
-		if storyError != nil {
-			logger.Fatalf("Failed to init story content s3 implementation: %v", err)
-		}
+	}
+
+	if storyError != nil {
+		logger.Fatalf("Failed to init story content: %v", err)
 	}
 
 	protocolStoryContentRepository := repository.NewProtocolStoryContentDbImpl(db)
