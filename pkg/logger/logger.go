@@ -4,15 +4,12 @@ import (
 	"os"
 	"sync"
 
-	"github.com/natefinch/lumberjack"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
 
 var (
 	// log file write path
-	LogPath      = "/var/log/storyprotocol/storyprotocol.log"
-	LogFileMax   = 500     // 500 megabytes
 	doLoggerOnce sync.Once // to avoid race condition
 	Log          *zap.SugaredLogger
 )
@@ -28,7 +25,7 @@ func InitLogger(l Level) (*zap.Logger, error) {
 		return nil, err
 	}
 	encoder := getEncoder()
-	writeSyncer := zapcore.NewMultiWriteSyncer(zapcore.AddSync(os.Stdout), getLogWriter())
+	writeSyncer := zapcore.AddSync(os.Stdout)
 	core := zapcore.NewCore(encoder, writeSyncer, level)
 	logger := zap.New(core, zap.AddCaller(), zap.AddCallerSkip(1))
 	Log = logger.Sugar()
@@ -44,18 +41,6 @@ func getEncoder() zapcore.Encoder {
 	cfg.EncoderConfig.EncodeDuration = zapcore.SecondsDurationEncoder
 	cfg.EncoderConfig.EncodeCaller = zapcore.ShortCallerEncoder
 	return zapcore.NewJSONEncoder(cfg.EncoderConfig)
-}
-
-func getLogWriter() zapcore.WriteSyncer {
-	// lumberjack.Logger is safe for concurrent use
-	lumberJackLogger := &lumberjack.Logger{
-		Filename:   LogPath,
-		MaxSize:    LogFileMax,
-		MaxBackups: 3,
-		MaxAge:     30,
-		Compress:   false,
-	}
-	return zapcore.AddSync(lumberJackLogger)
 }
 
 // Default will return Log, will initialize Log once if not yet.
