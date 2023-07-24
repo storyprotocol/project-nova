@@ -92,7 +92,7 @@ func main() {
 	}
 
 	if storyError != nil {
-		logger.Fatalf("Failed to init story content: %v", err)
+		logger.Fatalf("Failed to init story content: %v", storyError)
 	}
 
 	protocolStoryContentRepository := repository.NewProtocolStoryContentDbImpl(db)
