@@ -63,7 +63,10 @@ func main() {
 		logger.Fatalf("Failed to connect to the blockchain provider, error: %v", err)
 	}
 
-	kmsClient := keymanagement.NewKmsClient(cfg.Region)
+	kmsClient, err := keymanagement.NewKmsClient(cfg.Region, cfg.SSOProfile)
+	if err != nil {
+		logger.Fatalf("Failed to create kms client: %v", err)
+	}
 
 	awsSession, err := session.NewSession(&aws.Config{
 		Region: aws.String(cfg.Region),
