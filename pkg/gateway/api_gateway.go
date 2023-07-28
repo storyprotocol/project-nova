@@ -18,6 +18,7 @@ type ApiGateway interface {
 	CreateStoryChapter(franchiseId string, storyNum string, chapterNum string, requestBody *CreateStoryChapterRequestBody, authMessage string) error
 	UpdateContentCache(franchiseId string, storyNum string, chapterNum string, authMessage string) error
 	CreateCharacterWithBackstory(franchiseId int64, characterId int64, storyId int64, txHash string, authMessage string) error
+	CreateRelationship(sourceContract string, sourceId uint64, destContract string, destId uint64, txHash string, authMessage string) error
 }
 
 func NewApiHttpGateway(url string) ApiGateway {
@@ -153,6 +154,29 @@ func (s *apiHttpGateway) CreateCharacterWithBackstory(franchiseId int64, charact
 	_, err := s.client.RequestAddHeaders("POST", requestURL, headers, requestBody, nil)
 	if err != nil {
 		return fmt.Errorf("http request to create character with backstory. error: %v ", err)
+	}
+	return nil
+}
+
+func (s *apiHttpGateway) CreateRelationship(sourceContract string, sourceId uint64, destContract string, destId uint64, txHash string, authMessage string) error {
+	requestURL := "/admin/v2/relationship"
+
+	typeValue := "LINKED_TO"
+	headers := &map[string]string{
+		middleware.AuthMessageHeaderKey: authMessage,
+	}
+	requestBody := &CreateRelationshipRequestBody{
+		SourceContract: sourceContract,
+		SrcId:					sourceId,
+		DestContract:   destContract,
+		DstId:          destId,
+		TxHash:         txHash,
+		Type:           typeValue,
+	}
+
+	_, err := s.client.RequestAddHeaders("POST", requestURL, headers, requestBody, nil)
+	if err != nil {
+		return fmt.Errorf("http request to create relationship. error: %v ", err)
 	}
 	return nil
 }

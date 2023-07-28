@@ -1,0 +1,1010 @@
+[
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_franchiseRegistry",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "inputs": [],
+    "name": "CannotRelateToOtherFranchise",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "IntentAlreadyRegistered",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InvalidEndTimestamp",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InvalidIPAssetArray",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InvalidTTL",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "role",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
+    ],
+    "name": "MissingRole",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "NonExistingRelationship",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "Unauthorized",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "name",
+        "type": "string"
+      }
+    ],
+    "name": "UnsupportedInterface",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "UnsupportedRelationshipDst",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "UnsupportedRelationshipSrc",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "ZeroAddress",
+    "type": "error"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "accessControl",
+        "type": "address"
+      }
+    ],
+    "name": "AccessControlUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "previousAdmin",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "newAdmin",
+        "type": "address"
+      }
+    ],
+    "name": "AdminChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "beacon",
+        "type": "address"
+      }
+    ],
+    "name": "BeaconUpgraded",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint8",
+        "name": "version",
+        "type": "uint8"
+      }
+    ],
+    "name": "Initialized",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "sourceContract",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "sourceId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "destContract",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "destId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "relationshipId",
+        "type": "bytes32"
+      }
+    ],
+    "name": "RelationPendingProcessor",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "sourceContract",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "sourceId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "destContract",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "destId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "relationshipId",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "endTime",
+        "type": "uint256"
+      }
+    ],
+    "name": "RelationSet",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "sourceContract",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "sourceId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "destContract",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "destId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "relationshipId",
+        "type": "bytes32"
+      }
+    ],
+    "name": "RelationUnset",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "relationshipId",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "sourceIPAssetTypeMask",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "destIPAssetTypeMask",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "onlySameFranchise",
+        "type": "bool"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "processor",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "maxTTL",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "minTTL",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "renewable",
+        "type": "bool"
+      }
+    ],
+    "name": "RelationshipConfigSet",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "relationshipId",
+        "type": "bytes32"
+      }
+    ],
+    "name": "RelationshipConfigUnset",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "implementation",
+        "type": "address"
+      }
+    ],
+    "name": "Upgraded",
+    "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "FRANCHISE_REGISTRY",
+    "outputs": [
+      {
+        "internalType": "contract FranchiseRegistry",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "accessControl",
+        "type": "address"
+      }
+    ],
+    "name": "__RelationshipModuleBase_init",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "sourceContract",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "sourceId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "destContract",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "destId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "relationshipId",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "uint256",
+            "name": "ttl",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct IRelationshipModule.RelationshipParams",
+        "name": "params",
+        "type": "tuple"
+      }
+    ],
+    "name": "areTheyRelated",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "mask",
+        "type": "uint256"
+      }
+    ],
+    "name": "convertFromMask",
+    "outputs": [
+      {
+        "internalType": "enum IPAsset[]",
+        "name": "ipAssets",
+        "type": "uint8[]"
+      },
+      {
+        "internalType": "bool",
+        "name": "allowsExternal",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "enum IPAsset[]",
+        "name": "ipAssets",
+        "type": "uint8[]"
+      },
+      {
+        "internalType": "bool",
+        "name": "allowsExternal",
+        "type": "bool"
+      }
+    ],
+    "name": "convertToMask",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getAccessControl",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "relationshipId",
+        "type": "bytes32"
+      }
+    ],
+    "name": "getRelationshipConfig",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "sourceIPAssetTypeMask",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "destIPAssetTypeMask",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bool",
+            "name": "onlySameFranchise",
+            "type": "bool"
+          },
+          {
+            "internalType": "contract IRelationshipProcessor",
+            "name": "processor",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "disputer",
+            "type": "address"
+          },
+          {
+            "components": [
+              {
+                "internalType": "uint112",
+                "name": "maxTTL",
+                "type": "uint112"
+              },
+              {
+                "internalType": "uint112",
+                "name": "minTTL",
+                "type": "uint112"
+              },
+              {
+                "internalType": "bool",
+                "name": "renewable",
+                "type": "bool"
+              }
+            ],
+            "internalType": "struct IRelationshipModule.TimeConfig",
+            "name": "timeConfig",
+            "type": "tuple"
+          }
+        ],
+        "internalType": "struct IRelationshipModule.RelationshipConfig",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "relationshipId",
+        "type": "bytes32"
+      }
+    ],
+    "name": "getRelationshipConfigDecoded",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "enum IPAsset[]",
+            "name": "sourceIPAssets",
+            "type": "uint8[]"
+          },
+          {
+            "internalType": "bool",
+            "name": "allowedExternalSource",
+            "type": "bool"
+          },
+          {
+            "internalType": "enum IPAsset[]",
+            "name": "destIPAssets",
+            "type": "uint8[]"
+          },
+          {
+            "internalType": "bool",
+            "name": "allowedExternalDest",
+            "type": "bool"
+          },
+          {
+            "internalType": "bool",
+            "name": "onlySameFranchise",
+            "type": "bool"
+          },
+          {
+            "internalType": "address",
+            "name": "processor",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "disputer",
+            "type": "address"
+          },
+          {
+            "components": [
+              {
+                "internalType": "uint112",
+                "name": "maxTTL",
+                "type": "uint112"
+              },
+              {
+                "internalType": "uint112",
+                "name": "minTTL",
+                "type": "uint112"
+              },
+              {
+                "internalType": "bool",
+                "name": "renewable",
+                "type": "bool"
+              }
+            ],
+            "internalType": "struct IRelationshipModule.TimeConfig",
+            "name": "timeConfig",
+            "type": "tuple"
+          }
+        ],
+        "internalType": "struct IRelationshipModule.SetRelationshipConfigParams",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "name",
+        "type": "string"
+      }
+    ],
+    "name": "getRelationshipId",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "accessControl",
+        "type": "address"
+      }
+    ],
+    "name": "initialize",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "sourceContract",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "sourceId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "destContract",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "destId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "relationshipId",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "uint256",
+            "name": "ttl",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct IRelationshipModule.RelationshipParams",
+        "name": "params",
+        "type": "tuple"
+      }
+    ],
+    "name": "isRelationshipExpired",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes[]",
+        "name": "data",
+        "type": "bytes[]"
+      }
+    ],
+    "name": "multicall",
+    "outputs": [
+      {
+        "internalType": "bytes[]",
+        "name": "results",
+        "type": "bytes[]"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "proxiableUUID",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "sourceContract",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "sourceId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "destContract",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "destId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "relationshipId",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "uint256",
+            "name": "ttl",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct IRelationshipModule.RelationshipParams",
+        "name": "params",
+        "type": "tuple"
+      },
+      {
+        "internalType": "bytes",
+        "name": "data",
+        "type": "bytes"
+      }
+    ],
+    "name": "relate",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "accessControl",
+        "type": "address"
+      }
+    ],
+    "name": "setAccessControl",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "components": [
+          {
+            "internalType": "enum IPAsset[]",
+            "name": "sourceIPAssets",
+            "type": "uint8[]"
+          },
+          {
+            "internalType": "bool",
+            "name": "allowedExternalSource",
+            "type": "bool"
+          },
+          {
+            "internalType": "enum IPAsset[]",
+            "name": "destIPAssets",
+            "type": "uint8[]"
+          },
+          {
+            "internalType": "bool",
+            "name": "allowedExternalDest",
+            "type": "bool"
+          },
+          {
+            "internalType": "bool",
+            "name": "onlySameFranchise",
+            "type": "bool"
+          },
+          {
+            "internalType": "address",
+            "name": "processor",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "disputer",
+            "type": "address"
+          },
+          {
+            "components": [
+              {
+                "internalType": "uint112",
+                "name": "maxTTL",
+                "type": "uint112"
+              },
+              {
+                "internalType": "uint112",
+                "name": "minTTL",
+                "type": "uint112"
+              },
+              {
+                "internalType": "bool",
+                "name": "renewable",
+                "type": "bool"
+              }
+            ],
+            "internalType": "struct IRelationshipModule.TimeConfig",
+            "name": "timeConfig",
+            "type": "tuple"
+          }
+        ],
+        "internalType": "struct IRelationshipModule.SetRelationshipConfigParams",
+        "name": "params",
+        "type": "tuple"
+      }
+    ],
+    "name": "setRelationshipConfig",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "relationshipId",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "mask",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint8",
+        "name": "assetType",
+        "type": "uint8"
+      }
+    ],
+    "name": "supportsIPAssetType",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "sourceContract",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "sourceId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "destContract",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "destId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "relationshipId",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "uint256",
+            "name": "ttl",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct IRelationshipModule.RelationshipParams",
+        "name": "params",
+        "type": "tuple"
+      }
+    ],
+    "name": "unrelate",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "relationshipId",
+        "type": "bytes32"
+      }
+    ],
+    "name": "unsetRelationshipConfig",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newImplementation",
+        "type": "address"
+      }
+    ],
+    "name": "upgradeTo",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newImplementation",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes",
+        "name": "data",
+        "type": "bytes"
+      }
+    ],
+    "name": "upgradeToAndCall",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  }
+]

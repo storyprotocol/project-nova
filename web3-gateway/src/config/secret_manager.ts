@@ -4,12 +4,12 @@ import {
 } from '@aws-sdk/client-secrets-manager';
 
 export class SecretsManager {
-  private readonly smClient: SecretsManagerClient
+  private readonly smClient: SecretsManagerClient;
 
   constructor(smClient: SecretsManagerClient) {
-    this.smClient = smClient
+    this.smClient = smClient;
   }
-  
+
   public async fetchSecrets(appID: string): Promise<string> {
     try {
       const params = {

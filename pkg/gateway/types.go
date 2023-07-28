@@ -14,6 +14,15 @@ type CreateStoryChapterRequestBody struct {
 	ReleaseAt *time.Time `json:"releaseAt"`
 }
 
+type CreateRelationshipRequestBody struct {
+	SourceContract string `json:"sourceContract"`
+	SrcId          uint64 `json:"sourceId"`
+	DestContract   string `json:"destContract"`
+	DstId          uint64 `json:"destId"`
+	TxHash         string `json:"txHash"`
+	Type           string `json:"type"`
+}
+
 func FromStoryChapterModel(model *model.StoryContentModel) *CreateStoryChapterRequestBody {
 	requestBody := &CreateStoryChapterRequestBody{}
 	if model.Heading != "" {
@@ -31,5 +40,9 @@ func FromStoryChapterModel(model *model.StoryContentModel) *CreateStoryChapterRe
 
 // CreateCharacterWithBackstory contains the data for CreateCharacterWithBackstory request
 type CreateCharacterWithBackstoryRequestBody struct {
-	TxHash string
+	SourceContract string
+	SourceId       uint64
+	DestContract   string
+	DestId         uint64
+	TxHash         string
 }

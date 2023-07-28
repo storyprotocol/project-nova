@@ -152,36 +152,106 @@ func NewCreateCharacterHandlerV2(
 	}
 }
 
-// GET /story/:franchiseId
-func NewGetStoriesHandlerV2(
-	storyInfoV2Repository repository.StoryInfoV2Repository,
+func NewGetRelationshipHandler(
+	relationshipRepository repository.RelationshipRepository,
 ) func(c *gin.Context) {
 	return func(c *gin.Context) {
-		franchiseId, err := strconv.ParseInt(c.Param("franchiseId"), 10, 64)
-		if err != nil {
-			logger.Errorf("Invalid franchise id: %s", c.Param("franchiseId"))
-			c.JSON(http.StatusBadRequest, ErrorMessage("Invalid franchise id"))
-			return
-		}
+		srcId := c.Param("srcId")
+		dstId := c.Param("dstId")
 
-		stories, err := storyInfoV2Repository.GetStories(franchiseId)
+		relationship, err := relationshipRepository.GetRelationship(srcId, dstId)
 		if err != nil {
-			logger.Errorf("Failed to get stories: %v", err)
+			logger.Errorf("Failed to get relationship: %v", err)
 			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
 			return
 		}
 
-		resp := []*entity.GetStoryResp{}
-		for _, story := range stories {
-			storyResp, err := story.ToGetStoryResp()
-			if err != nil {
-				logger.Errorf("Failed to convert to story resp: %v", err)
-				continue
-			}
-			resp = append(resp, storyResp)
+		resp, err := relationship.ToGetRelationshipResp()
+		if err != nil {
+			logger.Errorf("Failed to convert to relationship resp: %v", err)
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+			return
 		}
 
 		c.JSON(http.StatusOK, resp)
+	}
+}
+
+func NewGetRelationshipsHandler(
+	relationshipRepository repository.RelationshipRepository,
+) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		relationships, err := relationshipRepository.GetRelationships()
+		if err != nil {
+			logger.Errorf("Failed to get relationships: %v", err)
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+			return
+		}
+
+		resp := []*entity.GetRelationshipResp{}
+		for _, relationship := range relationships {
+			relationshipResp, err := relationship.ToGetRelationshipResp()
+			if err != nil {
+				logger.Errorf("Failed to convert to relationship resp: %v", err)
+				continue
+			}
+			resp = append(resp, relationshipResp)
+		}
+
+		c.JSON(http.StatusOK, resp)
+	}
+}
+
+func NewGetRelationshipsByNodeIdHandler(
+	relationshipRepository repository.RelationshipRepository,
+) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		nodeId := c.Param("srcId")
+
+		relationships, err := relationshipRepository.GetRelationshipsByNodeId(nodeId)
+		if err != nil {
+			logger.Errorf("Failed to get relationships by node id: %v", err)
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+			return
+		}
+
+		resp := []*entity.GetRelationshipResp{}
+		for _, relationship := range relationships {
+			relationshipResp, err := relationship.ToGetRelationshipResp()
+			if err != nil {
+				logger.Errorf("Failed to convert to relationship resp: %v", err)
+				continue
+			}
+			resp = append(resp, relationshipResp)
+		}
+
+		c.JSON(http.StatusOK, resp)
+	}
+}
+
+func NewCreateRelationshipHandlerV2(
+	web3Gateway gateway.Web3GatewayClient,
+	relationshipRepository repository.RelationshipRepository,
+) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		var requestBody entity.CreateRelationshipRequestBody
+		if err := c.BindJSON(&requestBody); err != nil {
+			logger.Errorf("Failed to read request body: %v", err)
+			c.JSON(http.StatusBadRequest, ErrorMessage("Invalid request body"))
+			return
+		}
+
+		relationship := requestBody.ToRelationshipModel()
+		logger.Infof("Attempting to create relationship: %+v", relationship)
+
+		err := relationshipRepository.CreateRelationship(relationship)
+		if err != nil {
+			logger.Errorf("Failed to create relationship: %v", err)
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+			return
+		}
+
+		c.JSON(http.StatusOK, relationship)
 	}
 }
 
@@ -305,7 +375,7 @@ func NewAdminCreateCharacterWithBackstoryHandler(
 		}
 		storyOwnerStr := storyOwner.String()
 
-		storyBlock, err := storyBlocksRegistry.ReadStoryBlock(nil, big.NewInt(storyId))
+		storyBlock, err := storyBlocksRegistry.ReadIPAsset(nil, big.NewInt(storyId))
 		if err != nil {
 			logger.Errorf("Failed to create get the story block for the story %d: %v", storyId, err)
 			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
@@ -355,7 +425,7 @@ func NewAdminCreateCharacterWithBackstoryHandler(
 		}
 		characterOwnerStr := characterOwner.String()
 
-		characterBlock, err := storyBlocksRegistry.ReadStoryBlock(nil, big.NewInt(characterId))
+		characterBlock, err := storyBlocksRegistry.ReadIPAsset(nil, big.NewInt(characterId))
 		if err != nil {
 			logger.Errorf("Failed to create get the story block for the character %d: %v", characterId, err)
 			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
@@ -430,4 +500,36 @@ func createStoryV2(
 	}
 
 	return &resp.ContentUrl, nil
+}
+// GET /story/:franchiseId
+func NewGetStoriesHandlerV2(
+	storyInfoV2Repository repository.StoryInfoV2Repository,
+) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		franchiseId, err := strconv.ParseInt(c.Param("franchiseId"), 10, 64)
+		if err != nil {
+			logger.Errorf("Invalid franchise id: %s", c.Param("franchiseId"))
+			c.JSON(http.StatusBadRequest, ErrorMessage("Invalid franchise id"))
+			return
+		}
+
+		stories, err := storyInfoV2Repository.GetStories(franchiseId)
+		if err != nil {
+			logger.Errorf("Failed to get stories: %v", err)
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+			return
+		}
+
+		resp := []*entity.GetStoryResp{}
+		for _, story := range stories {
+			storyResp, err := story.ToGetStoryResp()
+			if err != nil {
+				logger.Errorf("Failed to convert to story resp: %v", err)
+				continue
+			}
+			resp = append(resp, storyResp)
+		}
+
+		c.JSON(http.StatusOK, resp)
+	}
 }

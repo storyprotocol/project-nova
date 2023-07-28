@@ -12,7 +12,7 @@ ECR ?= 243963068353.dkr.ecr.${REGION}.amazonaws.com
 BUILDER_IMAGE ?= builder
 ECR_BUILDER_IMAGE ?= ${ECR}/${BUILDER_IMAGE}
 
-DOCKER_BUILD=docker build --cache-from
+DOCKER_BUILD=docker build
 
 DEVELOPMENT_DB_URI = postgresql://postgres:@api-database:5432/postgres?sslmode=disable
 

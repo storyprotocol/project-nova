@@ -34,7 +34,7 @@ build-proto:
 
 .PHONY: web3-gateway-server
 web3-gateway-server: build-proto
-	rm -rf dist; tsc -b
+	rm -rf dist; npx tsc -b
 	cp src/proto/${PROTO_DESCRIPTOR_FILE_NAME} dist/proto
 	cp config/* dist/config/
 

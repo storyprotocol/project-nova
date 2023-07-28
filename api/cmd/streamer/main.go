@@ -14,6 +14,7 @@ import (
 	"github.com/project-nova/backend/pkg/keymanagement"
 	"github.com/project-nova/backend/pkg/logger"
 	"github.com/project-nova/backend/pkg/utils"
+	"github.com/project-nova/backend/pkg/abi/relationship"
 )
 
 const (
@@ -22,6 +23,10 @@ const (
 
 	// BackstoryCreated's Hash Identifier
 	BackstoryCreatedTopic = "0x45633e1dbbfb9daee5c3fef4d7e2f7956f7ebe21ef019d7d73891807f373233f"
+
+	// RelationSet Event Id
+	// `cast k "RelationSet(address,uint256,address,uint256,bytes32,uint256)"
+	RelationSetTopic = "0xdac80e4156e67d10c07ce819561c6cd96452ad81db0c68e6a47a8687f3d59271"
 )
 
 func main() {
@@ -82,6 +87,30 @@ func main() {
 		logger.Fatal(err)
 	}
 
+	relationshipContractAddress := common.HexToAddress(cfg.RelationshipContract)
+	relationshipFilterer, err := relationship.NewRelationshipFilterer(relationshipContractAddress, client)
+	if err != nil {
+			logger.Fatalf("Failed to create relationship filterer: %v", err)
+	}
+
+	// Monitor relationship contract
+	relationshipContractAddresses := []common.Address{
+		relationshipContractAddress,
+	}
+
+	relationshipQuery := ethereum.FilterQuery{
+		Addresses: relationshipContractAddresses,
+		Topics: [][]common.Hash{
+			{common.HexToHash(RelationSetTopic)},
+		},
+	}
+
+	relationshipLogs := make(chan types.Log)
+	relationshipSub, err := client.SubscribeFilterLogs(context.Background(), relationshipQuery, relationshipLogs)
+	if err != nil {
+		logger.Fatal(err)
+	}
+
 	// Monitor story block
 	orchestratorContractAddresses := []common.Address{
 		common.HexToAddress(cfg.OrchestratorContract),
@@ -104,6 +133,30 @@ func main() {
 
 	for {
 		select {
+		case err := <-relationshipSub.Err():
+			logger.Errorf("subscription error: %v", err)
+			relationshipSub.Unsubscribe()
+			relationshipSub, err = client.SubscribeFilterLogs(context.Background(), relationshipQuery, relationshipLogs)
+			if err != nil {
+				logger.Fatal(err)
+			}
+			logger.Info("Resubscribed")
+		case vlog := <-relationshipLogs:
+			logger.Infof("vlog: %+v", vlog)
+			event, err := relationshipFilterer.ParseRelationSet(vlog)
+			if err != nil {
+				logger.Fatal(err)
+			}
+			sourceContract := event.SourceContract.String()
+			sourceId := event.SourceId.Uint64()
+			destContract := event.DestContract.String()
+			destId := event.DestId.Uint64()
+			txHash := event.Raw.TxHash.String()
+
+			err = apiGateway.CreateRelationship(sourceContract, sourceId, destContract, destId, txHash, encryptedBase64)
+			if err != nil {
+				logger.Errorf("Failed to create relation set: %v", err)
+			}
 		case err := <-orchestratorSub.Err():
 			logger.Errorf("subscription error: %v", err)
 			orchestratorSub.Unsubscribe()
@@ -113,25 +166,25 @@ func main() {
 			}
 			logger.Info("Resubscribed")
 		case vlog := <-orchestratorLogs:
+			logger.Infof("vlog: %+v", vlog)
 			/* Sample log
 			{
-			  "address": "0x001c1fb84f8673f1fc40be20d45b3b012d300000",
-			  "topics": [
-			    "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
-			    "0x0000000000000000000000000000000000000000000000000000000000000000",
-			    "0x000000000000000000000000000b179bfd31635a387fc205f341d1fac6797327",
-			    "0x0000000000000000000000000000000000000000000000000000000000000022"
-			  ],
-			  "data": "0x",
-			  "blockNumber": "0x818800",
-			  "transactionHash": "0x09165dec5964fce09e35c4f7a83caf49b9b3018935f9158b60f6512daae00000",
-			  "transactionIndex": "0xc",
-			  "blockHash": "0x0f2bf435e82f9772e9611c1f7918130587c6fc0d5b21e2eb8d5e88d918f00000",
-			  "logIndex": "0x1a",
-			  "removed": false
+				"address": "0x001c1fb84f8673f1fc40be20d45b3b012d300000",
+				"topics": [
+					"0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+					"0x0000000000000000000000000000000000000000000000000000000000000000",
+					"0x000000000000000000000000000b179bfd31635a387fc205f341d1fac6797327",
+					"0x0000000000000000000000000000000000000000000000000000000000000022"
+				],
+				"data": "0x",
+				"blockNumber": "0x818800",
+				"transactionHash": "0x09165dec5964fce09e35c4f7a83caf49b9b3018935f9158b60f6512daae00000",
+				"transactionIndex": "0xc",
+				"blockHash": "0x0f2bf435e82f9772e9611c1f7918130587c6fc0d5b21e2eb8d5e88d918f00000",
+				"logIndex": "0x1a",
+				"removed": false
 			}
 			*/
-			logger.Infof("vlog: %+v", vlog)
 
 			franchiseId := vlog.Topics[1].Big().Int64()
 			characterId := vlog.Topics[2].Big().Int64()

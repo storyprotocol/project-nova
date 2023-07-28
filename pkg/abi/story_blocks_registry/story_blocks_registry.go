@@ -26,10 +26,11 @@ var (
 	_ = common.Big1
 	_ = types.BloomLookup
 	_ = event.NewSubscription
+	_ = abi.ConvertType
 )
 
-// IStoryBlockStorageStoryBlockData is an auto generated low-level Go binding around an user-defined struct.
-type IStoryBlockStorageStoryBlockData struct {
+// IIPAssetDataIPAssetData is an auto generated low-level Go binding around an user-defined struct.
+type IIPAssetDataIPAssetData struct {
 	Name        string
 	Description string
 	MediaUrl    string
@@ -38,7 +39,7 @@ type IStoryBlockStorageStoryBlockData struct {
 
 // StoryBlocksRegistryMetaData contains all meta data concerning the StoryBlocksRegistry contract.
 var StoryBlocksRegistryMetaData = &bind.MetaData{
-	ABI: "[{\"inputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"inputs\":[],\"name\":\"GroupedTypeNotGroupType\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"IdOverBounds\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"InvalidBlockType\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"enumStoryBlock\",\"name\":\"sb\",\"type\":\"uint8\"}],\"name\":\"InvalidStoryBlock\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"TooManyLinkedItems\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"}],\"name\":\"ZeroAddress\",\"type\":\"error\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"approved\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"}],\"name\":\"Approval\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"operator\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bool\",\"name\":\"approved\",\"type\":\"bool\"}],\"name\":\"ApprovalForAll\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"id\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"enumStoryBlock\",\"name\":\"linkedType\",\"type\":\"uint8\"},{\"indexed\":false,\"internalType\":\"uint256[]\",\"name\":\"linkedItems\",\"type\":\"uint256[]\"}],\"name\":\"GroupedItems\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint8\",\"name\":\"version\",\"type\":\"uint8\"}],\"name\":\"Initialized\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"enumStoryBlock\",\"name\":\"sb\",\"type\":\"uint8\"},{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"}],\"name\":\"StoryBlockMinted\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"storyBlockId\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"enumStoryBlock\",\"name\":\"blockType\",\"type\":\"uint8\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"description\",\"type\":\"string\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"mediaUrl\",\"type\":\"string\"}],\"name\":\"StoryBlockWritten\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"from\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"}],\"name\":\"Transfer\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"MAX_LINKED_AT_ONCE\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"}],\"name\":\"approve\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"}],\"name\":\"balanceOf\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"_description\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"mediaUrl\",\"type\":\"string\"},{\"internalType\":\"enumStoryBlock\",\"name\":\"linkedType\",\"type\":\"uint8\"},{\"internalType\":\"uint256[]\",\"name\":\"linkedItems\",\"type\":\"uint256[]\"}],\"name\":\"createGroup\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"enumStoryBlock\",\"name\":\"sb\",\"type\":\"uint8\"},{\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"_description\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"mediaUrl\",\"type\":\"string\"}],\"name\":\"createStoryBlock\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"enumStoryBlock\",\"name\":\"sb\",\"type\":\"uint8\"}],\"name\":\"currentIdFor\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"description\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"franchiseId\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"}],\"name\":\"getApproved\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"id\",\"type\":\"uint256\"},{\"internalType\":\"uint256[]\",\"name\":\"linkedItems\",\"type\":\"uint256[]\"}],\"name\":\"groupItems\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_franchiseId\",\"type\":\"uint256\"},{\"internalType\":\"string\",\"name\":\"_name\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"_symbol\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"_description\",\"type\":\"string\"}],\"name\":\"initialize\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"operator\",\"type\":\"address\"}],\"name\":\"isApprovedForAll\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes[]\",\"name\":\"data\",\"type\":\"bytes[]\"}],\"name\":\"multicall\",\"outputs\":[{\"internalType\":\"bytes[]\",\"name\":\"results\",\"type\":\"bytes[]\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"name\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"}],\"name\":\"ownerOf\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"id\",\"type\":\"uint256\"}],\"name\":\"readGroup\",\"outputs\":[{\"components\":[{\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"description\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"mediaUrl\",\"type\":\"string\"},{\"internalType\":\"enumStoryBlock\",\"name\":\"blockType\",\"type\":\"uint8\"}],\"internalType\":\"structIStoryBlockStorage.StoryBlockData\",\"name\":\"blockData\",\"type\":\"tuple\"},{\"internalType\":\"enumStoryBlock\",\"name\":\"linkedType\",\"type\":\"uint8\"},{\"internalType\":\"uint256[]\",\"name\":\"linkedItems\",\"type\":\"uint256[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"storyBlockId\",\"type\":\"uint256\"}],\"name\":\"readStoryBlock\",\"outputs\":[{\"components\":[{\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"description\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"mediaUrl\",\"type\":\"string\"},{\"internalType\":\"enumStoryBlock\",\"name\":\"blockType\",\"type\":\"uint8\"}],\"internalType\":\"structIStoryBlockStorage.StoryBlockData\",\"name\":\"\",\"type\":\"tuple\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"from\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"}],\"name\":\"safeTransferFrom\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"from\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"}],\"name\":\"safeTransferFrom\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"operator\",\"type\":\"address\"},{\"internalType\":\"bool\",\"name\":\"approved\",\"type\":\"bool\"}],\"name\":\"setApprovalForAll\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes4\",\"name\":\"interfaceId\",\"type\":\"bytes4\"}],\"name\":\"supportsInterface\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"symbol\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"}],\"name\":\"tokenURI\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"from\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"}],\"name\":\"transferFrom\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"version\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"pure\",\"type\":\"function\"}]",
+	ABI: "[{\"inputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"inputs\":[],\"name\":\"GroupedTypeNotGroupType\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"IdOverBounds\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"InvalidBlockType\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"enumIPAsset\",\"name\":\"sb\",\"type\":\"uint8\"}],\"name\":\"InvalidIPAsset\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"TooManyLinkedItems\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"ZeroAmount\",\"type\":\"error\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"approved\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"}],\"name\":\"Approval\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"operator\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bool\",\"name\":\"approved\",\"type\":\"bool\"}],\"name\":\"ApprovalForAll\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"id\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"enumIPAsset\",\"name\":\"linkedType\",\"type\":\"uint8\"},{\"indexed\":false,\"internalType\":\"uint256[]\",\"name\":\"linkedItems\",\"type\":\"uint256[]\"}],\"name\":\"GroupedItems\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"IPAssetId\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"enumIPAsset\",\"name\":\"blockType\",\"type\":\"uint8\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"description\",\"type\":\"string\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"mediaUrl\",\"type\":\"string\"}],\"name\":\"IPAssetWritten\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint8\",\"name\":\"version\",\"type\":\"uint8\"}],\"name\":\"Initialized\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"from\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"}],\"name\":\"Transfer\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"MAX_LINKED_AT_ONCE\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"__IPAssetData_init\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"}],\"name\":\"approve\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"}],\"name\":\"balanceOf\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"_description\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"mediaUrl\",\"type\":\"string\"},{\"internalType\":\"enumIPAsset\",\"name\":\"linkedType\",\"type\":\"uint8\"},{\"internalType\":\"uint256[]\",\"name\":\"linkedItems\",\"type\":\"uint256[]\"}],\"name\":\"createGroup\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"enumIPAsset\",\"name\":\"sb\",\"type\":\"uint8\"},{\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"_description\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"mediaUrl\",\"type\":\"string\"}],\"name\":\"createIPAsset\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"enumIPAsset\",\"name\":\"sb\",\"type\":\"uint8\"}],\"name\":\"currentIdFor\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"description\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"franchiseId\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"}],\"name\":\"getApproved\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"id\",\"type\":\"uint256\"},{\"internalType\":\"uint256[]\",\"name\":\"linkedItems\",\"type\":\"uint256[]\"}],\"name\":\"groupItems\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_franchiseId\",\"type\":\"uint256\"},{\"internalType\":\"string\",\"name\":\"_name\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"_symbol\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"_description\",\"type\":\"string\"}],\"name\":\"initialize\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"operator\",\"type\":\"address\"}],\"name\":\"isApprovedForAll\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes[]\",\"name\":\"data\",\"type\":\"bytes[]\"}],\"name\":\"multicall\",\"outputs\":[{\"internalType\":\"bytes[]\",\"name\":\"results\",\"type\":\"bytes[]\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"name\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"}],\"name\":\"ownerOf\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"id\",\"type\":\"uint256\"}],\"name\":\"readGroup\",\"outputs\":[{\"components\":[{\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"description\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"mediaUrl\",\"type\":\"string\"},{\"internalType\":\"enumIPAsset\",\"name\":\"blockType\",\"type\":\"uint8\"}],\"internalType\":\"structIIPAssetData.IPAssetData\",\"name\":\"blockData\",\"type\":\"tuple\"},{\"internalType\":\"enumIPAsset\",\"name\":\"linkedType\",\"type\":\"uint8\"},{\"internalType\":\"uint256[]\",\"name\":\"linkedItems\",\"type\":\"uint256[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"IPAssetId\",\"type\":\"uint256\"}],\"name\":\"readIPAsset\",\"outputs\":[{\"components\":[{\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"description\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"mediaUrl\",\"type\":\"string\"},{\"internalType\":\"enumIPAsset\",\"name\":\"blockType\",\"type\":\"uint8\"}],\"internalType\":\"structIIPAssetData.IPAssetData\",\"name\":\"\",\"type\":\"tuple\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"from\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"}],\"name\":\"safeTransferFrom\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"from\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"}],\"name\":\"safeTransferFrom\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"operator\",\"type\":\"address\"},{\"internalType\":\"bool\",\"name\":\"approved\",\"type\":\"bool\"}],\"name\":\"setApprovalForAll\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes4\",\"name\":\"interfaceId\",\"type\":\"bytes4\"}],\"name\":\"supportsInterface\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"symbol\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"}],\"name\":\"tokenURI\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"from\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"}],\"name\":\"transferFrom\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"version\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"pure\",\"type\":\"function\"}]",
 }
 
 // StoryBlocksRegistryABI is the input ABI used to generate the binding from.
@@ -142,11 +143,11 @@ func NewStoryBlocksRegistryFilterer(address common.Address, filterer bind.Contra
 
 // bindStoryBlocksRegistry binds a generic wrapper to an already deployed contract.
 func bindStoryBlocksRegistry(address common.Address, caller bind.ContractCaller, transactor bind.ContractTransactor, filterer bind.ContractFilterer) (*bind.BoundContract, error) {
-	parsed, err := abi.JSON(strings.NewReader(StoryBlocksRegistryABI))
+	parsed, err := StoryBlocksRegistryMetaData.GetAbi()
 	if err != nil {
 		return nil, err
 	}
-	return bind.NewBoundContract(address, parsed, caller, transactor, filterer), nil
+	return bind.NewBoundContract(address, *parsed, caller, transactor, filterer), nil
 }
 
 // Call invokes the (constant) contract method with params as input values and
@@ -470,7 +471,7 @@ func (_StoryBlocksRegistry *StoryBlocksRegistryCallerSession) OwnerOf(tokenId *b
 //
 // Solidity: function readGroup(uint256 id) view returns((string,string,string,uint8) blockData, uint8 linkedType, uint256[] linkedItems)
 func (_StoryBlocksRegistry *StoryBlocksRegistryCaller) ReadGroup(opts *bind.CallOpts, id *big.Int) (struct {
-	BlockData   IStoryBlockStorageStoryBlockData
+	BlockData   IIPAssetDataIPAssetData
 	LinkedType  uint8
 	LinkedItems []*big.Int
 }, error) {
@@ -478,7 +479,7 @@ func (_StoryBlocksRegistry *StoryBlocksRegistryCaller) ReadGroup(opts *bind.Call
 	err := _StoryBlocksRegistry.contract.Call(opts, &out, "readGroup", id)
 
 	outstruct := new(struct {
-		BlockData   IStoryBlockStorageStoryBlockData
+		BlockData   IIPAssetDataIPAssetData
 		LinkedType  uint8
 		LinkedItems []*big.Int
 	})
@@ -486,7 +487,7 @@ func (_StoryBlocksRegistry *StoryBlocksRegistryCaller) ReadGroup(opts *bind.Call
 		return *outstruct, err
 	}
 
-	outstruct.BlockData = *abi.ConvertType(out[0], new(IStoryBlockStorageStoryBlockData)).(*IStoryBlockStorageStoryBlockData)
+	outstruct.BlockData = *abi.ConvertType(out[0], new(IIPAssetDataIPAssetData)).(*IIPAssetDataIPAssetData)
 	outstruct.LinkedType = *abi.ConvertType(out[1], new(uint8)).(*uint8)
 	outstruct.LinkedItems = *abi.ConvertType(out[2], new([]*big.Int)).(*[]*big.Int)
 
@@ -498,7 +499,7 @@ func (_StoryBlocksRegistry *StoryBlocksRegistryCaller) ReadGroup(opts *bind.Call
 //
 // Solidity: function readGroup(uint256 id) view returns((string,string,string,uint8) blockData, uint8 linkedType, uint256[] linkedItems)
 func (_StoryBlocksRegistry *StoryBlocksRegistrySession) ReadGroup(id *big.Int) (struct {
-	BlockData   IStoryBlockStorageStoryBlockData
+	BlockData   IIPAssetDataIPAssetData
 	LinkedType  uint8
 	LinkedItems []*big.Int
 }, error) {
@@ -509,42 +510,42 @@ func (_StoryBlocksRegistry *StoryBlocksRegistrySession) ReadGroup(id *big.Int) (
 //
 // Solidity: function readGroup(uint256 id) view returns((string,string,string,uint8) blockData, uint8 linkedType, uint256[] linkedItems)
 func (_StoryBlocksRegistry *StoryBlocksRegistryCallerSession) ReadGroup(id *big.Int) (struct {
-	BlockData   IStoryBlockStorageStoryBlockData
+	BlockData   IIPAssetDataIPAssetData
 	LinkedType  uint8
 	LinkedItems []*big.Int
 }, error) {
 	return _StoryBlocksRegistry.Contract.ReadGroup(&_StoryBlocksRegistry.CallOpts, id)
 }
 
-// ReadStoryBlock is a free data retrieval call binding the contract method 0x9484c103.
+// ReadIPAsset is a free data retrieval call binding the contract method 0xeb1f6b5a.
 //
-// Solidity: function readStoryBlock(uint256 storyBlockId) view returns((string,string,string,uint8))
-func (_StoryBlocksRegistry *StoryBlocksRegistryCaller) ReadStoryBlock(opts *bind.CallOpts, storyBlockId *big.Int) (IStoryBlockStorageStoryBlockData, error) {
+// Solidity: function readIPAsset(uint256 IPAssetId) view returns((string,string,string,uint8))
+func (_StoryBlocksRegistry *StoryBlocksRegistryCaller) ReadIPAsset(opts *bind.CallOpts, IPAssetId *big.Int) (IIPAssetDataIPAssetData, error) {
 	var out []interface{}
-	err := _StoryBlocksRegistry.contract.Call(opts, &out, "readStoryBlock", storyBlockId)
+	err := _StoryBlocksRegistry.contract.Call(opts, &out, "readIPAsset", IPAssetId)
 
 	if err != nil {
-		return *new(IStoryBlockStorageStoryBlockData), err
+		return *new(IIPAssetDataIPAssetData), err
 	}
 
-	out0 := *abi.ConvertType(out[0], new(IStoryBlockStorageStoryBlockData)).(*IStoryBlockStorageStoryBlockData)
+	out0 := *abi.ConvertType(out[0], new(IIPAssetDataIPAssetData)).(*IIPAssetDataIPAssetData)
 
 	return out0, err
 
 }
 
-// ReadStoryBlock is a free data retrieval call binding the contract method 0x9484c103.
+// ReadIPAsset is a free data retrieval call binding the contract method 0xeb1f6b5a.
 //
-// Solidity: function readStoryBlock(uint256 storyBlockId) view returns((string,string,string,uint8))
-func (_StoryBlocksRegistry *StoryBlocksRegistrySession) ReadStoryBlock(storyBlockId *big.Int) (IStoryBlockStorageStoryBlockData, error) {
-	return _StoryBlocksRegistry.Contract.ReadStoryBlock(&_StoryBlocksRegistry.CallOpts, storyBlockId)
+// Solidity: function readIPAsset(uint256 IPAssetId) view returns((string,string,string,uint8))
+func (_StoryBlocksRegistry *StoryBlocksRegistrySession) ReadIPAsset(IPAssetId *big.Int) (IIPAssetDataIPAssetData, error) {
+	return _StoryBlocksRegistry.Contract.ReadIPAsset(&_StoryBlocksRegistry.CallOpts, IPAssetId)
 }
 
-// ReadStoryBlock is a free data retrieval call binding the contract method 0x9484c103.
+// ReadIPAsset is a free data retrieval call binding the contract method 0xeb1f6b5a.
 //
-// Solidity: function readStoryBlock(uint256 storyBlockId) view returns((string,string,string,uint8))
-func (_StoryBlocksRegistry *StoryBlocksRegistryCallerSession) ReadStoryBlock(storyBlockId *big.Int) (IStoryBlockStorageStoryBlockData, error) {
-	return _StoryBlocksRegistry.Contract.ReadStoryBlock(&_StoryBlocksRegistry.CallOpts, storyBlockId)
+// Solidity: function readIPAsset(uint256 IPAssetId) view returns((string,string,string,uint8))
+func (_StoryBlocksRegistry *StoryBlocksRegistryCallerSession) ReadIPAsset(IPAssetId *big.Int) (IIPAssetDataIPAssetData, error) {
+	return _StoryBlocksRegistry.Contract.ReadIPAsset(&_StoryBlocksRegistry.CallOpts, IPAssetId)
 }
 
 // SupportsInterface is a free data retrieval call binding the contract method 0x01ffc9a7.
@@ -671,6 +672,27 @@ func (_StoryBlocksRegistry *StoryBlocksRegistryCallerSession) Version() (string,
 	return _StoryBlocksRegistry.Contract.Version(&_StoryBlocksRegistry.CallOpts)
 }
 
+// IPAssetDataInit is a paid mutator transaction binding the contract method 0x4ff0a2b2.
+//
+// Solidity: function __IPAssetData_init() returns()
+func (_StoryBlocksRegistry *StoryBlocksRegistryTransactor) IPAssetDataInit(opts *bind.TransactOpts) (*types.Transaction, error) {
+	return _StoryBlocksRegistry.contract.Transact(opts, "__IPAssetData_init")
+}
+
+// IPAssetDataInit is a paid mutator transaction binding the contract method 0x4ff0a2b2.
+//
+// Solidity: function __IPAssetData_init() returns()
+func (_StoryBlocksRegistry *StoryBlocksRegistrySession) IPAssetDataInit() (*types.Transaction, error) {
+	return _StoryBlocksRegistry.Contract.IPAssetDataInit(&_StoryBlocksRegistry.TransactOpts)
+}
+
+// IPAssetDataInit is a paid mutator transaction binding the contract method 0x4ff0a2b2.
+//
+// Solidity: function __IPAssetData_init() returns()
+func (_StoryBlocksRegistry *StoryBlocksRegistryTransactorSession) IPAssetDataInit() (*types.Transaction, error) {
+	return _StoryBlocksRegistry.Contract.IPAssetDataInit(&_StoryBlocksRegistry.TransactOpts)
+}
+
 // Approve is a paid mutator transaction binding the contract method 0x095ea7b3.
 //
 // Solidity: function approve(address to, uint256 tokenId) returns()
@@ -713,25 +735,25 @@ func (_StoryBlocksRegistry *StoryBlocksRegistryTransactorSession) CreateGroup(na
 	return _StoryBlocksRegistry.Contract.CreateGroup(&_StoryBlocksRegistry.TransactOpts, name, _description, mediaUrl, linkedType, linkedItems)
 }
 
-// CreateStoryBlock is a paid mutator transaction binding the contract method 0x2336a84a.
+// CreateIPAsset is a paid mutator transaction binding the contract method 0xf46aa189.
 //
-// Solidity: function createStoryBlock(uint8 sb, string name, string _description, string mediaUrl) returns(uint256)
-func (_StoryBlocksRegistry *StoryBlocksRegistryTransactor) CreateStoryBlock(opts *bind.TransactOpts, sb uint8, name string, _description string, mediaUrl string) (*types.Transaction, error) {
-	return _StoryBlocksRegistry.contract.Transact(opts, "createStoryBlock", sb, name, _description, mediaUrl)
+// Solidity: function createIPAsset(uint8 sb, string name, string _description, string mediaUrl) returns(uint256)
+func (_StoryBlocksRegistry *StoryBlocksRegistryTransactor) CreateIPAsset(opts *bind.TransactOpts, sb uint8, name string, _description string, mediaUrl string) (*types.Transaction, error) {
+	return _StoryBlocksRegistry.contract.Transact(opts, "createIPAsset", sb, name, _description, mediaUrl)
 }
 
-// CreateStoryBlock is a paid mutator transaction binding the contract method 0x2336a84a.
+// CreateIPAsset is a paid mutator transaction binding the contract method 0xf46aa189.
 //
-// Solidity: function createStoryBlock(uint8 sb, string name, string _description, string mediaUrl) returns(uint256)
-func (_StoryBlocksRegistry *StoryBlocksRegistrySession) CreateStoryBlock(sb uint8, name string, _description string, mediaUrl string) (*types.Transaction, error) {
-	return _StoryBlocksRegistry.Contract.CreateStoryBlock(&_StoryBlocksRegistry.TransactOpts, sb, name, _description, mediaUrl)
+// Solidity: function createIPAsset(uint8 sb, string name, string _description, string mediaUrl) returns(uint256)
+func (_StoryBlocksRegistry *StoryBlocksRegistrySession) CreateIPAsset(sb uint8, name string, _description string, mediaUrl string) (*types.Transaction, error) {
+	return _StoryBlocksRegistry.Contract.CreateIPAsset(&_StoryBlocksRegistry.TransactOpts, sb, name, _description, mediaUrl)
 }
 
-// CreateStoryBlock is a paid mutator transaction binding the contract method 0x2336a84a.
+// CreateIPAsset is a paid mutator transaction binding the contract method 0xf46aa189.
 //
-// Solidity: function createStoryBlock(uint8 sb, string name, string _description, string mediaUrl) returns(uint256)
-func (_StoryBlocksRegistry *StoryBlocksRegistryTransactorSession) CreateStoryBlock(sb uint8, name string, _description string, mediaUrl string) (*types.Transaction, error) {
-	return _StoryBlocksRegistry.Contract.CreateStoryBlock(&_StoryBlocksRegistry.TransactOpts, sb, name, _description, mediaUrl)
+// Solidity: function createIPAsset(uint8 sb, string name, string _description, string mediaUrl) returns(uint256)
+func (_StoryBlocksRegistry *StoryBlocksRegistryTransactorSession) CreateIPAsset(sb uint8, name string, _description string, mediaUrl string) (*types.Transaction, error) {
+	return _StoryBlocksRegistry.Contract.CreateIPAsset(&_StoryBlocksRegistry.TransactOpts, sb, name, _description, mediaUrl)
 }
 
 // GroupItems is a paid mutator transaction binding the contract method 0x9dc6693c.
@@ -1343,6 +1365,162 @@ func (_StoryBlocksRegistry *StoryBlocksRegistryFilterer) ParseGroupedItems(log t
 	return event, nil
 }
 
+// StoryBlocksRegistryIPAssetWrittenIterator is returned from FilterIPAssetWritten and is used to iterate over the raw logs and unpacked data for IPAssetWritten events raised by the StoryBlocksRegistry contract.
+type StoryBlocksRegistryIPAssetWrittenIterator struct {
+	Event *StoryBlocksRegistryIPAssetWritten // Event containing the contract specifics and raw log
+
+	contract *bind.BoundContract // Generic contract to use for unpacking event data
+	event    string              // Event name to use for unpacking event data
+
+	logs chan types.Log        // Log channel receiving the found contract events
+	sub  ethereum.Subscription // Subscription for errors, completion and termination
+	done bool                  // Whether the subscription completed delivering logs
+	fail error                 // Occurred error to stop iteration
+}
+
+// Next advances the iterator to the subsequent event, returning whether there
+// are any more events found. In case of a retrieval or parsing error, false is
+// returned and Error() can be queried for the exact failure.
+func (it *StoryBlocksRegistryIPAssetWrittenIterator) Next() bool {
+	// If the iterator failed, stop iterating
+	if it.fail != nil {
+		return false
+	}
+	// If the iterator completed, deliver directly whatever's available
+	if it.done {
+		select {
+		case log := <-it.logs:
+			it.Event = new(StoryBlocksRegistryIPAssetWritten)
+			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+				it.fail = err
+				return false
+			}
+			it.Event.Raw = log
+			return true
+
+		default:
+			return false
+		}
+	}
+	// Iterator still in progress, wait for either a data or an error event
+	select {
+	case log := <-it.logs:
+		it.Event = new(StoryBlocksRegistryIPAssetWritten)
+		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+			it.fail = err
+			return false
+		}
+		it.Event.Raw = log
+		return true
+
+	case err := <-it.sub.Err():
+		it.done = true
+		it.fail = err
+		return it.Next()
+	}
+}
+
+// Error returns any retrieval or parsing error occurred during filtering.
+func (it *StoryBlocksRegistryIPAssetWrittenIterator) Error() error {
+	return it.fail
+}
+
+// Close terminates the iteration process, releasing any pending underlying
+// resources.
+func (it *StoryBlocksRegistryIPAssetWrittenIterator) Close() error {
+	it.sub.Unsubscribe()
+	return nil
+}
+
+// StoryBlocksRegistryIPAssetWritten represents a IPAssetWritten event raised by the StoryBlocksRegistry contract.
+type StoryBlocksRegistryIPAssetWritten struct {
+	IPAssetId   *big.Int
+	BlockType   uint8
+	Name        string
+	Description string
+	MediaUrl    string
+	Raw         types.Log // Blockchain specific contextual infos
+}
+
+// FilterIPAssetWritten is a free log retrieval operation binding the contract event 0xa82032c25afb0149419a68bef0de224f05ddf61f663c81661d7f86f32f0381f8.
+//
+// Solidity: event IPAssetWritten(uint256 indexed IPAssetId, uint8 indexed blockType, string name, string description, string mediaUrl)
+func (_StoryBlocksRegistry *StoryBlocksRegistryFilterer) FilterIPAssetWritten(opts *bind.FilterOpts, IPAssetId []*big.Int, blockType []uint8) (*StoryBlocksRegistryIPAssetWrittenIterator, error) {
+
+	var IPAssetIdRule []interface{}
+	for _, IPAssetIdItem := range IPAssetId {
+		IPAssetIdRule = append(IPAssetIdRule, IPAssetIdItem)
+	}
+	var blockTypeRule []interface{}
+	for _, blockTypeItem := range blockType {
+		blockTypeRule = append(blockTypeRule, blockTypeItem)
+	}
+
+	logs, sub, err := _StoryBlocksRegistry.contract.FilterLogs(opts, "IPAssetWritten", IPAssetIdRule, blockTypeRule)
+	if err != nil {
+		return nil, err
+	}
+	return &StoryBlocksRegistryIPAssetWrittenIterator{contract: _StoryBlocksRegistry.contract, event: "IPAssetWritten", logs: logs, sub: sub}, nil
+}
+
+// WatchIPAssetWritten is a free log subscription operation binding the contract event 0xa82032c25afb0149419a68bef0de224f05ddf61f663c81661d7f86f32f0381f8.
+//
+// Solidity: event IPAssetWritten(uint256 indexed IPAssetId, uint8 indexed blockType, string name, string description, string mediaUrl)
+func (_StoryBlocksRegistry *StoryBlocksRegistryFilterer) WatchIPAssetWritten(opts *bind.WatchOpts, sink chan<- *StoryBlocksRegistryIPAssetWritten, IPAssetId []*big.Int, blockType []uint8) (event.Subscription, error) {
+
+	var IPAssetIdRule []interface{}
+	for _, IPAssetIdItem := range IPAssetId {
+		IPAssetIdRule = append(IPAssetIdRule, IPAssetIdItem)
+	}
+	var blockTypeRule []interface{}
+	for _, blockTypeItem := range blockType {
+		blockTypeRule = append(blockTypeRule, blockTypeItem)
+	}
+
+	logs, sub, err := _StoryBlocksRegistry.contract.WatchLogs(opts, "IPAssetWritten", IPAssetIdRule, blockTypeRule)
+	if err != nil {
+		return nil, err
+	}
+	return event.NewSubscription(func(quit <-chan struct{}) error {
+		defer sub.Unsubscribe()
+		for {
+			select {
+			case log := <-logs:
+				// New log arrived, parse the event and forward to the user
+				event := new(StoryBlocksRegistryIPAssetWritten)
+				if err := _StoryBlocksRegistry.contract.UnpackLog(event, "IPAssetWritten", log); err != nil {
+					return err
+				}
+				event.Raw = log
+
+				select {
+				case sink <- event:
+				case err := <-sub.Err():
+					return err
+				case <-quit:
+					return nil
+				}
+			case err := <-sub.Err():
+				return err
+			case <-quit:
+				return nil
+			}
+		}
+	}), nil
+}
+
+// ParseIPAssetWritten is a log parse operation binding the contract event 0xa82032c25afb0149419a68bef0de224f05ddf61f663c81661d7f86f32f0381f8.
+//
+// Solidity: event IPAssetWritten(uint256 indexed IPAssetId, uint8 indexed blockType, string name, string description, string mediaUrl)
+func (_StoryBlocksRegistry *StoryBlocksRegistryFilterer) ParseIPAssetWritten(log types.Log) (*StoryBlocksRegistryIPAssetWritten, error) {
+	event := new(StoryBlocksRegistryIPAssetWritten)
+	if err := _StoryBlocksRegistry.contract.UnpackLog(event, "IPAssetWritten", log); err != nil {
+		return nil, err
+	}
+	event.Raw = log
+	return event, nil
+}
+
 // StoryBlocksRegistryInitializedIterator is returned from FilterInitialized and is used to iterate over the raw logs and unpacked data for Initialized events raised by the StoryBlocksRegistry contract.
 type StoryBlocksRegistryInitializedIterator struct {
 	Event *StoryBlocksRegistryInitialized // Event containing the contract specifics and raw log
@@ -1471,324 +1649,6 @@ func (_StoryBlocksRegistry *StoryBlocksRegistryFilterer) WatchInitialized(opts *
 func (_StoryBlocksRegistry *StoryBlocksRegistryFilterer) ParseInitialized(log types.Log) (*StoryBlocksRegistryInitialized, error) {
 	event := new(StoryBlocksRegistryInitialized)
 	if err := _StoryBlocksRegistry.contract.UnpackLog(event, "Initialized", log); err != nil {
-		return nil, err
-	}
-	event.Raw = log
-	return event, nil
-}
-
-// StoryBlocksRegistryStoryBlockMintedIterator is returned from FilterStoryBlockMinted and is used to iterate over the raw logs and unpacked data for StoryBlockMinted events raised by the StoryBlocksRegistry contract.
-type StoryBlocksRegistryStoryBlockMintedIterator struct {
-	Event *StoryBlocksRegistryStoryBlockMinted // Event containing the contract specifics and raw log
-
-	contract *bind.BoundContract // Generic contract to use for unpacking event data
-	event    string              // Event name to use for unpacking event data
-
-	logs chan types.Log        // Log channel receiving the found contract events
-	sub  ethereum.Subscription // Subscription for errors, completion and termination
-	done bool                  // Whether the subscription completed delivering logs
-	fail error                 // Occurred error to stop iteration
-}
-
-// Next advances the iterator to the subsequent event, returning whether there
-// are any more events found. In case of a retrieval or parsing error, false is
-// returned and Error() can be queried for the exact failure.
-func (it *StoryBlocksRegistryStoryBlockMintedIterator) Next() bool {
-	// If the iterator failed, stop iterating
-	if it.fail != nil {
-		return false
-	}
-	// If the iterator completed, deliver directly whatever's available
-	if it.done {
-		select {
-		case log := <-it.logs:
-			it.Event = new(StoryBlocksRegistryStoryBlockMinted)
-			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-				it.fail = err
-				return false
-			}
-			it.Event.Raw = log
-			return true
-
-		default:
-			return false
-		}
-	}
-	// Iterator still in progress, wait for either a data or an error event
-	select {
-	case log := <-it.logs:
-		it.Event = new(StoryBlocksRegistryStoryBlockMinted)
-		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-			it.fail = err
-			return false
-		}
-		it.Event.Raw = log
-		return true
-
-	case err := <-it.sub.Err():
-		it.done = true
-		it.fail = err
-		return it.Next()
-	}
-}
-
-// Error returns any retrieval or parsing error occurred during filtering.
-func (it *StoryBlocksRegistryStoryBlockMintedIterator) Error() error {
-	return it.fail
-}
-
-// Close terminates the iteration process, releasing any pending underlying
-// resources.
-func (it *StoryBlocksRegistryStoryBlockMintedIterator) Close() error {
-	it.sub.Unsubscribe()
-	return nil
-}
-
-// StoryBlocksRegistryStoryBlockMinted represents a StoryBlockMinted event raised by the StoryBlocksRegistry contract.
-type StoryBlocksRegistryStoryBlockMinted struct {
-	To      common.Address
-	Sb      uint8
-	TokenId *big.Int
-	Raw     types.Log // Blockchain specific contextual infos
-}
-
-// FilterStoryBlockMinted is a free log retrieval operation binding the contract event 0x46c5798f976ec5e5dec617e7f27479bc578f63e6bcf4f693ade547151a3219cd.
-//
-// Solidity: event StoryBlockMinted(address indexed to, uint8 indexed sb, uint256 indexed tokenId)
-func (_StoryBlocksRegistry *StoryBlocksRegistryFilterer) FilterStoryBlockMinted(opts *bind.FilterOpts, to []common.Address, sb []uint8, tokenId []*big.Int) (*StoryBlocksRegistryStoryBlockMintedIterator, error) {
-
-	var toRule []interface{}
-	for _, toItem := range to {
-		toRule = append(toRule, toItem)
-	}
-	var sbRule []interface{}
-	for _, sbItem := range sb {
-		sbRule = append(sbRule, sbItem)
-	}
-	var tokenIdRule []interface{}
-	for _, tokenIdItem := range tokenId {
-		tokenIdRule = append(tokenIdRule, tokenIdItem)
-	}
-
-	logs, sub, err := _StoryBlocksRegistry.contract.FilterLogs(opts, "StoryBlockMinted", toRule, sbRule, tokenIdRule)
-	if err != nil {
-		return nil, err
-	}
-	return &StoryBlocksRegistryStoryBlockMintedIterator{contract: _StoryBlocksRegistry.contract, event: "StoryBlockMinted", logs: logs, sub: sub}, nil
-}
-
-// WatchStoryBlockMinted is a free log subscription operation binding the contract event 0x46c5798f976ec5e5dec617e7f27479bc578f63e6bcf4f693ade547151a3219cd.
-//
-// Solidity: event StoryBlockMinted(address indexed to, uint8 indexed sb, uint256 indexed tokenId)
-func (_StoryBlocksRegistry *StoryBlocksRegistryFilterer) WatchStoryBlockMinted(opts *bind.WatchOpts, sink chan<- *StoryBlocksRegistryStoryBlockMinted, to []common.Address, sb []uint8, tokenId []*big.Int) (event.Subscription, error) {
-
-	var toRule []interface{}
-	for _, toItem := range to {
-		toRule = append(toRule, toItem)
-	}
-	var sbRule []interface{}
-	for _, sbItem := range sb {
-		sbRule = append(sbRule, sbItem)
-	}
-	var tokenIdRule []interface{}
-	for _, tokenIdItem := range tokenId {
-		tokenIdRule = append(tokenIdRule, tokenIdItem)
-	}
-
-	logs, sub, err := _StoryBlocksRegistry.contract.WatchLogs(opts, "StoryBlockMinted", toRule, sbRule, tokenIdRule)
-	if err != nil {
-		return nil, err
-	}
-	return event.NewSubscription(func(quit <-chan struct{}) error {
-		defer sub.Unsubscribe()
-		for {
-			select {
-			case log := <-logs:
-				// New log arrived, parse the event and forward to the user
-				event := new(StoryBlocksRegistryStoryBlockMinted)
-				if err := _StoryBlocksRegistry.contract.UnpackLog(event, "StoryBlockMinted", log); err != nil {
-					return err
-				}
-				event.Raw = log
-
-				select {
-				case sink <- event:
-				case err := <-sub.Err():
-					return err
-				case <-quit:
-					return nil
-				}
-			case err := <-sub.Err():
-				return err
-			case <-quit:
-				return nil
-			}
-		}
-	}), nil
-}
-
-// ParseStoryBlockMinted is a log parse operation binding the contract event 0x46c5798f976ec5e5dec617e7f27479bc578f63e6bcf4f693ade547151a3219cd.
-//
-// Solidity: event StoryBlockMinted(address indexed to, uint8 indexed sb, uint256 indexed tokenId)
-func (_StoryBlocksRegistry *StoryBlocksRegistryFilterer) ParseStoryBlockMinted(log types.Log) (*StoryBlocksRegistryStoryBlockMinted, error) {
-	event := new(StoryBlocksRegistryStoryBlockMinted)
-	if err := _StoryBlocksRegistry.contract.UnpackLog(event, "StoryBlockMinted", log); err != nil {
-		return nil, err
-	}
-	event.Raw = log
-	return event, nil
-}
-
-// StoryBlocksRegistryStoryBlockWrittenIterator is returned from FilterStoryBlockWritten and is used to iterate over the raw logs and unpacked data for StoryBlockWritten events raised by the StoryBlocksRegistry contract.
-type StoryBlocksRegistryStoryBlockWrittenIterator struct {
-	Event *StoryBlocksRegistryStoryBlockWritten // Event containing the contract specifics and raw log
-
-	contract *bind.BoundContract // Generic contract to use for unpacking event data
-	event    string              // Event name to use for unpacking event data
-
-	logs chan types.Log        // Log channel receiving the found contract events
-	sub  ethereum.Subscription // Subscription for errors, completion and termination
-	done bool                  // Whether the subscription completed delivering logs
-	fail error                 // Occurred error to stop iteration
-}
-
-// Next advances the iterator to the subsequent event, returning whether there
-// are any more events found. In case of a retrieval or parsing error, false is
-// returned and Error() can be queried for the exact failure.
-func (it *StoryBlocksRegistryStoryBlockWrittenIterator) Next() bool {
-	// If the iterator failed, stop iterating
-	if it.fail != nil {
-		return false
-	}
-	// If the iterator completed, deliver directly whatever's available
-	if it.done {
-		select {
-		case log := <-it.logs:
-			it.Event = new(StoryBlocksRegistryStoryBlockWritten)
-			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-				it.fail = err
-				return false
-			}
-			it.Event.Raw = log
-			return true
-
-		default:
-			return false
-		}
-	}
-	// Iterator still in progress, wait for either a data or an error event
-	select {
-	case log := <-it.logs:
-		it.Event = new(StoryBlocksRegistryStoryBlockWritten)
-		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-			it.fail = err
-			return false
-		}
-		it.Event.Raw = log
-		return true
-
-	case err := <-it.sub.Err():
-		it.done = true
-		it.fail = err
-		return it.Next()
-	}
-}
-
-// Error returns any retrieval or parsing error occurred during filtering.
-func (it *StoryBlocksRegistryStoryBlockWrittenIterator) Error() error {
-	return it.fail
-}
-
-// Close terminates the iteration process, releasing any pending underlying
-// resources.
-func (it *StoryBlocksRegistryStoryBlockWrittenIterator) Close() error {
-	it.sub.Unsubscribe()
-	return nil
-}
-
-// StoryBlocksRegistryStoryBlockWritten represents a StoryBlockWritten event raised by the StoryBlocksRegistry contract.
-type StoryBlocksRegistryStoryBlockWritten struct {
-	StoryBlockId *big.Int
-	BlockType    uint8
-	Name         string
-	Description  string
-	MediaUrl     string
-	Raw          types.Log // Blockchain specific contextual infos
-}
-
-// FilterStoryBlockWritten is a free log retrieval operation binding the contract event 0x621ca783668a03c147f29e5ae01f40cc55df212956bde68afb53b1d6119a2ea7.
-//
-// Solidity: event StoryBlockWritten(uint256 indexed storyBlockId, uint8 indexed blockType, string name, string description, string mediaUrl)
-func (_StoryBlocksRegistry *StoryBlocksRegistryFilterer) FilterStoryBlockWritten(opts *bind.FilterOpts, storyBlockId []*big.Int, blockType []uint8) (*StoryBlocksRegistryStoryBlockWrittenIterator, error) {
-
-	var storyBlockIdRule []interface{}
-	for _, storyBlockIdItem := range storyBlockId {
-		storyBlockIdRule = append(storyBlockIdRule, storyBlockIdItem)
-	}
-	var blockTypeRule []interface{}
-	for _, blockTypeItem := range blockType {
-		blockTypeRule = append(blockTypeRule, blockTypeItem)
-	}
-
-	logs, sub, err := _StoryBlocksRegistry.contract.FilterLogs(opts, "StoryBlockWritten", storyBlockIdRule, blockTypeRule)
-	if err != nil {
-		return nil, err
-	}
-	return &StoryBlocksRegistryStoryBlockWrittenIterator{contract: _StoryBlocksRegistry.contract, event: "StoryBlockWritten", logs: logs, sub: sub}, nil
-}
-
-// WatchStoryBlockWritten is a free log subscription operation binding the contract event 0x621ca783668a03c147f29e5ae01f40cc55df212956bde68afb53b1d6119a2ea7.
-//
-// Solidity: event StoryBlockWritten(uint256 indexed storyBlockId, uint8 indexed blockType, string name, string description, string mediaUrl)
-func (_StoryBlocksRegistry *StoryBlocksRegistryFilterer) WatchStoryBlockWritten(opts *bind.WatchOpts, sink chan<- *StoryBlocksRegistryStoryBlockWritten, storyBlockId []*big.Int, blockType []uint8) (event.Subscription, error) {
-
-	var storyBlockIdRule []interface{}
-	for _, storyBlockIdItem := range storyBlockId {
-		storyBlockIdRule = append(storyBlockIdRule, storyBlockIdItem)
-	}
-	var blockTypeRule []interface{}
-	for _, blockTypeItem := range blockType {
-		blockTypeRule = append(blockTypeRule, blockTypeItem)
-	}
-
-	logs, sub, err := _StoryBlocksRegistry.contract.WatchLogs(opts, "StoryBlockWritten", storyBlockIdRule, blockTypeRule)
-	if err != nil {
-		return nil, err
-	}
-	return event.NewSubscription(func(quit <-chan struct{}) error {
-		defer sub.Unsubscribe()
-		for {
-			select {
-			case log := <-logs:
-				// New log arrived, parse the event and forward to the user
-				event := new(StoryBlocksRegistryStoryBlockWritten)
-				if err := _StoryBlocksRegistry.contract.UnpackLog(event, "StoryBlockWritten", log); err != nil {
-					return err
-				}
-				event.Raw = log
-
-				select {
-				case sink <- event:
-				case err := <-sub.Err():
-					return err
-				case <-quit:
-					return nil
-				}
-			case err := <-sub.Err():
-				return err
-			case <-quit:
-				return nil
-			}
-		}
-	}), nil
-}
-
-// ParseStoryBlockWritten is a log parse operation binding the contract event 0x621ca783668a03c147f29e5ae01f40cc55df212956bde68afb53b1d6119a2ea7.
-//
-// Solidity: event StoryBlockWritten(uint256 indexed storyBlockId, uint8 indexed blockType, string name, string description, string mediaUrl)
-func (_StoryBlocksRegistry *StoryBlocksRegistryFilterer) ParseStoryBlockWritten(log types.Log) (*StoryBlocksRegistryStoryBlockWritten, error) {
-	event := new(StoryBlocksRegistryStoryBlockWritten)
-	if err := _StoryBlocksRegistry.contract.UnpackLog(event, "StoryBlockWritten", log); err != nil {
 		return nil, err
 	}
 	event.Raw = log

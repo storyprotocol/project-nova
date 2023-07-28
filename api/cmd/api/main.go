@@ -84,6 +84,7 @@ func main() {
 	storyInfoRepository := repository.NewStoryInfoDbImpl(db)
 	characterInfoRepository := repository.NewCharacterInfoDbImpl(db)
 	storyInfoV2Repository := repository.NewStoryInfoV2DbImpl(db)
+	relationshipRepository := repository.NewRelationshipDbImpl(db)
 
 	var storyContentRepository repository.StoryContentRepository
 	var storyError error
@@ -203,6 +204,9 @@ func main() {
 		adminV2.POST("/character/:franchiseId/:characterId/:storyId",
 			handler.NewAdminCreateCharacterWithBackstoryHandler(characterInfoRepository, storyInfoV2Repository, web3Gateway, httpClient, storyBlocksRegistry),
 		)
+
+		// Endpoint to create a relationship
+		adminV2.POST("/relationship", handler.NewCreateRelationshipHandlerV2(web3Gateway, relationshipRepository))
 	}
 
 	protocolV1 := r.Group("/protocol/v1")
@@ -262,6 +266,15 @@ func main() {
 
 		// Endpoint to create a story in a franchise
 		protocolV2.POST("/story/:franchiseId", handler.NewCreateStoryHandlerV2(web3Gateway))
+
+		// Endpoint to get all relationships
+		protocolV2.GET("/relationship", handler.NewGetRelationshipsHandler(relationshipRepository))
+
+		// Endpoint to get relationships between sourceId and destId
+		protocolV2.GET("/relationship/:srcId/:dstId", handler.NewGetRelationshipHandler(relationshipRepository))
+
+		// Endpoint to get all relationships linked to a sourceId
+		protocolV2.GET("/relationship/:srcId", handler.NewGetRelationshipsByNodeIdHandler(relationshipRepository))
 	}
 
 	port := fmt.Sprintf(":%d", cfg.Port)
