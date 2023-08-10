@@ -13,9 +13,11 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/machinebox/graphql"
 	"github.com/project-nova/backend/api/internal/config"
 	"github.com/project-nova/backend/api/internal/handler"
 	"github.com/project-nova/backend/api/internal/repository"
+	"github.com/project-nova/backend/api/internal/service"
 	"github.com/project-nova/backend/pkg/abi/story_blocks_registry"
 	xconfig "github.com/project-nova/backend/pkg/config"
 	"github.com/project-nova/backend/pkg/constant"
@@ -109,6 +111,9 @@ func main() {
 	}
 
 	httpClient := xhttp.NewClient(&xhttp.ClientConfig{})
+
+	theGraphClient := graphql.NewClient("https://api.thegraph.com/subgraphs/name/edisonz0718/testhostedservice")
+	theGraphService := service.NewTheGraphServiceImpl(theGraphClient)
 
 	storyBlocksRegistry, err := story_blocks_registry.NewStoryBlocksRegistry(
 		common.HexToAddress(cfg.StoryBlocksRegistry),
@@ -259,6 +264,25 @@ func main() {
 
 		// Endpoint to create a story in a franchise
 		protocolV2.POST("/story/:franchiseId", handler.NewCreateStoryHandlerV2(web3Gateway))
+	}
+
+	protocolKbw := r.Group("/protocol/kbw")
+	protocolKbw.Use(cors.Default())
+	{
+		// Endpoint to get franchises
+		protocolKbw.GET("/franchise", handler.NewGetFranchisesHandlerKbw(theGraphService, web3Gateway))
+
+		// Endpoint to get a franchise
+		protocolKbw.GET("/franchise/:franchiseId", handler.NewGetFranchiseHandlerKbw(theGraphService, web3Gateway))
+
+		// Endpoint to get characters from a franchise
+		protocolKbw.GET("/character", handler.NewGetCharactersHandlerKbw(theGraphService, web3Gateway))
+
+		// Endpoint to get stories from a franchise
+		protocolKbw.GET("/story", handler.NewGetStoriesHandlerKbw(theGraphService, web3Gateway))
+
+		// Endpoint to get a single story from a franchise
+		protocolKbw.GET("/story/:storyId", handler.NewGetStoryHandlerKbw(theGraphService, web3Gateway))
 	}
 
 	port := fmt.Sprintf(":%d", cfg.Port)
