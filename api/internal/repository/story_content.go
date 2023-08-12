@@ -66,6 +66,9 @@ func (s *storyContentS3Impl) AddContentByChapter(franchiseId int64, storyNum int
 }
 
 func (s *storyContentS3Impl) downloadAndUpdate(key string) (*model.StoryContentModel, error) {
+	if key == "kbw" {
+		return nil, nil
+	}
 	buf := aws.NewWriteAtBuffer([]byte{})
 	_, err := s.s3Client.DownloadObject(buf, s.bucket, key+"/"+constant.ContentObject)
 	if err != nil {
