@@ -112,7 +112,7 @@ func main() {
 
 	httpClient := xhttp.NewClient(&xhttp.ClientConfig{})
 
-	theGraphClient := graphql.NewClient("https://api.thegraph.com/subgraphs/name/edisonz0718/testhostedservice")
+	theGraphClient := graphql.NewClient("https://api.thegraph.com/subgraphs/name/edisonz0718/kbw-demo")
 	theGraphService := service.NewTheGraphServiceImpl(theGraphClient)
 
 	storyBlocksRegistry, err := story_blocks_registry.NewStoryBlocksRegistry(
@@ -270,19 +270,19 @@ func main() {
 	protocolKbw.Use(cors.Default())
 	{
 		// Endpoint to get franchises
-		protocolKbw.GET("/franchise", handler.NewGetFranchisesHandlerKbw(theGraphService, web3Gateway))
+		protocolKbw.GET("/franchise", handler.NewGetFranchisesHandlerKbw(theGraphService, httpClient))
 
 		// Endpoint to get a franchise
-		protocolKbw.GET("/franchise/:franchiseId", handler.NewGetFranchiseHandlerKbw(theGraphService, web3Gateway))
+		protocolKbw.GET("/franchise/:franchiseId", handler.NewGetFranchiseHandlerKbw(theGraphService, httpClient))
 
 		// Endpoint to get characters from a franchise
-		protocolKbw.GET("/character", handler.NewGetCharactersHandlerKbw(theGraphService, web3Gateway))
+		protocolKbw.GET("/character", handler.NewGetCharactersHandlerKbw(theGraphService, httpClient))
 
 		// Endpoint to get stories from a franchise
-		protocolKbw.GET("/story", handler.NewGetStoriesHandlerKbw(theGraphService, web3Gateway))
+		protocolKbw.GET("/story", handler.NewGetStoriesHandlerKbw(theGraphService, httpClient))
 
 		// Endpoint to get a single story from a franchise
-		protocolKbw.GET("/story/:storyId", handler.NewGetStoryHandlerKbw(theGraphService, web3Gateway))
+		protocolKbw.GET("/story/:storyId", handler.NewGetStoryHandlerKbw(theGraphService, httpClient))
 	}
 
 	port := fmt.Sprintf(":%d", cfg.Port)

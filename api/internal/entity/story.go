@@ -3,6 +3,7 @@ package entity
 import (
 	"fmt"
 	"math/rand"
+	"strconv"
 	"time"
 
 	"github.com/google/uuid"
@@ -223,4 +224,26 @@ type StoryMetadata struct {
 
 type CreateStoryResp struct {
 	MediaUri string `json:"arweaveURI"`
+}
+
+func (f *IpAssetTheGraph) ToStoryInfoV2() (*StoryInfoV2Model, error) {
+	franchiseId, err := strconv.ParseInt(f.FranchiseId, 10, 64)
+	if err != nil {
+		return nil, fmt.Errorf("failed to convert. franchise id: %s is not a valid int64. %v", f.FranchiseId, err)
+	}
+
+	ipAssetId, err := strconv.ParseInt(f.IpAssetId, 10, 64)
+	if err != nil {
+		return nil, fmt.Errorf("failed to convert. ipAssetId: %s is not a valid int64. %v", f.IpAssetId, err)
+	}
+
+	story := &StoryInfoV2Model{
+		FranchiseId:  franchiseId,
+		StoryId:      &ipAssetId,
+		OwnerAddress: &f.Owner,
+		StoryName:    f.Name,
+		MediaUri:     &f.MediaUrl,
+		Txhash:       &f.TxHash,
+	}
+	return story, err
 }

@@ -3,6 +3,7 @@ package entity
 import (
 	"fmt"
 	"math/rand"
+	"strconv"
 	"time"
 
 	"github.com/google/uuid"
@@ -153,4 +154,39 @@ func (c *CharacterInfoModel) ToGetCharacterResp() *GetCharacterResp {
 	}
 
 	return resp
+}
+
+type IpAssetsTheGraphResposne struct {
+	IpAssetCreateds []*IpAssetTheGraph `json:"ipassetCreateds"`
+}
+
+type IpAssetTheGraph struct {
+	ID          string `json:"id"`
+	FranchiseId string `json:"franchiseId"`
+	IpAssetId   string `json:"ipAssetId"`
+	Owner       string `json:"owner"`
+	Name        string `json:"name"`
+	MediaUrl    string `json:"mediaUrl"`
+	TxHash      string `json:"transactionHash"`
+}
+
+func (f *IpAssetTheGraph) ToCharacterInfo() (*CharacterInfoModel, error) {
+	franchiseId, err := strconv.ParseInt(f.FranchiseId, 10, 64)
+	if err != nil {
+		return nil, fmt.Errorf("failed to convert. franchise id: %s is not a valid int64. %v", f.FranchiseId, err)
+	}
+
+	ipAssetId, err := strconv.ParseInt(f.IpAssetId, 10, 64)
+	if err != nil {
+		return nil, fmt.Errorf("failed to convert. ipAssetId: %s is not a valid int64. %v", f.IpAssetId, err)
+	}
+
+	character := &CharacterInfoModel{
+		FranchiseId:   franchiseId,
+		CharacterId:   &ipAssetId,
+		OwnerAddress:  f.Owner,
+		CharacterName: f.Name,
+		MediaUri:      &f.MediaUrl,
+	}
+	return character, err
 }
