@@ -283,6 +283,12 @@ func main() {
 
 		// Endpoint to get a single story from a franchise
 		protocolKbw.GET("/story/:storyId", handler.NewGetStoryHandlerKbw(theGraphService, httpClient))
+
+		// Endpoint to get licenses from a story
+		protocolKbw.GET("/license", handler.NewGetLicensesHandlerKbw(theGraphService))
+
+		// Endpoint to get a single license from a story
+		protocolKbw.GET("/license/:licenseId", handler.NewGetLicenseHandlerKbw(theGraphService))
 	}
 
 	port := fmt.Sprintf(":%d", cfg.Port)

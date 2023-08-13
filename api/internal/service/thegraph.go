@@ -15,6 +15,9 @@ type TheGraphService interface {
 	GetCharacters(franchiseId int64) ([]*entity.CharacterInfoModel, error)
 	GetStories(franchiseId int64) ([]*entity.StoryInfoV2Model, error)
 	GetStory(franchiseId int64, storyId int64) (*entity.StoryInfoV2Model, error)
+	GetLicensesByStory(franchiseId int64, storyId int64) ([]*entity.License, error)
+	GetLicensesByProfile(franchiseId int64, storyId int64, walletAddress string) ([]*entity.License, error)
+	GetLicense(licenseId int64) (*entity.License, error)
 }
 
 func NewTheGraphServiceImpl(client *graphql.Client) TheGraphService {
@@ -46,10 +49,11 @@ func (c *theGraphServiceImpl) GetFranchises() ([]*entity.Franchise, error) {
 		return nil, fmt.Errorf("failed to get the franchises from the graph. error: %v", err)
 	}
 
-	var franchises []*entity.Franchise
+	franchises := []*entity.Franchise{}
 	for _, franchise := range franchisesResponse.FranchisesRegistered {
 		franchises = append(franchises, franchise.ToFranchise())
 	}
+
 	return franchises, nil
 }
 
@@ -101,7 +105,7 @@ func (c *theGraphServiceImpl) GetCharacters(franchiseId int64) ([]*entity.Charac
 		return nil, fmt.Errorf("failed to get the characters from the graph. error: %v", err)
 	}
 
-	var characters []*entity.CharacterInfoModel
+	characters := []*entity.CharacterInfoModel{}
 	for _, character := range charactersResponse.IpAssetCreateds {
 		characterInfo, err := character.ToCharacterInfo()
 		if err != nil {
@@ -135,7 +139,7 @@ func (c *theGraphServiceImpl) GetStories(franchiseId int64) ([]*entity.StoryInfo
 		return nil, fmt.Errorf("failed to get the stories from the graph. error: %v", err)
 	}
 
-	var stories []*entity.StoryInfoV2Model
+	stories := []*entity.StoryInfoV2Model{}
 	for _, story := range storiesResponse.IpAssetCreateds {
 		storyInfo, err := story.ToStoryInfoV2()
 		if err != nil {
@@ -179,4 +183,120 @@ func (c *theGraphServiceImpl) GetStory(franchiseId int64, storyId int64) (*entit
 	}
 
 	return storyInfo, nil
+}
+
+func (c *theGraphServiceImpl) GetLicensesByStory(franchiseId int64, storyId int64) ([]*entity.License, error) {
+	req := graphql.NewRequest(`
+    query($franchiseId: BigInt, $storyId: BigInt) {
+		licenseGranteds(where: { and: [{ franchiseId: $franchiseId }, { storyId: $storyId }]}) {
+			id
+			licenseId
+			franchiseId
+			storyId
+			storyName
+			owner
+			scope
+			duration
+			right
+			imageUrl
+			collectionAddress
+	  	}
+	}`)
+
+	req.Var("franchiseId", franchiseId)
+	req.Var("storyId", storyId)
+
+	ctx := context.Background()
+	var licensesResponse entity.LicensesTheGraphResponse
+	if err := c.client.Run(ctx, req, &licensesResponse); err != nil {
+		return nil, fmt.Errorf("failed to get the licenses from the graph. error: %v", err)
+	}
+
+	licenses := []*entity.License{}
+	for _, license := range licensesResponse.LicensesGranted {
+		licenseModel, err := license.ToLicense()
+		if err != nil {
+			logger.Errorf("Failed to convert the graph license response to license model: %v", err)
+			continue
+		}
+		licenses = append(licenses, licenseModel)
+	}
+	return licenses, nil
+}
+
+func (c *theGraphServiceImpl) GetLicensesByProfile(franchiseId int64, storyId int64, walletAddress string) ([]*entity.License, error) {
+	req := graphql.NewRequest(`
+    query($franchiseId: BigInt, $storyId: BigInt, $walletAddress: String) {
+		licenseGranteds(where: { and: [{ franchiseId: $franchiseId }, { storyId: $storyId }, { owner: $walletAddress }]}) {
+			id
+			licenseId
+			franchiseId
+			storyId
+			storyName
+			owner
+			scope
+			duration
+			right
+			imageUrl
+			collectionAddress
+	  	}
+	}`)
+
+	req.Var("franchiseId", franchiseId)
+	req.Var("storyId", storyId)
+	req.Var("walletAddress", walletAddress)
+
+	ctx := context.Background()
+	var licensesResponse entity.LicensesTheGraphResponse
+	if err := c.client.Run(ctx, req, &licensesResponse); err != nil {
+		return nil, fmt.Errorf("failed to get the licenses from the graph. error: %v", err)
+	}
+
+	licenses := []*entity.License{}
+	for _, license := range licensesResponse.LicensesGranted {
+		licenseModel, err := license.ToLicense()
+		if err != nil {
+			logger.Errorf("Failed to convert the graph license response to license model: %v", err)
+			continue
+		}
+		licenses = append(licenses, licenseModel)
+	}
+	return licenses, nil
+}
+
+func (c *theGraphServiceImpl) GetLicense(licenseId int64) (*entity.License, error) {
+	req := graphql.NewRequest(`
+    query($licenseId: BigInt) {
+		licenseGranteds(where: {licenseId: $licenseId}) {
+			id
+			licenseId
+			franchiseId
+			storyId
+			storyName
+			owner
+			scope
+			duration
+			right
+			imageUrl
+			collectionAddress
+	  	}
+	}`)
+
+	req.Var("licenseId", licenseId)
+
+	ctx := context.Background()
+	var licensesResponse entity.LicensesTheGraphResponse
+	if err := c.client.Run(ctx, req, &licensesResponse); err != nil {
+		return nil, fmt.Errorf("failed to get the licenses from the graph. error: %v", err)
+	}
+	if len(licensesResponse.LicensesGranted) == 0 {
+		return nil, fmt.Errorf("failed to find the license")
+	}
+
+	licenseModel, err := licensesResponse.LicensesGranted[0].ToLicense()
+	if err != nil {
+		return nil, fmt.Errorf("failed to convert the graph license response to license model: %v", err)
+	}
+
+	return licenseModel, nil
 }
