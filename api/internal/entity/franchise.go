@@ -33,6 +33,7 @@ type FranchiseTheGraph struct {
 	IpAssetRegistry string `json:"ipAssetRegistry"`
 	Name            string `json:"name"`
 	TokenURI        string `json:"tokenURI"`
+	TxHash          string `json:"transactionHash"`
 }
 
 func (f *FranchiseTheGraph) ToFranchise() *Franchise {
@@ -41,6 +42,7 @@ func (f *FranchiseTheGraph) ToFranchise() *Franchise {
 		OwnerAddress: f.Owner,
 		Name:         f.Name,
 		TokenUri:     f.TokenURI,
+		Txhash:       &f.TxHash,
 	}
 	return franchise
 }

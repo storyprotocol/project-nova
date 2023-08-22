@@ -8,8 +8,8 @@ import (
 type License struct {
 	ID                int64  `json:"id"`
 	FranchiseId       int64  `json:"franchiseId"`
-	StoryId           int64  `json:"storyId"`
-	StoryName         string `json:"storyName"`
+	IpAssetId         int64  `json:"ipAssetId"`
+	IpAssetName       string `json:"ipAssetName"`
 	OwnerAddress      string `json:"ownerAddress"`
 	CollectionAddress string `json:"collectionAddress"`
 	Scope             string `json:"scope"`
@@ -26,8 +26,8 @@ type LicenseTheGraph struct {
 	ID                string `json:"id"`
 	LicenseId         string `json:"licenseId"`
 	FranchiseId       string `json:"franchiseId"`
-	StoryId           string `json:"storyId"`
-	StoryName         string `json:"storyName"`
+	IpAssetId         string `json:"storyId"`
+	IpAssetName       string `json:"storyName"`
 	OwnerAddress      string `json:"owner"`
 	CollectionAddress string `json:"collectionAddress"`
 	Scope             string `json:"scope"`
@@ -41,9 +41,9 @@ func (l *LicenseTheGraph) ToLicense() (*License, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to convert. franchise id: %s is not a valid int64. %v", l.FranchiseId, err)
 	}
-	storyId, err := strconv.ParseInt(l.StoryId, 10, 64)
+	ipAssetId, err := strconv.ParseInt(l.IpAssetId, 10, 64)
 	if err != nil {
-		return nil, fmt.Errorf("failed to convert. story id: %s is not a valid int64. %v", l.StoryId, err)
+		return nil, fmt.Errorf("failed to convert. story id: %s is not a valid int64. %v", l.IpAssetId, err)
 	}
 	licenseId, err := strconv.ParseInt(l.LicenseId, 10, 64)
 	if err != nil {
@@ -53,8 +53,8 @@ func (l *LicenseTheGraph) ToLicense() (*License, error) {
 	license := &License{
 		ID:                licenseId,
 		FranchiseId:       franchiseId,
-		StoryId:           storyId,
-		StoryName:         l.StoryName,
+		IpAssetId:         ipAssetId,
+		IpAssetName:       l.IpAssetName,
 		OwnerAddress:      l.OwnerAddress,
 		CollectionAddress: l.CollectionAddress,
 		Scope:             l.Scope,

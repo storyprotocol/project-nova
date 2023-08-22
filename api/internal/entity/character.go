@@ -187,6 +187,7 @@ func (f *IpAssetTheGraph) ToCharacterInfo() (*CharacterInfoModel, error) {
 		OwnerAddress:  f.Owner,
 		CharacterName: f.Name,
 		MediaUri:      &f.MediaUrl,
+		Txhash:        &f.TxHash,
 	}
 	return character, err
 }

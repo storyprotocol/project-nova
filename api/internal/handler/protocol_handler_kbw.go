@@ -118,6 +118,44 @@ func NewGetCharactersHandlerKbw(graphService service.TheGraphService, httpClient
 	}
 }
 
+// GET /character/:characterId
+func NewGetCharacterHandlerKbw(graphService service.TheGraphService, httpClient xhttp.Client) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		franchiseId, err := strconv.ParseInt(c.DefaultQuery("franchiseId", ""), 10, 64)
+		if err != nil {
+			logger.Errorf("Invalid franchise id: %s", c.DefaultQuery("franchiseId", ""))
+			c.JSON(http.StatusBadRequest, ErrorMessage("Invalid franchise id"))
+			return
+		}
+		_, err = strconv.ParseInt(c.Param("characterId"), 10, 64)
+		if err != nil {
+			logger.Errorf("Invalid character Id: %s", c.Param("characterId"))
+			c.JSON(http.StatusBadRequest, ErrorMessage("Invalid character Id"))
+			return
+		}
+
+		// 1. call the graph service to get all the characters
+		character, err := graphService.GetCharacter(franchiseId, c.Param("characterId"))
+		if err != nil {
+			logger.Errorf("Failed to get the character: %v", err)
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+			return
+		}
+
+		// 2. Get the metadata from arweave
+		var characterMetaData entity.CharacterMetadata
+		_, err = httpClient.Request("GET", *character.MediaUri, nil, &characterMetaData)
+		if err != nil {
+			logger.Errorf("Failed to get character metadata from remote storage. url: %s, error: %v", *character.MediaUri, err)
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+			return
+		}
+		character.ImageUrl = characterMetaData.ImageUrl
+
+		c.JSON(http.StatusOK, character)
+	}
+}
+
 // GET /story
 func NewGetStoriesHandlerKbw(graphService service.TheGraphService, httpClient xhttp.Client) func(c *gin.Context) {
 	return func(c *gin.Context) {
@@ -156,7 +194,7 @@ func NewGetStoriesHandlerKbw(graphService service.TheGraphService, httpClient xh
 // GET /story/:storyId
 func NewGetStoryHandlerKbw(graphService service.TheGraphService, httpClient xhttp.Client) func(c *gin.Context) {
 	return func(c *gin.Context) {
-		storyId, err := strconv.ParseInt(c.Param("storyId"), 10, 64)
+		_, err := strconv.ParseInt(c.Param("storyId"), 10, 64)
 		if err != nil {
 			logger.Errorf("Invalid story id: %s", c.Param("storyId"))
 			c.JSON(http.StatusBadRequest, ErrorMessage("Invalid story id"))
@@ -170,7 +208,7 @@ func NewGetStoryHandlerKbw(graphService service.TheGraphService, httpClient xhtt
 		}
 
 		// 1. call the graph service to get all the stories
-		story, err := graphService.GetStory(franchiseId, storyId)
+		story, err := graphService.GetStory(franchiseId, c.Param("storyId"))
 		if err != nil {
 			logger.Errorf("Failed to get story: %v", err)
 			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
@@ -194,10 +232,10 @@ func NewGetStoryHandlerKbw(graphService service.TheGraphService, httpClient xhtt
 // GET /license
 func NewGetLicensesHandlerKbw(graphService service.TheGraphService) func(c *gin.Context) {
 	return func(c *gin.Context) {
-		storyId, err := strconv.ParseInt(c.DefaultQuery("storyId", ""), 10, 64)
+		_, err := strconv.ParseInt(c.DefaultQuery("ipAssetId", ""), 10, 64)
 		if err != nil {
-			logger.Errorf("Invalid story id: %s", c.DefaultQuery("storyId", ""))
-			c.JSON(http.StatusBadRequest, ErrorMessage("Invalid story id"))
+			logger.Errorf("Invalid ip asset id: %s", c.DefaultQuery("ipAssetId", ""))
+			c.JSON(http.StatusBadRequest, ErrorMessage("Invalid ip asset id"))
 			return
 		}
 		franchiseId, err := strconv.ParseInt(c.DefaultQuery("franchiseId", ""), 10, 64)
@@ -217,16 +255,16 @@ func NewGetLicensesHandlerKbw(graphService service.TheGraphService) func(c *gin.
 				c.JSON(http.StatusBadRequest, ErrorMessage("Invalid wallet address"))
 				return
 			}
-			licenses, err = graphService.GetLicensesByProfile(franchiseId, storyId, walletAddress)
+			licenses, err = graphService.GetLicensesByProfile(franchiseId, c.DefaultQuery("ipAssetId", ""), walletAddress)
 			if err != nil {
 				logger.Errorf("Failed to get licenses by profile from the graph service. error: %v", err)
 				c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
 				return
 			}
 		} else {
-			licenses, err = graphService.GetLicensesByStory(franchiseId, storyId)
+			licenses, err = graphService.GetLicensesByIpAsset(franchiseId, c.DefaultQuery("ipAssetId", ""))
 			if err != nil {
-				logger.Errorf("Failed to get licenses by story from the graph service. error: %v", err)
+				logger.Errorf("Failed to get licenses by IP Asset from the graph service. error: %v", err)
 				c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
 				return
 			}

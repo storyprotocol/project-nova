@@ -278,6 +278,9 @@ func main() {
 		// Endpoint to get characters from a franchise
 		protocolKbw.GET("/character", handler.NewGetCharactersHandlerKbw(theGraphService, httpClient))
 
+		// Endpoint to get a single character from a franchise
+		protocolKbw.GET("/character/:characterId", handler.NewGetCharacterHandlerKbw(theGraphService, httpClient))
+
 		// Endpoint to get stories from a franchise
 		protocolKbw.GET("/story", handler.NewGetStoriesHandlerKbw(theGraphService, httpClient))
 
