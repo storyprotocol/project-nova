@@ -184,6 +184,24 @@ func NewGetStoriesHandlerKbw(graphService service.TheGraphService, httpClient xh
 				continue
 			}
 			story.Content = &storyMetaData.Content
+
+			if storyMetaData.Characters != nil && len(storyMetaData.Characters) > 0 {
+				// 3. Get characters associated with the story
+				var characterIds []string
+				for _, characterInfo := range storyMetaData.Characters {
+					if characterInfo.CharacterId != nil {
+						characterIds = append(characterIds, strconv.FormatInt(*characterInfo.CharacterId, 10))
+					}
+				}
+				characters, err := graphService.GetCharactersByCharacterIds(franchiseId, characterIds)
+				if err != nil {
+					logger.Errorf("Failed to get story: %v", err)
+					c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+					return
+				}
+				story.Characters = characters
+			}
+
 			storiesFinal = append(storiesFinal, story)
 		}
 
@@ -215,7 +233,7 @@ func NewGetStoryHandlerKbw(graphService service.TheGraphService, httpClient xhtt
 			return
 		}
 
-		// 2. Get the metadata from arweave
+		// 2. Get the story metadata from arweave
 		var storyMetaData entity.StoryMetadata
 		_, err = httpClient.Request("GET", *story.MediaUri, nil, &storyMetaData)
 		if err != nil {
@@ -224,6 +242,23 @@ func NewGetStoryHandlerKbw(graphService service.TheGraphService, httpClient xhtt
 			return
 		}
 		story.Content = &storyMetaData.Content
+
+		if storyMetaData.Characters != nil && len(storyMetaData.Characters) > 0 {
+			// 3. Get characters associated with the story
+			var characterIds []string
+			for _, characterInfo := range storyMetaData.Characters {
+				if characterInfo.CharacterId != nil {
+					characterIds = append(characterIds, strconv.FormatInt(*characterInfo.CharacterId, 10))
+				}
+			}
+			characters, err := graphService.GetCharactersByCharacterIds(franchiseId, characterIds)
+			if err != nil {
+				logger.Errorf("Failed to get story: %v", err)
+				c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+				return
+			}
+			story.Characters = characters
+		}
 
 		c.JSON(http.StatusOK, story)
 	}

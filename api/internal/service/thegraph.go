@@ -12,6 +12,7 @@ import (
 type TheGraphService interface {
 	GetFranchises() ([]*entity.Franchise, error)
 	GetFranchise(franchiseId int64) (*entity.Franchise, error)
+	GetCharactersByCharacterIds(franchiseId int64, characterIds []string) ([]*entity.CharacterInfoModel, error)
 	GetCharacters(franchiseId int64) ([]*entity.CharacterInfoModel, error)
 	GetCharacter(franchiseId int64, characterId string) (*entity.CharacterInfoModel, error)
 	GetStories(franchiseId int64) ([]*entity.StoryInfoV2Model, error)
@@ -85,6 +86,41 @@ func (c *theGraphServiceImpl) GetFranchise(franchiseId int64) (*entity.Franchise
 	}
 
 	return franchiseResponse.FranchisesRegistered[0].ToFranchise(), nil
+}
+
+func (c *theGraphServiceImpl) GetCharactersByCharacterIds(franchiseId int64, characterIds []string) ([]*entity.CharacterInfoModel, error) {
+	req := graphql.NewRequest(`
+	query($franchiseId: BigInt, $characterIds: [String]) {
+		ipassetCreateds(where: { and: [{ ipAssetType: 2 }, { franchiseId: $franchiseId }, { ipAssetId_in: $characterIds }]}) {
+			id
+			franchiseId
+			ipAssetId
+			owner
+			name
+			mediaUrl
+			transactionHash
+	  	}
+	}`)
+
+	req.Var("franchiseId", franchiseId)
+	req.Var("characterIds", characterIds)
+
+	ctx := context.Background()
+	var charactersResponse entity.IpAssetsTheGraphResposne
+	if err := c.client.Run(ctx, req, &charactersResponse); err != nil {
+		return nil, fmt.Errorf("failed to get the characters from the graph. error: %v", err)
+	}
+
+	characters := []*entity.CharacterInfoModel{}
+	for _, character := range charactersResponse.IpAssetCreateds {
+		characterInfo, err := character.ToCharacterInfo()
+		if err != nil {
+			logger.Errorf("Failed to convert the graph character response to character info: %v", err)
+			continue
+		}
+		characters = append(characters, characterInfo)
+	}
+	return characters, nil
 }
 
 func (c *theGraphServiceImpl) GetCharacters(franchiseId int64) ([]*entity.CharacterInfoModel, error) {

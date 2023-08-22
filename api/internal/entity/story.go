@@ -93,18 +93,19 @@ func ToStoryChapterModel(request *gateway.CreateStoryChapterRequestBody, storyId
 }
 
 type StoryInfoV2Model struct {
-	ID               string    `gorm:"primaryKey;column:id" json:"id,omitempty"`
-	FranchiseId      int64     `json:"franchiseId,omitempty"`
-	StoryId          *int64    `json:"storyId,omitempty"`
-	StoryName        string    `json:"storyName,omitempty"`
-	StoryDescription *string   `json:"storyDescription,omitempty"`
-	OwnerAddress     *string   `json:"ownerAddress,omitempty"`
-	CoverUrl         *string   `json:"coverUrl,omitempty"`
-	Content          *string   `json:"content,omitempty"`
-	MediaUri         *string   `json:"mediaUri,omitempty"`
-	Txhash           *string   `json:"txhash,omitempty"`
-	CreatedAt        time.Time `json:"createdAt,omitempty"`
-	UpdatedAt        time.Time `json:"updatedAt,omitempty"`
+	ID               string                `gorm:"primaryKey;column:id" json:"id,omitempty"`
+	FranchiseId      int64                 `json:"franchiseId,omitempty"`
+	StoryId          *int64                `json:"storyId,omitempty"`
+	StoryName        string                `json:"storyName,omitempty"`
+	StoryDescription *string               `json:"storyDescription,omitempty"`
+	OwnerAddress     *string               `json:"ownerAddress,omitempty"`
+	CoverUrl         *string               `json:"coverUrl,omitempty"`
+	Content          *string               `json:"content,omitempty"`
+	MediaUri         *string               `json:"mediaUri,omitempty"`
+	Txhash           *string               `json:"txhash,omitempty"`
+	Characters       []*CharacterInfoModel `json:"characters,omitempty"`
+	CreatedAt        time.Time             `json:"createdAt,omitempty"`
+	UpdatedAt        time.Time             `json:"updatedAt,omitempty"`
 }
 
 func (StoryInfoV2Model) TableName() string {
@@ -182,10 +183,11 @@ type GetStoryDetailsResp struct {
 }
 
 type CreateStoryRequestBody struct {
-	StoryName        *string `json:"name"`
-	StoryDescription *string `json:"description"`
-	OwnerAddress     *string `json:"owner"`
-	Content          *string `json:"content"`
+	StoryName        *string               `json:"name"`
+	StoryDescription *string               `json:"description"`
+	OwnerAddress     *string               `json:"owner"`
+	Content          *string               `json:"content"`
+	Characters       []*CharacterInfoModel `json:"characters"`
 }
 
 func (c *CreateStoryRequestBody) Validate() error {
@@ -219,7 +221,8 @@ func (c *CreateStoryRequestBody) ToStoryInfoV2Model() *StoryInfoV2Model {
 }
 
 type StoryMetadata struct {
-	Content string `json:"content"`
+	Content    string                `json:"content"`
+	Characters []*CharacterInfoModel `json:"characters,omitempty"`
 }
 
 type CreateStoryResp struct {

@@ -408,6 +408,9 @@ func createStoryV2(
 	storyMeta := &entity.StoryMetadata{
 		Content: *request.Content,
 	}
+	if len(request.Characters) > 0 {
+		storyMeta.Characters = request.Characters
+	}
 	storyMetaBytes, err := json.Marshal(storyMeta)
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal the story meta: %v", err)
