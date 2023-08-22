@@ -1,14 +1,14 @@
 package entity
 
 type Franchise struct {
-	ID           string          `json:"franchiseId"`
-	Name         string          `json:"franchiseName"`
-	OwnerAddress string          `json:"ownerAddress"`
-	TokenUri     string          `json:"tokenUri"`
-	ImageUrl     *string         `json:"image"`
-	BannerUrl    *string         `json:"banner"`
-	Txhash       *string         `json:"txhash"`
-	Metrics      FranchiseMetric `json:"metrics"`
+	ID           string          `json:"franchiseId,omitempty"`
+	Name         string          `json:"franchiseName,omitempty"`
+	OwnerAddress string          `json:"ownerAddress,omitempty"`
+	TokenUri     string          `json:"tokenUri,omitempty"`
+	ImageUrl     *string         `json:"image,omitempty"`
+	BannerUrl    *string         `json:"banner,omitempty"`
+	Txhash       *string         `json:"txhash,omitempty"`
+	Metrics      FranchiseMetric `json:"metrics,omitempty"`
 }
 
 type FranchiseMetric struct {

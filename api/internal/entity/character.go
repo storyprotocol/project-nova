@@ -100,17 +100,17 @@ func (c *CreateCharacterRequestBody) ToCharacterInfoModel() *CharacterInfoModel 
 }
 
 type CharacterInfoModel struct {
-	ID            string    `gorm:"primaryKey;column:id" json:"id"`
-	FranchiseId   int64     `json:"franchiseId"`
-	CharacterId   *int64    `json:"characterId"`
-	CharacterName string    `json:"characterName"`
-	OwnerAddress  string    `json:"ownerAddress"`
-	ImageUrl      *string   `json:"imageUrl"`
-	Backstory     *string   `json:"backstory"`
-	MediaUri      *string   `json:"mediaUri"`
-	Txhash        *string   `json:"txhash"`
-	CreatedAt     time.Time `json:"createdAt"`
-	UpdatedAt     time.Time `json:"updatedAt"`
+	ID            string    `gorm:"primaryKey;column:id" json:"id,omitempty"`
+	FranchiseId   int64     `json:"franchiseId,omitempty"`
+	CharacterId   *int64    `json:"characterId,omitempty"`
+	CharacterName string    `json:"characterName,omitempty"`
+	OwnerAddress  string    `json:"ownerAddress,omitempty"`
+	ImageUrl      *string   `json:"imageUrl,omitempty"`
+	Backstory     *string   `json:"backstory,omitempty"`
+	MediaUri      *string   `json:"mediaUri,omitempty"`
+	Txhash        *string   `json:"txhash,omitempty"`
+	CreatedAt     time.Time `json:"createdAt,omitempty"`
+	UpdatedAt     time.Time `json:"updatedAt,omitempty"`
 }
 
 func (CharacterInfoModel) TableName() string {

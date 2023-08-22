@@ -6,16 +6,16 @@ import (
 )
 
 type License struct {
-	ID                int64  `json:"id"`
-	FranchiseId       int64  `json:"franchiseId"`
-	IpAssetId         int64  `json:"ipAssetId"`
-	IpAssetName       string `json:"ipAssetName"`
-	OwnerAddress      string `json:"ownerAddress"`
-	CollectionAddress string `json:"collectionAddress"`
-	Scope             string `json:"scope"`
-	Duration          string `json:"duration"`
-	Right             string `json:"right"`
-	ImageUrl          string `json:"imageUrl"`
+	ID                int64  `json:"id,omitempty"`
+	FranchiseId       int64  `json:"franchiseId,omitempty"`
+	IpAssetId         int64  `json:"ipAssetId,omitempty"`
+	IpAssetName       string `json:"ipAssetName,omitempty"`
+	OwnerAddress      string `json:"ownerAddress,omitempty"`
+	CollectionAddress string `json:"collectionAddress,omitempty"`
+	Scope             string `json:"scope,omitempty"`
+	Duration          string `json:"duration,omitempty"`
+	Right             string `json:"right,omitempty"`
+	ImageUrl          string `json:"imageUrl,omitempty"`
 }
 
 type LicensesTheGraphResponse struct {

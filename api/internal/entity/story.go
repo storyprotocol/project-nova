@@ -93,18 +93,18 @@ func ToStoryChapterModel(request *gateway.CreateStoryChapterRequestBody, storyId
 }
 
 type StoryInfoV2Model struct {
-	ID               string    `gorm:"primaryKey;column:id" json:"id"`
-	FranchiseId      int64     `json:"franchiseId"`
-	StoryId          *int64    `json:"storyId"`
-	StoryName        string    `json:"storyName"`
-	StoryDescription *string   `json:"storyDescription"`
-	OwnerAddress     *string   `json:"ownerAddress"`
-	CoverUrl         *string   `json:"coverUrl"`
-	Content          *string   `json:"content"`
-	MediaUri         *string   `json:"mediaUri"`
-	Txhash           *string   `json:"txhash"`
-	CreatedAt        time.Time `json:"createdAt"`
-	UpdatedAt        time.Time `json:"updatedAt"`
+	ID               string    `gorm:"primaryKey;column:id" json:"id,omitempty"`
+	FranchiseId      int64     `json:"franchiseId,omitempty"`
+	StoryId          *int64    `json:"storyId,omitempty"`
+	StoryName        string    `json:"storyName,omitempty"`
+	StoryDescription *string   `json:"storyDescription,omitempty"`
+	OwnerAddress     *string   `json:"ownerAddress,omitempty"`
+	CoverUrl         *string   `json:"coverUrl,omitempty"`
+	Content          *string   `json:"content,omitempty"`
+	MediaUri         *string   `json:"mediaUri,omitempty"`
+	Txhash           *string   `json:"txhash,omitempty"`
+	CreatedAt        time.Time `json:"createdAt,omitempty"`
+	UpdatedAt        time.Time `json:"updatedAt,omitempty"`
 }
 
 func (StoryInfoV2Model) TableName() string {
