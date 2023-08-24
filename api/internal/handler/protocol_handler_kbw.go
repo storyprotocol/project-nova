@@ -199,7 +199,21 @@ func NewGetStoriesHandlerKbw(graphService service.TheGraphService, httpClient xh
 					c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
 					return
 				}
-				story.Characters = characters
+				// 4. Get character metadata from Arweave
+				charactersFinal := []*entity.CharacterInfoModel{}
+				for _, character := range characters {
+					var characterMetaData entity.CharacterMetadata
+					_, err = httpClient.Request("GET", *character.MediaUri, nil, &characterMetaData)
+					if err != nil {
+						logger.Errorf("Failed to get character metadata from remote storage. url: %s, error: %v", *character.MediaUri, err)
+						c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+						return
+					}
+
+					character.ImageUrl = characterMetaData.ImageUrl
+					charactersFinal = append(charactersFinal, character)
+				}
+				story.Characters = charactersFinal
 			}
 
 			storiesFinal = append(storiesFinal, story)
@@ -257,7 +271,21 @@ func NewGetStoryHandlerKbw(graphService service.TheGraphService, httpClient xhtt
 				c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
 				return
 			}
-			story.Characters = characters
+			// 4. Get character metadata from Arweave
+			charactersFinal := []*entity.CharacterInfoModel{}
+			for _, character := range characters {
+				var characterMetaData entity.CharacterMetadata
+				_, err = httpClient.Request("GET", *character.MediaUri, nil, &characterMetaData)
+				if err != nil {
+					logger.Errorf("Failed to get character metadata from remote storage. url: %s, error: %v", *character.MediaUri, err)
+					c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+					return
+				}
+
+				character.ImageUrl = characterMetaData.ImageUrl
+				charactersFinal = append(charactersFinal, character)
+			}
+			story.Characters = charactersFinal
 		}
 
 		c.JSON(http.StatusOK, story)
