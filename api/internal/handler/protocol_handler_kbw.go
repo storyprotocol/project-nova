@@ -110,7 +110,12 @@ func NewGetCharactersHandlerKbw(graphService service.TheGraphService, httpClient
 				logger.Errorf("Failed to get character metadata from remote storage. url: %s, error: %v", *character.MediaUri, err)
 				continue
 			}
-			character.ImageUrl = characterMetaData.ImageUrl
+			if characterMetaData.ImageUrl != nil {
+				character.ImageUrl = characterMetaData.ImageUrl
+			}
+			if characterMetaData.Backstory != "" {
+				character.Backstory = &characterMetaData.Backstory
+			}
 			charactersFinal = append(charactersFinal, character)
 		}
 
@@ -150,7 +155,12 @@ func NewGetCharacterHandlerKbw(graphService service.TheGraphService, httpClient 
 			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
 			return
 		}
-		character.ImageUrl = characterMetaData.ImageUrl
+		if characterMetaData.ImageUrl != nil {
+			character.ImageUrl = characterMetaData.ImageUrl
+		}
+		if characterMetaData.Backstory != "" {
+			character.Backstory = &characterMetaData.Backstory
+		}
 
 		c.JSON(http.StatusOK, character)
 	}
@@ -210,7 +220,12 @@ func NewGetStoriesHandlerKbw(graphService service.TheGraphService, httpClient xh
 						return
 					}
 
-					character.ImageUrl = characterMetaData.ImageUrl
+					if characterMetaData.ImageUrl != nil {
+						character.ImageUrl = characterMetaData.ImageUrl
+					}
+					if characterMetaData.Backstory != "" {
+						character.Backstory = &characterMetaData.Backstory
+					}
 					charactersFinal = append(charactersFinal, character)
 				}
 				story.Characters = charactersFinal
@@ -282,7 +297,12 @@ func NewGetStoryHandlerKbw(graphService service.TheGraphService, httpClient xhtt
 					return
 				}
 
-				character.ImageUrl = characterMetaData.ImageUrl
+				if characterMetaData.ImageUrl != nil {
+					character.ImageUrl = characterMetaData.ImageUrl
+				}
+				if characterMetaData.Backstory != "" {
+					character.Backstory = &characterMetaData.Backstory
+				}
 				charactersFinal = append(charactersFinal, character)
 			}
 			story.Characters = charactersFinal
