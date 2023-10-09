@@ -211,7 +211,7 @@ func main() {
 	protocolV1.Use(cors.Default())
 	{
 		// Endpoint to list all franchise
-		protocolV1.GET("/franchise", handler.NewGetFranchisesHandler(ethClient, franchiseMap))
+		protocolV1.GET("/franchise", handler.NewGetFranchisesHandlerV1(ethClient, franchiseMap))
 
 		// Endpoint to get franchise collections
 		protocolV1.GET("/franchise/:franchiseAddress", handler.NewGetFranchiseCollectionsHandler(ethClient, franchiseMap))
@@ -292,6 +292,37 @@ func main() {
 
 		// Endpoint to get a single license from a story
 		protocolKbw.GET("/license/:licenseId", handler.NewGetLicenseHandlerKbw(theGraphService))
+	}
+
+	protocol := r.Group("/")
+	protocol.Use(cors.Default())
+	{
+		// Endpoint to get franchises
+		protocol.GET("/franchise", handler.NewGetFranchisesHandler(theGraphService, httpClient))
+
+		// Endpoint to get a franchise
+		protocol.GET("/franchise/:franchiseId", handler.NewGetFranchiseHandler(theGraphService, httpClient))
+
+		// Endpoint to get ip assets from a franchise
+		protocol.GET("/ipasset", handler.NewGetIpAssetsHandler(theGraphService, httpClient))
+
+		// Endpoint to get a single ip asset from a franchise
+		protocol.GET("/ipasset/:ipAssetId", handler.NewGetIpAssetHandler(theGraphService, httpClient))
+
+		// Endpoint to get licenses from an ip asset
+		protocol.GET("/license", handler.NewGetLicensesHandler(theGraphService))
+
+		// Endpoint to get a single license
+		protocol.GET("/license/:licenseId", handler.NewGetLicenseHandler(theGraphService))
+
+		// Endpoint to get collections
+		protocol.GET("/collection", handler.NewGetCollectionsHandler(theGraphService))
+
+		// Endpoint to get transactions
+		protocol.GET("/transaction", handler.NewGetTransactionsHandler(theGraphService))
+
+		// Endpoint to get transaction
+		protocol.GET("/transaction/:transactionId", handler.NewGetTransactionHandler(theGraphService))
 	}
 
 	port := fmt.Sprintf(":%d", cfg.Port)

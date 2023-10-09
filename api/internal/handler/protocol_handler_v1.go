@@ -29,7 +29,7 @@ import (
 )
 
 // GET /franchise
-func NewGetFranchisesHandler(client *ethclient.Client, franchiseMap map[string]*config.FranchiseConfig) func(c *gin.Context) {
+func NewGetFranchisesHandlerV1(client *ethclient.Client, franchiseMap map[string]*config.FranchiseConfig) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		var franchise []*config.Franchise
 		for _, franchiseCfg := range franchiseMap {
