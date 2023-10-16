@@ -6,14 +6,14 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/project-nova/backend/api/internal/entity"
-	"github.com/project-nova/backend/api/internal/service"
+	"github.com/project-nova/backend/api/internal/service/thegraph"
 	xhttp "github.com/project-nova/backend/pkg/http"
 	"github.com/project-nova/backend/pkg/logger"
 	"github.com/project-nova/backend/pkg/utils"
 )
 
 // GET /franchise
-func NewGetFranchisesHandlerKbw(graphService service.TheGraphService, httpClient xhttp.Client) func(c *gin.Context) {
+func NewGetFranchisesHandlerKbw(graphService thegraph.TheGraphServiceKbw, httpClient xhttp.Client) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		// 1. call the graph service to get all the franchises
 		franchises, err := graphService.GetFranchises()
@@ -47,7 +47,7 @@ func NewGetFranchisesHandlerKbw(graphService service.TheGraphService, httpClient
 }
 
 // GET /franchise/:franchiseId
-func NewGetFranchiseHandlerKbw(graphService service.TheGraphService, httpClient xhttp.Client) func(c *gin.Context) {
+func NewGetFranchiseHandlerKbw(graphService thegraph.TheGraphServiceKbw, httpClient xhttp.Client) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		franchiseId, err := strconv.ParseInt(c.Param("franchiseId"), 10, 64)
 		if err != nil {
@@ -84,7 +84,7 @@ func NewGetFranchiseHandlerKbw(graphService service.TheGraphService, httpClient 
 }
 
 // GET /character
-func NewGetCharactersHandlerKbw(graphService service.TheGraphService, httpClient xhttp.Client) func(c *gin.Context) {
+func NewGetCharactersHandlerKbw(graphService thegraph.TheGraphServiceKbw, httpClient xhttp.Client) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		franchiseId, err := strconv.ParseInt(c.DefaultQuery("franchiseId", ""), 10, 64)
 		if err != nil {
@@ -124,7 +124,7 @@ func NewGetCharactersHandlerKbw(graphService service.TheGraphService, httpClient
 }
 
 // GET /character/:characterId
-func NewGetCharacterHandlerKbw(graphService service.TheGraphService, httpClient xhttp.Client) func(c *gin.Context) {
+func NewGetCharacterHandlerKbw(graphService thegraph.TheGraphServiceKbw, httpClient xhttp.Client) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		franchiseId, err := strconv.ParseInt(c.DefaultQuery("franchiseId", ""), 10, 64)
 		if err != nil {
@@ -167,7 +167,7 @@ func NewGetCharacterHandlerKbw(graphService service.TheGraphService, httpClient 
 }
 
 // GET /story
-func NewGetStoriesHandlerKbw(graphService service.TheGraphService, httpClient xhttp.Client) func(c *gin.Context) {
+func NewGetStoriesHandlerKbw(graphService thegraph.TheGraphServiceKbw, httpClient xhttp.Client) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		franchiseId, err := strconv.ParseInt(c.DefaultQuery("franchiseId", ""), 10, 64)
 		if err != nil {
@@ -239,7 +239,7 @@ func NewGetStoriesHandlerKbw(graphService service.TheGraphService, httpClient xh
 }
 
 // GET /story/:storyId
-func NewGetStoryHandlerKbw(graphService service.TheGraphService, httpClient xhttp.Client) func(c *gin.Context) {
+func NewGetStoryHandlerKbw(graphService thegraph.TheGraphServiceKbw, httpClient xhttp.Client) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		_, err := strconv.ParseInt(c.Param("storyId"), 10, 64)
 		if err != nil {
@@ -313,7 +313,7 @@ func NewGetStoryHandlerKbw(graphService service.TheGraphService, httpClient xhtt
 }
 
 // GET /license
-func NewGetLicensesHandlerKbw(graphService service.TheGraphService) func(c *gin.Context) {
+func NewGetLicensesHandlerKbw(graphService thegraph.TheGraphServiceKbw) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		_, err := strconv.ParseInt(c.DefaultQuery("ipAssetId", ""), 10, 64)
 		if err != nil {
@@ -358,7 +358,7 @@ func NewGetLicensesHandlerKbw(graphService service.TheGraphService) func(c *gin.
 }
 
 // GET /license/:licenseId
-func NewGetLicenseHandlerKbw(graphService service.TheGraphService) func(c *gin.Context) {
+func NewGetLicenseHandlerKbw(graphService thegraph.TheGraphServiceKbw) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		licenseId, err := strconv.ParseInt(c.Param("licenseId"), 10, 64)
 		if err != nil {

@@ -17,7 +17,7 @@ import (
 	"github.com/project-nova/backend/api/internal/config"
 	"github.com/project-nova/backend/api/internal/handler"
 	"github.com/project-nova/backend/api/internal/repository"
-	"github.com/project-nova/backend/api/internal/service"
+	"github.com/project-nova/backend/api/internal/service/thegraph"
 	"github.com/project-nova/backend/pkg/abi/story_blocks_registry"
 	xconfig "github.com/project-nova/backend/pkg/config"
 	"github.com/project-nova/backend/pkg/constant"
@@ -112,8 +112,11 @@ func main() {
 
 	httpClient := xhttp.NewClient(&xhttp.ClientConfig{})
 
-	theGraphClient := graphql.NewClient("https://api.thegraph.com/subgraphs/name/edisonz0718/kbw-demo")
-	theGraphService := service.NewTheGraphServiceImpl(theGraphClient)
+	theGraphClientKbw := graphql.NewClient("https://api.thegraph.com/subgraphs/name/edisonz0718/kbw-demo")
+	theGraphServiceKbw := thegraph.NewTheGraphServiceKbwImpl(theGraphClientKbw)
+
+	theGraphClientMvp := graphql.NewClient("https://api.thegraph.com/subgraphs/name/edisonz0718/storyprotocol-v0-mvp")
+	theGraphServiceMvp := thegraph.NewTheGraphServiceMvpImpl(theGraphClientMvp)
 
 	storyBlocksRegistry, err := story_blocks_registry.NewStoryBlocksRegistry(
 		common.HexToAddress(cfg.StoryBlocksRegistry),
@@ -270,59 +273,59 @@ func main() {
 	protocolKbw.Use(cors.Default())
 	{
 		// Endpoint to get franchises
-		protocolKbw.GET("/franchise", handler.NewGetFranchisesHandlerKbw(theGraphService, httpClient))
+		protocolKbw.GET("/franchise", handler.NewGetFranchisesHandlerKbw(theGraphServiceKbw, httpClient))
 
 		// Endpoint to get a franchise
-		protocolKbw.GET("/franchise/:franchiseId", handler.NewGetFranchiseHandlerKbw(theGraphService, httpClient))
+		protocolKbw.GET("/franchise/:franchiseId", handler.NewGetFranchiseHandlerKbw(theGraphServiceKbw, httpClient))
 
 		// Endpoint to get characters from a franchise
-		protocolKbw.GET("/character", handler.NewGetCharactersHandlerKbw(theGraphService, httpClient))
+		protocolKbw.GET("/character", handler.NewGetCharactersHandlerKbw(theGraphServiceKbw, httpClient))
 
 		// Endpoint to get a single character from a franchise
-		protocolKbw.GET("/character/:characterId", handler.NewGetCharacterHandlerKbw(theGraphService, httpClient))
+		protocolKbw.GET("/character/:characterId", handler.NewGetCharacterHandlerKbw(theGraphServiceKbw, httpClient))
 
 		// Endpoint to get stories from a franchise
-		protocolKbw.GET("/story", handler.NewGetStoriesHandlerKbw(theGraphService, httpClient))
+		protocolKbw.GET("/story", handler.NewGetStoriesHandlerKbw(theGraphServiceKbw, httpClient))
 
 		// Endpoint to get a single story from a franchise
-		protocolKbw.GET("/story/:storyId", handler.NewGetStoryHandlerKbw(theGraphService, httpClient))
+		protocolKbw.GET("/story/:storyId", handler.NewGetStoryHandlerKbw(theGraphServiceKbw, httpClient))
 
 		// Endpoint to get licenses from a story
-		protocolKbw.GET("/license", handler.NewGetLicensesHandlerKbw(theGraphService))
+		protocolKbw.GET("/license", handler.NewGetLicensesHandlerKbw(theGraphServiceKbw))
 
 		// Endpoint to get a single license from a story
-		protocolKbw.GET("/license/:licenseId", handler.NewGetLicenseHandlerKbw(theGraphService))
+		protocolKbw.GET("/license/:licenseId", handler.NewGetLicenseHandlerKbw(theGraphServiceKbw))
 	}
 
 	protocol := r.Group("/")
 	protocol.Use(cors.Default())
 	{
 		// Endpoint to get franchises
-		protocol.GET("/franchise", handler.NewGetFranchisesHandler(theGraphService, httpClient))
+		protocol.GET("/franchise", handler.NewGetFranchisesHandler(theGraphServiceMvp, httpClient))
 
 		// Endpoint to get a franchise
-		protocol.GET("/franchise/:franchiseId", handler.NewGetFranchiseHandler(theGraphService, httpClient))
+		protocol.GET("/franchise/:franchiseId", handler.NewGetFranchiseHandler(theGraphServiceMvp, httpClient))
 
 		// Endpoint to get ip assets from a franchise
-		protocol.GET("/ipasset", handler.NewGetIpAssetsHandler(theGraphService, httpClient))
+		protocol.GET("/ipasset", handler.NewGetIpAssetsHandler(theGraphServiceMvp, httpClient))
 
 		// Endpoint to get a single ip asset from a franchise
-		protocol.GET("/ipasset/:ipAssetId", handler.NewGetIpAssetHandler(theGraphService, httpClient))
+		protocol.GET("/ipasset/:ipAssetId", handler.NewGetIpAssetHandler(theGraphServiceMvp, httpClient))
 
 		// Endpoint to get licenses from an ip asset
-		protocol.GET("/license", handler.NewGetLicensesHandler(theGraphService))
+		protocol.GET("/license", handler.NewGetLicensesHandler(theGraphServiceMvp))
 
 		// Endpoint to get a single license
-		protocol.GET("/license/:licenseId", handler.NewGetLicenseHandler(theGraphService))
+		protocol.GET("/license/:licenseId", handler.NewGetLicenseHandler(theGraphServiceMvp))
 
 		// Endpoint to get collections
-		protocol.GET("/collection", handler.NewGetCollectionsHandler(theGraphService))
+		protocol.GET("/collection", handler.NewGetCollectionsHandler(theGraphServiceMvp))
 
 		// Endpoint to get transactions
-		protocol.GET("/transaction", handler.NewGetTransactionsHandler(theGraphService))
+		protocol.GET("/transaction", handler.NewGetTransactionsHandler(theGraphServiceMvp))
 
 		// Endpoint to get transaction
-		protocol.GET("/transaction/:transactionId", handler.NewGetTransactionHandler(theGraphService))
+		protocol.GET("/transaction/:transactionId", handler.NewGetTransactionHandler(theGraphServiceMvp))
 	}
 
 	port := fmt.Sprintf(":%d", cfg.Port)

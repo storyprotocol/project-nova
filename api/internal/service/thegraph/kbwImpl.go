@@ -1,4 +1,4 @@
-package service
+package thegraph
 
 import (
 	"context"
@@ -9,30 +9,17 @@ import (
 	"github.com/project-nova/backend/pkg/logger"
 )
 
-type TheGraphService interface {
-	GetFranchises() ([]*entity.Franchise, error)
-	GetFranchise(franchiseId int64) (*entity.Franchise, error)
-	GetCharactersByCharacterIds(franchiseId int64, characterIds []string) ([]*entity.CharacterInfoModel, error)
-	GetCharacters(franchiseId int64) ([]*entity.CharacterInfoModel, error)
-	GetCharacter(franchiseId int64, characterId string) (*entity.CharacterInfoModel, error)
-	GetStories(franchiseId int64) ([]*entity.StoryInfoV2Model, error)
-	GetStory(franchiseId int64, storyId string) (*entity.StoryInfoV2Model, error)
-	GetLicensesByIpAsset(franchiseId int64, ipAssetId string) ([]*entity.License, error)
-	GetLicensesByProfile(franchiseId int64, ipAssetId string, walletAddress string) ([]*entity.License, error)
-	GetLicense(licenseId int64) (*entity.License, error)
-}
-
-func NewTheGraphServiceImpl(client *graphql.Client) TheGraphService {
-	return &theGraphServiceImpl{
+func NewTheGraphServiceKbwImpl(client *graphql.Client) TheGraphServiceKbw {
+	return &theGraphServiceKbwImpl{
 		client: client,
 	}
 }
 
-type theGraphServiceImpl struct {
+type theGraphServiceKbwImpl struct {
 	client *graphql.Client
 }
 
-func (c *theGraphServiceImpl) GetFranchises() ([]*entity.Franchise, error) {
+func (c *theGraphServiceKbwImpl) GetFranchises() ([]*entity.Franchise, error) {
 	req := graphql.NewRequest(`
     {
 		franchiseRegistereds {
@@ -60,7 +47,7 @@ func (c *theGraphServiceImpl) GetFranchises() ([]*entity.Franchise, error) {
 	return franchises, nil
 }
 
-func (c *theGraphServiceImpl) GetFranchise(franchiseId int64) (*entity.Franchise, error) {
+func (c *theGraphServiceKbwImpl) GetFranchise(franchiseId int64) (*entity.Franchise, error) {
 	req := graphql.NewRequest(`
     query($franchiseId: BigInt) {
 		franchiseRegistereds(where: {franchiseId: $franchiseId}) {
@@ -88,7 +75,7 @@ func (c *theGraphServiceImpl) GetFranchise(franchiseId int64) (*entity.Franchise
 	return franchiseResponse.FranchisesRegistered[0].ToFranchise(), nil
 }
 
-func (c *theGraphServiceImpl) GetCharactersByCharacterIds(franchiseId int64, characterIds []string) ([]*entity.CharacterInfoModel, error) {
+func (c *theGraphServiceKbwImpl) GetCharactersByCharacterIds(franchiseId int64, characterIds []string) ([]*entity.CharacterInfoModel, error) {
 	req := graphql.NewRequest(`
 	query($franchiseId: BigInt, $characterIds: [String]) {
 		ipassetCreateds(where: { and: [{ ipAssetType: 2 }, { franchiseId: $franchiseId }, { ipAssetId_in: $characterIds }]}) {
@@ -123,7 +110,7 @@ func (c *theGraphServiceImpl) GetCharactersByCharacterIds(franchiseId int64, cha
 	return characters, nil
 }
 
-func (c *theGraphServiceImpl) GetCharacters(franchiseId int64) ([]*entity.CharacterInfoModel, error) {
+func (c *theGraphServiceKbwImpl) GetCharacters(franchiseId int64) ([]*entity.CharacterInfoModel, error) {
 	req := graphql.NewRequest(`
 	query($franchiseId: BigInt) {
 		ipassetCreateds(where: { and: [{ ipAssetType: 2 }, { franchiseId: $franchiseId }]}) {
@@ -157,7 +144,7 @@ func (c *theGraphServiceImpl) GetCharacters(franchiseId int64) ([]*entity.Charac
 	return characters, nil
 }
 
-func (c *theGraphServiceImpl) GetCharacter(franchiseId int64, characterId string) (*entity.CharacterInfoModel, error) {
+func (c *theGraphServiceKbwImpl) GetCharacter(franchiseId int64, characterId string) (*entity.CharacterInfoModel, error) {
 	req := graphql.NewRequest(`
     query($franchiseId: BigInt, $characterId: BigInt) {
 		ipassetCreateds(where: { and: [{ ipAssetType: 2 }, { franchiseId: $franchiseId }, { ipAssetId: $characterId }]}) {
@@ -191,7 +178,7 @@ func (c *theGraphServiceImpl) GetCharacter(franchiseId int64, characterId string
 	return characterInfo, nil
 }
 
-func (c *theGraphServiceImpl) GetStories(franchiseId int64) ([]*entity.StoryInfoV2Model, error) {
+func (c *theGraphServiceKbwImpl) GetStories(franchiseId int64) ([]*entity.StoryInfoV2Model, error) {
 	req := graphql.NewRequest(`
     query($franchiseId: BigInt) {
 		ipassetCreateds(where: { and: [{ ipAssetType: 1 }, { franchiseId: $franchiseId }]}) {
@@ -225,7 +212,7 @@ func (c *theGraphServiceImpl) GetStories(franchiseId int64) ([]*entity.StoryInfo
 	return stories, nil
 }
 
-func (c *theGraphServiceImpl) GetStory(franchiseId int64, storyId string) (*entity.StoryInfoV2Model, error) {
+func (c *theGraphServiceKbwImpl) GetStory(franchiseId int64, storyId string) (*entity.StoryInfoV2Model, error) {
 	req := graphql.NewRequest(`
     query($franchiseId: BigInt, $storyId: BigInt) {
 		ipassetCreateds(where: { and: [{ ipAssetType: 1 }, { franchiseId: $franchiseId }, { ipAssetId: $storyId }]}) {
@@ -259,7 +246,7 @@ func (c *theGraphServiceImpl) GetStory(franchiseId int64, storyId string) (*enti
 	return storyInfo, nil
 }
 
-func (c *theGraphServiceImpl) GetLicensesByIpAsset(franchiseId int64, ipAssetId string) ([]*entity.License, error) {
+func (c *theGraphServiceKbwImpl) GetLicensesByIpAsset(franchiseId int64, ipAssetId string) ([]*entity.License, error) {
 	req := graphql.NewRequest(`
     query($franchiseId: BigInt, $ipAssetId: BigInt) {
 		licenseGranteds(where: { and: [{ franchiseId: $franchiseId }, { storyId: $ipAssetId }]}) {
@@ -298,7 +285,7 @@ func (c *theGraphServiceImpl) GetLicensesByIpAsset(franchiseId int64, ipAssetId 
 	return licenses, nil
 }
 
-func (c *theGraphServiceImpl) GetLicensesByProfile(franchiseId int64, ipAssetId string, walletAddress string) ([]*entity.License, error) {
+func (c *theGraphServiceKbwImpl) GetLicensesByProfile(franchiseId int64, ipAssetId string, walletAddress string) ([]*entity.License, error) {
 	req := graphql.NewRequest(`
     query($franchiseId: BigInt, $ipAssetId: BigInt, $walletAddress: String) {
 		licenseGranteds(where: { and: [{ franchiseId: $franchiseId }, { storyId: $ipAssetId }, { owner: $walletAddress }]}) {
@@ -338,7 +325,7 @@ func (c *theGraphServiceImpl) GetLicensesByProfile(franchiseId int64, ipAssetId 
 	return licenses, nil
 }
 
-func (c *theGraphServiceImpl) GetLicense(licenseId int64) (*entity.License, error) {
+func (c *theGraphServiceKbwImpl) GetLicense(licenseId int64) (*entity.License, error) {
 	req := graphql.NewRequest(`
     query($licenseId: BigInt) {
 		licenseGranteds(where: {licenseId: $licenseId}) {
