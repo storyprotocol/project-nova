@@ -18,9 +18,15 @@ type IpAssetType string
 var IpAssetTypes = struct {
 	Story     IpAssetType
 	Character IpAssetType
+	Art       IpAssetType
+	Group     IpAssetType
+	Location  IpAssetType
 }{
-	Story:     "STORY",
-	Character: "CHARACTER",
+	Story:     "Story",
+	Character: "Character",
+	Art:       "Art",
+	Group:     "Group",
+	Location:  "Location",
 }
 
 type IpAssetMVP struct {
@@ -59,11 +65,11 @@ var ResourceTypes = struct {
 	Relationship ResourceType
 	Collection   ResourceType
 }{
-	Franchise:    "FRANCHISE",
-	IpAsset:      "IP_ASSET",
-	License:      "LICENSE",
-	Relationship: "RELATIONSHIP",
-	Collection:   "COLLECTION",
+	Franchise:    "Franchise",
+	IpAsset:      "IPAsset",
+	License:      "License",
+	Relationship: "Relationship",
+	Collection:   "Collection",
 }
 
 type TransactionMVP struct {
