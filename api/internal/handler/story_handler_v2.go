@@ -107,7 +107,7 @@ func NewAdminUploadStoryContentHandlerV2(
 		resp, err := web3Gateway.UploadContent(&web3_gateway.UploadContentReq{
 			Storage:     web3_gateway.StorageType_ARWEAVE,
 			Content:     []byte(contentBase64),
-			ContentType: web3_gateway.ContentType_MARKDOWN,
+			ContentType: "text/markdown",
 			Tags: []*web3_gateway.Tag{
 				{
 					Name:  "franchise",

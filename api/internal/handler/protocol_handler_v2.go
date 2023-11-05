@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"math/big"
 	"net/http"
 	"strconv"
@@ -120,7 +121,7 @@ func NewCreateCharacterHandlerV2(
 		resp, err := web3Gateway.UploadContent(&web3_gateway.UploadContentReq{
 			Storage:     web3_gateway.StorageType_ARWEAVE,
 			Content:     []byte(contentBase64),
-			ContentType: web3_gateway.ContentType_MARKDOWN,
+			ContentType: "text/markdown",
 			Tags: []*web3_gateway.Tag{
 				{
 					Name:  "Content-Type",
@@ -222,12 +223,49 @@ func NewGetStoryHandlerV2(
 	}
 }
 
+// POST /files/upload
+func NewUploadFileHandlerV2(
+	web3Gateway gateway.Web3GatewayClient,
+) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		form, _ := c.MultipartForm()
+		files := form.File["file[]"]
+		logger.Infof("files: %v", files)
+
+		contentUrl := []string{}
+		for _, file := range files {
+			contentType := c.PostForm("content_type")
+			// Get the file bytes in memory
+			f, _ := file.Open()
+			fileBytes, _ := ioutil.ReadAll(f)
+
+			resp, err := web3Gateway.UploadContent(&web3_gateway.UploadContentReq{
+				Storage:     web3_gateway.StorageType_ARWEAVE,
+				Content:     fileBytes,
+				ContentType: contentType,
+			})
+			if err != nil {
+				logger.Errorf("Failed to upload content to web3-gateway: %v", err)
+				contentUrl = append(contentUrl, "")
+				continue
+			}
+			contentUrl = append(contentUrl, resp.ContentUrl)
+			logger.Infof("file size: %d, content-type: %s", len(fileBytes), contentType)
+		}
+
+		c.JSON(http.StatusOK, &entity.FileUploadResp{
+			URIs: contentUrl,
+		})
+	}
+}
+
 // POST /story/:franchiseId
 func NewCreateStoryHandlerV2(
 	web3Gateway gateway.Web3GatewayClient,
 ) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		franchiseId, err := strconv.ParseInt(c.Param("franchiseId"), 10, 64)
+		logger.Infof(">>> franchiseId: %d", franchiseId)
 		if err != nil {
 			logger.Errorf("Invalid franchise id: %s", c.Param("franchiseId"))
 			c.JSON(http.StatusBadRequest, ErrorMessage("Invalid franchise id"))
@@ -416,17 +454,10 @@ func createStoryV2(
 		return nil, fmt.Errorf("failed to marshal the story meta: %v", err)
 	}
 
-	contentBase64 := base64.StdEncoding.EncodeToString(storyMetaBytes)
 	resp, err := web3Gateway.UploadContent(&web3_gateway.UploadContentReq{
 		Storage:     web3_gateway.StorageType_ARWEAVE,
-		Content:     []byte(contentBase64),
-		ContentType: web3_gateway.ContentType_MARKDOWN,
-		Tags: []*web3_gateway.Tag{
-			{
-				Name:  "Content-Type",
-				Value: "application/json",
-			},
-		},
+		Content:     storyMetaBytes,
+		ContentType: "application/json",
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to upload content to web3-gateway: %v", err)

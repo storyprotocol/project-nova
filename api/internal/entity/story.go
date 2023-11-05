@@ -250,3 +250,7 @@ func (f *IpAssetTheGraph) ToStoryInfoV2() (*StoryInfoV2Model, error) {
 	}
 	return story, err
 }
+
+type FileUploadResp struct {
+	URIs []string `json:"uris"`
+}

@@ -1,5 +1,5 @@
 import NodeBundlr from '@bundlr-network/client/build/cjs/node/bundlr';
-import { ContentType, Tag } from '../proto/proto/v1/web3_gateway/storage';
+import { Tag } from '../proto/proto/v1/web3_gateway/storage';
 import { ArweaveConfig } from '../config/config';
 import { logger } from '../util';
 
@@ -13,26 +13,20 @@ export class ArweaveService {
 
   public async uploadContent(
     content: Buffer,
-    contentType: ContentType,
+    contentType: string,
     tags: Tag[],
   ): Promise<string> {
+    // don't add Content-type tag if it already exists
+    const hasContentTypeTag =
+      tags && tags.some((t) => t.name.toLowerCase() === 'content-type');
+
+    tags = hasContentTypeTag
+      ? tags
+      : [{ name: 'Content-Type', value: contentType }, ...(tags ?? [])];
+
     try {
-      switch (contentType) {
-        case ContentType.MARKDOWN: {
-          const contentDecoded = atob(content.toString());
-          const response = await this.bundler.upload(contentDecoded, { tags });
-          return `${this.cfg.base_url}` + `${response.id}`;
-        }
-        default: {
-          logger.error(
-            'Unrecognized content type: ',
-            `${contentType.toString()}`,
-          );
-          throw new Error(
-            `Unrecognized content type: ${contentType.toString()}`,
-          );
-        }
-      }
+      const response = await this.bundler.upload(content, { tags });
+      return `${this.cfg.base_url}` + `${response.id}`;
     } catch (e) {
       logger.error('failed to upload content to Arweave', e);
       throw new Error(`failed to upload content to Arweave: ${e}`);

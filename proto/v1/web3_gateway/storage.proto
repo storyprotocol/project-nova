@@ -10,11 +10,6 @@ enum StorageType {
     IPFS = 2;
 }
 
-enum ContentType {
-    UNSPECIFIED_CONTENT_TYPE = 0;
-    MARKDOWN = 1;
-}
-
 message Tag {
     string name = 1;
     string value = 2;
@@ -23,7 +18,7 @@ message Tag {
 message UploadContentReq {	
   StorageType storage = 1;
   bytes content = 2;
-  ContentType content_type = 3;   
+  string content_type = 3;   
   repeated Tag tags = 4;
 }
 
