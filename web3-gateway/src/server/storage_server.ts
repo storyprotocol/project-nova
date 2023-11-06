@@ -36,7 +36,13 @@ export class StorageServer implements StorageServiceServer {
           const contentUrl = await (
             this.arweaveService as ArweaveService
           ).uploadContent(content, contentType, tags);
-          console.log(contentUrl);
+          logger.info(
+            'Uploaded content to Arweave: ',
+            `${contentUrl}`,
+            `${contentType}`,
+            `${content.length}`,
+            tags,
+          );
           callback(
             null,
             UploadContentResp.fromJSON({

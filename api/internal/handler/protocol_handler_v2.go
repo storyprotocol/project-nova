@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"bytes"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -228,7 +229,27 @@ func NewUploadFileHandlerV2(
 	web3Gateway gateway.Web3GatewayClient,
 ) func(c *gin.Context) {
 	return func(c *gin.Context) {
-		form, _ := c.MultipartForm()
+		body, err := ioutil.ReadAll(c.Request.Body)
+		if err != nil {
+			// Handle error
+			logger.Errorf("Failed to read request body: %v", err)
+			c.JSON(http.StatusBadRequest, ErrorMessage("Invalid request"))
+			return
+		}
+
+		// Log the request body
+		logger.Infof("Request body: %s", string(body))
+
+		// Reset the request body so it can be read again later
+		c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(body))
+
+		form, err := c.MultipartForm()
+		if err != nil {
+			logger.Errorf("Failed to read multipart form: %v", err)
+			c.JSON(http.StatusBadRequest, ErrorMessage("Invalid request"))
+			return
+		}
+
 		files := form.File["file[]"]
 		logger.Infof("files: %v", files)
 
