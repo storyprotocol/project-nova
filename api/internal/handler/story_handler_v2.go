@@ -16,6 +16,164 @@ import (
 	"github.com/project-nova/backend/proto/v1/web3_gateway"
 )
 
+// GET /franchise/:franchiseId/stories/:storyId
+func NewGetStoryDetailHandlerV2() func(c *gin.Context) {
+	return func(c *gin.Context) {
+		c.JSON(http.StatusOK, entity.StoryV2{
+			ID:           "1",
+			Title:        "A Tale of Two Cities",
+			Introduction: "A novel by Charles Dickens, is set against the backdrop of the French Revolution and explores themes of resurrection, sacrifice, and the struggle between tyranny and freedom. The story unfolds in two cities: London and Paris. It opens with the famous lines, 'It was the best of times, it was the worst of times,' reflecting the contradictions of the era. Central characters include Charles Darnay, a French aristocrat who renounces his heritage for a modest life in England, and Sydney Carton, a dissipated English lawyer whose love for Darnay's wife, Lucie Manette, inspires profound self-sacrifice. Lucie's father, Dr. Manette, unjustly imprisoned in the Bastille for 18 years, embodies the trauma of the old regime's brutality. The novel is a rich tapestry of love, honor, and redemption, played out against the grim realities of the Revolution.",
+			Image:        "https://cdn.discordapp.com/attachments/1091875369864413214/1173056228990136340/Screenshot_2023-11-11_at_4.26.16_PM.png?ex=656290bf&is=65501bbf&hm=5f7a5f69e14c29c0c9f9172243b9bda49d03ea05e74c7c0625eddd030ae9eada&",
+			WordCount:    1000,
+			Addresses: []entity.ContentAddress{
+				{
+					Type:    "arweave",
+					Address: "https://arweave.net/1",
+				},
+				{
+					Type:    "owner",
+					Address: "0x8fbad875c3485f64bc1fad98595dec4f7b0f225d",
+				},
+				{
+					Type:    "nft",
+					Address: "0x8fbad875c3485f64bc1fad98595dec4f7b0f225d",
+				},
+			},
+			Author: entity.Author{
+				ID:           "1",
+				Name:         "Charles Dickens",
+				Introduction: "Charles John Huffam Dickens FRSA was an English writer and social critic. He created some of the world's best-known fictional characters and is regarded by many as the greatest novelist of the Victorian era. His works enjoyed unprecedented popularity during his lifetime, and by the 20th century, critics and scholars had recognised him as a literary genius. His novels and short stories are still widely read today.",
+				Image:        "https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/Dickens_Gurney_head.jpg/220px-Dickens_Gurney_head.jpg",
+				Addresses: []entity.ContentAddress{
+					{
+						Type:    "ethereum",
+						Address: "0x8fbad875c3485f64bc1fad98595dec4f7b0f225d",
+					},
+				},
+			},
+			Assets: []entity.Asset{
+				{
+					ID:    "1",
+					Type:  "character",
+					Name:  "Charles Darnay",
+					Image: "https://static.wikia.nocookie.net/classical-literature/images/5/50/Darnay1958.png/revision/latest?cb=20230222192722",
+					Addresses: []entity.ContentAddress{
+						{
+							Type:    "arweave",
+							Address: "https://arweave.net/1",
+						},
+						{
+							Type:    "ethereum",
+							Address: "0x8fbad875c3485f64bc1fad98595dec4f7b0f225d",
+						},
+						{
+							Type:    "nft",
+							Address: "0x8fbad875c3485f64bc1fad98595dec4f7b0f225d",
+						},
+					},
+				},
+				{
+					ID:    "2",
+					Type:  "character",
+					Name:  "Sydney Carton",
+					Image: "https://static.wikia.nocookie.net/classical-literature/images/5/50/Darnay1958.png/revision/latest?cb=20230222192722",
+					Addresses: []entity.ContentAddress{
+						{
+							Type:    "arweave",
+							Address: "https://arweave.net/1",
+						},
+						{
+							Type:    "ethereum",
+							Address: "0x8fbad875c3485f64bc1fad98595dec4f7b0f225d",
+						},
+						{
+							Type:    "nft",
+							Address: "0x8fbad875c3485f64bc1fad98595dec4f7b0f225d",
+						},
+					},
+				},
+			},
+			Chapters: []entity.Chapter{
+				{
+					ID:        "1",
+					Title:     "Chapter 1",
+					Content:   "It was the best of times, it was the worst of times, it was the age of wisdom, it was the age of foolishness, it was the epoch of belief, it was the epoch of incredulity, it was the season of Light, it was the season of Darkness, it was the spring of hope, it was the winter of despair, we had everything before us, we had nothing before us, we were all going direct to Heaven, we were all going direct the other way—in short, the period was so far like the present period, that some of its noisiest authorities insisted on its being received, for good or for evil, in the superlative degree of comparison only.",
+					WordCount: 1000,
+				},
+				{
+					ID:        "2",
+					Title:     "Chapter 2",
+					Content:   "It was the best of times, it was the worst of times, it was the age of wisdom, it was the age of foolishness, it was the epoch of belief, it was the epoch of incredulity",
+					WordCount: 1000,
+				},
+			},
+		})
+	}
+}
+
+// GET /franchise/:franchiseId/stories
+func NewListFranchiseStoriesHandlerV2() func(c *gin.Context) {
+	return func(c *gin.Context) {
+		c.JSON(http.StatusOK, entity.StoriesV2{
+			Stories: []*entity.StoryV2{
+				{
+					ID:           "1",
+					Title:        "A Tale of Two Cities",
+					Introduction: "A novel by Charles Dickens, is set against the backdrop of the French Revolution and explores themes of resurrection, sacrifice, and the struggle between tyranny and freedom. The story unfolds in two cities: London and Paris. It opens with the famous lines, 'It was the best of times, it was the worst of times,' reflecting the contradictions of the era. Central characters include Charles Darnay, a French aristocrat who renounces his heritage for a modest life in England, and Sydney Carton, a dissipated English lawyer whose love for Darnay's wife, Lucie Manette, inspires profound self-sacrifice. Lucie's father, Dr. Manette, unjustly imprisoned in the Bastille for 18 years, embodies the trauma of the old regime's brutality. The novel is a rich tapestry of love, honor, and redemption, played out against the grim realities of the Revolution.",
+					Image:        "https://cdn.discordapp.com/attachments/1091875369864413214/1173056228990136340/Screenshot_2023-11-11_at_4.26.16_PM.png?ex=656290bf&is=65501bbf&hm=5f7a5f69e14c29c0c9f9172243b9bda49d03ea05e74c7c0625eddd030ae9eada&",
+					WordCount:    1000,
+					Addresses: []entity.ContentAddress{
+						{
+							Type:    "arweave",
+							Address: "https://arweave.net/1",
+						},
+						{
+							Type:    "ethereum",
+							Address: "0x8fbad875c3485f64bc1fad98595dec4f7b0f225d",
+						},
+						{
+							Type:    "nft",
+							Address: "0x8fbad875c3485f64bc1fad98595dec4f7b0f225d",
+						},
+					},
+					Author: entity.Author{
+						ID:   "1",
+						Name: "Charles Dickens",
+					},
+				},
+				// do the same format but for another novel
+				{
+					ID:           "2",
+					Title:        "The Great Gatsby",
+					Introduction: "The Great Gatsby is a 1925 novel by American writer F. Scott Fitzgerald. Set in the Jazz Age on Long Island, the novel depicts narrator Nick Carraway's interactions with mysterious millionaire Jay Gatsby and Gatsby's obsession to reunite with his former lover, Daisy Buchanan.",
+					Image:        "https://cdn.discordapp.com/attachments/1091875369864413214/1173056228990136340/Screenshot_2023-11-11_at_4.26.16_PM.png?ex=656290bf&is=65501bbf&hm=5f7a5f69e14c29c0c9f9172243b9bda49d03ea05e74c7c0625eddd030ae9eada&",
+					WordCount:    1000,
+					Addresses: []entity.ContentAddress{
+						{
+							Type:    "arweave",
+							Address: "https://arweave.net/1",
+						},
+						{
+							Type:    "owner",
+							Address: "0x8fbad875c3485f64bc1fad98595dec4f7b0f225d",
+						},
+						{
+							Type: "nft",
+
+							Address: "0x8fbad875c3485f64bc1fad98595dec4f7b0f225d",
+						},
+					},
+
+					Author: entity.Author{
+						ID:   "2",
+						Name: "F. Scott Fitzgerald",
+					},
+				},
+			},
+		})
+	}
+}
+
 // GET /story/:franchiseId/:storyId/:chapterId
 func NewGetStoryContentHandlerV2(
 	contentRepo repository.ProtocolStoryContentRepository,

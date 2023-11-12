@@ -173,3 +173,47 @@ type ContentPageInfoV2 struct {
 	Title   *string `json:"title"`
 	Banner  *string `json:"banner"`
 }
+
+type ContentAddress struct {
+	Type    string `json:"type"`
+	Address string `json:"address"`
+}
+
+type StoryV2 struct {
+	ID           string           `json:"id"`
+	Title        string           `json:"title"`
+	Introduction string           `json:"introduction"`
+	Image        string           `json:"image"`
+	WordCount    int              `json:"wordCount"`
+	Addresses    []ContentAddress `json:"addresses"`
+	Author       Author           `json:"author"`
+	Assets       []Asset          `json:"assets"`
+	Chapters     []Chapter        `json:"chapters"`
+}
+
+type Asset struct {
+	ID        string           `json:"id"`
+	Type      string           `json:"type"`
+	Name      string           `json:"name"`
+	Image     string           `json:"image"`
+	Addresses []ContentAddress `json:"addresses"`
+}
+
+type Chapter struct {
+	ID        string `json:"id"`
+	Title     string `json:"title"`
+	Content   string `json:"content"`
+	WordCount int    `json:"wordCount"`
+}
+
+type Author struct {
+	ID           string           `json:"id"`
+	Name         string           `json:"name"`
+	Introduction string           `json:"introduction"`
+	Image        string           `json:"image"`
+	Addresses    []ContentAddress `json:"addresses"`
+}
+
+type StoriesV2 struct {
+	Stories []*StoryV2 `json:"stories"`
+}

@@ -270,6 +270,12 @@ func main() {
 
 		// Endpoint for uploading a generic file to Arweave
 		protocolV2.POST("/files/upload", handler.NewUploadFileHandlerV2(web3Gateway))
+
+		// Endpoint for listing all stories in a franchise
+		protocolV2.GET("/franchise/:franchiseId", handler.NewListFranchiseStoriesHandlerV2())
+
+		// Endpoint for getting the detail information about a franchise story
+		protocolV2.GET("/franchise/:franchiseId/stories/:storyId", handler.NewGetStoryDetailHandlerV2())
 	}
 
 	protocolKbw := r.Group("/protocol/kbw")
