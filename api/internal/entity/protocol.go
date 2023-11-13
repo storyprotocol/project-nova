@@ -217,3 +217,8 @@ type Author struct {
 type StoriesV2 struct {
 	Stories []*StoryV2 `json:"stories"`
 }
+
+type UploadFileRequestBody struct {
+	Base64      string `json:"base64"`
+	ContentType string `json:"contentType"`
+}

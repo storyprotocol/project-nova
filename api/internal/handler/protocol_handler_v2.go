@@ -4,7 +4,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"math/big"
 	"net/http"
 	"strconv"
@@ -228,42 +227,76 @@ func NewUploadFileHandlerV2(
 	web3Gateway gateway.Web3GatewayClient,
 ) func(c *gin.Context) {
 	return func(c *gin.Context) {
-		headers := c.Request.Header
-		logger.Infof("headers: %v", headers)
-		form, err := c.MultipartForm()
-		if err != nil {
-			logger.Errorf("Failed to read multipart form: %v", err)
-			c.JSON(http.StatusBadRequest, ErrorMessage("Invalid request"))
+		var requestBody entity.UploadFileRequestBody
+		if err := c.BindJSON(&requestBody); err != nil {
+			logger.Errorf("Failed to read request body: %v", err)
+			c.JSON(http.StatusBadRequest, ErrorMessage("invalid request body"))
 			return
 		}
 
-		files := form.File["file[]"]
-		logger.Infof("files: %v", files)
+		// decode base64 string into byte array
+		decoded, err := base64.StdEncoding.DecodeString(requestBody.Base64)
+		if err != nil {
+			logger.Errorf("Failed to decode base64 string: %v", err)
+			c.JSON(http.StatusBadRequest, ErrorMessage("invalid base64 string"))
+			return
+		}
 
-		contentUrl := []string{}
-		for _, file := range files {
-			contentType := c.PostForm("content_type")
-			// Get the file bytes in memory
-			f, _ := file.Open()
-			fileBytes, _ := ioutil.ReadAll(f)
-
-			resp, err := web3Gateway.UploadContent(&web3_gateway.UploadContentReq{
-				Storage:     web3_gateway.StorageType_ARWEAVE,
-				Content:     fileBytes,
-				ContentType: contentType,
-			})
-			if err != nil {
-				logger.Errorf("Failed to upload content to web3-gateway: %v", err)
-				contentUrl = append(contentUrl, "")
-				continue
-			}
-			contentUrl = append(contentUrl, resp.ContentUrl)
-			logger.Infof("file size: %d, content-type: %s", len(fileBytes), contentType)
+		resp, err := web3Gateway.UploadContent(&web3_gateway.UploadContentReq{
+			Storage:     web3_gateway.StorageType_ARWEAVE,
+			Content:     decoded,
+			ContentType: requestBody.ContentType,
+		})
+		if err != nil {
+			logger.Errorf("Failed to upload content to web3-gateway: %v", err)
+			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+			return
+		}
+		contentUrl := []string{
+			resp.ContentUrl,
 		}
 
 		c.JSON(http.StatusOK, &entity.FileUploadResp{
 			URIs: contentUrl,
 		})
+
+		// TODO(Rex): Re-enable until S3 permission is fixed
+		// headers := c.Request.Header
+		// logger.Infof("headers: %v", headers)
+		// form, err := c.MultipartForm()
+		// if err != nil {
+		// 	logger.Errorf("Failed to read multipart form: %v", err)
+		// 	c.JSON(http.StatusBadRequest, ErrorMessage("Invalid request"))
+		// 	return
+		// }
+
+		// files := form.File["file[]"]
+		// logger.Infof("files: %v", files)
+
+		// contentUrl := []string{}
+		// for _, file := range files {
+		// 	contentType := c.PostForm("content_type")
+		// 	// Get the file bytes in memory
+		// 	f, _ := file.Open()
+		// 	fileBytes, _ := ioutil.ReadAll(f)
+
+		// 	resp, err := web3Gateway.UploadContent(&web3_gateway.UploadContentReq{
+		// 		Storage:     web3_gateway.StorageType_ARWEAVE,
+		// 		Content:     fileBytes,
+		// 		ContentType: contentType,
+		// 	})
+		// 	if err != nil {
+		// 		logger.Errorf("Failed to upload content to web3-gateway: %v", err)
+		// 		contentUrl = append(contentUrl, "")
+		// 		continue
+		// 	}
+		// 	contentUrl = append(contentUrl, resp.ContentUrl)
+		// 	logger.Infof("file size: %d, content-type: %s", len(fileBytes), contentType)
+		// }
+
+		// c.JSON(http.StatusOK, &entity.FileUploadResp{
+		// 	URIs: contentUrl,
+		// })
 	}
 }
 
