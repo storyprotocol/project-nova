@@ -252,12 +252,8 @@ func NewUploadFileHandlerV2(
 			c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
 			return
 		}
-		contentUrl := []string{
-			resp.ContentUrl,
-		}
-
 		c.JSON(http.StatusOK, &entity.FileUploadResp{
-			URIs: contentUrl,
+			URI: resp.ContentUrl,
 		})
 
 		// TODO(Rex): Re-enable until S3 permission is fixed
