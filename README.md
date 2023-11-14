@@ -2,6 +2,35 @@
 
 Story Protocol backend provides the protocol data indexing and API services for other products and services 
 
+## Onboarding
+
+### Tool Installation
+* Install make `xcode-select --install`
+* Install docker: https://docs.docker.com/docker-for-mac/install/
+* Install golang: https://jimkang.medium.com/install-go-on-mac-with-homebrew-5fa421fc55f5
+* Install protoc: `go get -u github.com/golang/protobuf/{proto,protoc-gen-go}`
+* Install AWS CLI: https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
+* Install AWS iam authencator: https://docs.aws.amazon.com/eks/latest/userguide/install-aws-iam-authenticator.html
+* Install kubectl: https://kubernetes.io/docs/tasks/tools/
+* Install kubectx: `brew install kubectx`
+* Install k9s: `brew install k9s`
+
+
+### Infrastructure Setup
+* Ask admin to 1) create a new profile for you 2) get you access to the k8s cluster
+* Setup your profile with `aws configure set`
+* Login SSO with `aws sso login`
+* Verify your ECR access with `make ecr-auth` and you should see "Login Succeeded"
+* ? setup eks locally 
+* Verify your EKS access with command `k9s`, and you should see cluster information with no errors
+
+
+### Web3-gateway
+* Install typescript: 
+
+
+### API service
+
 ## Prerequisites
 - Install Docker
 - Install Go

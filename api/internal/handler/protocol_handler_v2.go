@@ -7,6 +7,7 @@ import (
 	"math/big"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -234,8 +235,18 @@ func NewUploadFileHandlerV2(
 			return
 		}
 
+		// remove file information prefix for base64 if exists
+		base64String := requestBody.Base64
+		parts := strings.Split(base64String, ",")
+		if len(parts) > 1 {
+			// Check if meta information prefix exists
+			if strings.HasPrefix(parts[0], "data:") {
+				base64String = strings.Join(parts[1:], ",")
+			}
+		}
+
 		// decode base64 string into byte array
-		decoded, err := base64.StdEncoding.DecodeString(requestBody.Base64)
+		decoded, err := base64.StdEncoding.DecodeString(base64String)
 		if err != nil {
 			logger.Errorf("Failed to decode base64 string: %v", err)
 			c.JSON(http.StatusBadRequest, ErrorMessage("invalid base64 string"))
