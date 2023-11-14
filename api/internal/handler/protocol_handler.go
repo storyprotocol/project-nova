@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/project-nova/backend/api/internal/entity"
+	v0alpha "github.com/project-nova/backend/api/internal/entity/v0-alpha"
 	"github.com/project-nova/backend/api/internal/service/thegraph"
 	xhttp "github.com/project-nova/backend/pkg/http"
 	"github.com/project-nova/backend/pkg/logger"
@@ -80,6 +81,51 @@ func NewGetFranchiseHandler(graphService thegraph.TheGraphServiceMvp, httpClient
 				},
 			})
 		*/
+	}
+}
+
+// POST /iporg
+func NewListIpOrgsHandler(graphService thegraph.TheGraphServiceMvp, httpClient xhttp.Client) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		c.JSON(http.StatusOK, v0alpha.ListIpOrgResponse{
+			IPOrgs: []v0alpha.IPOrg{
+				{
+					ID:          "7",
+					Name:        "Star Wars",
+					Symbol:      "STAR",
+					Owner:       "0x4f9693ac46f2c7e2f48dd14d8fe1ab44192cd57d",
+					MetadataUrl: "https://arweave.net/dnFJl1v8kgOx_6Z0gEsBce3D56cMP4-lxAcFqSsL0_w",
+					TxHash:      "0xc80c23b7992cc94a271d1a56280ccc16a8f78a6d63ee34efdc35d8ffc71eda58",
+					CreatedAt:   "2023-11-14T00:29:13Z",
+				},
+				{
+					ID:          "10",
+					Name:        "Divine Anarchy",
+					Symbol:      "DA",
+					Owner:       "0x4f9693ac46f2c7e2f48dd14d8fe1ab44192cd57d",
+					MetadataUrl: "https://arweave.net/uwhn8-mPXjORkqHLBxPNe-rbUh_k9OV8OCCWkyNCijI",
+					TxHash:      "0x95ed7d1d6fa5db08be22c7e58727729bf582a25ef82e94530a5e4cdf2d934a95",
+					CreatedAt:   "2023-11-14T00:29:13Z",
+				},
+			},
+		})
+	}
+}
+
+// GET /iporg/:ipOrgId
+func NewGetIpOrgHandler(graphService thegraph.TheGraphServiceMvp, httpClient xhttp.Client) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		c.JSON(http.StatusOK, v0alpha.GetIpOrgResponse{
+			IPOrg: &v0alpha.IPOrg{
+				ID:          "7",
+				Name:        "Star Wars",
+				Symbol:      "STAR",
+				Owner:       "0x4f9693ac46f2c7e2f48dd14d8fe1ab44192cd57d",
+				MetadataUrl: "https://arweave.net/dnFJl1v8kgOx_6Z0gEsBce3D56cMP4-lxAcFqSsL0_w",
+				TxHash:      "0xc80c23b7992cc94a271d1a56280ccc16a8f78a6d63ee34efdc35d8ffc71eda58",
+				CreatedAt:   "2023-11-14T00:29:13Z",
+			},
+		})
 	}
 }
 
@@ -176,6 +222,13 @@ func NewGetIpAssetHandler(graphService thegraph.TheGraphServiceMvp, httpClient x
 	}
 }
 
+// POST /ipasset
+func NewListIpAssetsHandler(graphService thegraph.TheGraphServiceMvp, httpClient xhttp.Client) func(c *gin.Context) {
+	return func(c *gin.Context) {
+
+	}
+}
+
 // GET /license
 func NewGetLicensesHandler(graphService thegraph.TheGraphServiceMvp) func(c *gin.Context) {
 	return func(c *gin.Context) {
@@ -263,6 +316,13 @@ func NewGetLicenseHandler(graphService thegraph.TheGraphServiceMvp) func(c *gin.
 				},
 			})
 		*/
+	}
+}
+
+// POST /license
+func NewListLicensesHandler(graphService thegraph.TheGraphServiceMvp) func(c *gin.Context) {
+	return func(c *gin.Context) {
+
 	}
 }
 
@@ -379,5 +439,47 @@ func NewGetTransactionHandler(graphService thegraph.TheGraphServiceMvp) func(c *
 				},
 			})
 		*/
+	}
+}
+
+// POST /transaction
+func NewListTransactionsHandler(graphService thegraph.TheGraphServiceMvp) func(c *gin.Context) {
+	return func(c *gin.Context) {
+
+	}
+}
+
+// POST /relationship
+func NewListRelationshipsHandler(graphService thegraph.TheGraphServiceMvp) func(c *gin.Context) {
+	return func(c *gin.Context) {
+
+	}
+}
+
+// POST /module
+func NewListModulesHandler(graphService thegraph.TheGraphServiceMvp) func(c *gin.Context) {
+	return func(c *gin.Context) {
+
+	}
+}
+
+// GET /module/:moduleId
+func NewGetModuleHandler(graphService thegraph.TheGraphServiceMvp) func(c *gin.Context) {
+	return func(c *gin.Context) {
+
+	}
+}
+
+// POST /hook
+func NewListHooksHandler(graphService thegraph.TheGraphServiceMvp) func(c *gin.Context) {
+	return func(c *gin.Context) {
+
+	}
+}
+
+// GET /hook/:hookId
+func NewGetHookHandler(graphService thegraph.TheGraphServiceMvp) func(c *gin.Context) {
+	return func(c *gin.Context) {
+
 	}
 }

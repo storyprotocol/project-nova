@@ -315,17 +315,29 @@ func main() {
 		// Endpoint to get a franchise
 		protocol.GET("/franchise/:franchiseId", handler.NewGetFranchiseHandler(theGraphServiceMvp, httpClient))
 
+		// Endpoint to list ip orgs
+		protocol.POST("/iporg", handler.NewListIpOrgsHandler(theGraphServiceMvp, httpClient))
+
+		// Endpoint to get an ip org
+		protocol.GET("/iporg/:ipOrgId", handler.NewGetIpOrgHandler(theGraphServiceMvp, httpClient))
+
 		// Endpoint to get ip assets from a franchise
 		protocol.GET("/ipasset", handler.NewGetIpAssetsHandler(theGraphServiceMvp, httpClient))
 
 		// Endpoint to get a single ip asset from a franchise
 		protocol.GET("/ipasset/:ipAssetId", handler.NewGetIpAssetHandler(theGraphServiceMvp, httpClient))
 
+		// Endpoint to list ip assets from an ip org
+		protocol.POST("/ipasset", handler.NewListIpAssetsHandler(theGraphServiceMvp, httpClient))
+
 		// Endpoint to get licenses from an ip asset
 		protocol.GET("/license", handler.NewGetLicensesHandler(theGraphServiceMvp))
 
 		// Endpoint to get a single license
 		protocol.GET("/license/:licenseId", handler.NewGetLicenseHandler(theGraphServiceMvp))
+
+		// Endpoint to list licenses from an ip asset
+		protocol.POST("/license", handler.NewListLicensesHandler(theGraphServiceMvp))
 
 		// Endpoint to get collections
 		protocol.GET("/collection", handler.NewGetCollectionsHandler(theGraphServiceMvp))
@@ -335,6 +347,24 @@ func main() {
 
 		// Endpoint to get transaction
 		protocol.GET("/transaction/:transactionId", handler.NewGetTransactionHandler(theGraphServiceMvp))
+
+		// Endpoint to list transactions
+		protocol.POST("/transaction", handler.NewListTransactionsHandler(theGraphServiceMvp))
+
+		// Endpoint to list relatioinships
+		protocol.POST("/relationship", handler.NewListRelationshipsHandler(theGraphServiceMvp))
+
+		// Endpoint to list modules
+		protocol.POST("/module", handler.NewListModulesHandler(theGraphServiceMvp))
+
+		// Endpoint to get a module
+		protocol.GET("/module/:moduleId", handler.NewGetModuleHandler(theGraphServiceMvp))
+
+		// Endpoint to list hooks
+		protocol.POST("/hook", handler.NewListHooksHandler(theGraphServiceMvp))
+
+		// Endpoint to get a hook
+		protocol.GET("/hook/:hookId", handler.NewGetHookHandler(theGraphServiceMvp))
 	}
 
 	port := fmt.Sprintf(":%d", cfg.Port)
