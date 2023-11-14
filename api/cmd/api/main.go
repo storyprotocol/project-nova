@@ -306,44 +306,57 @@ func main() {
 		protocolKbw.GET("/license/:licenseId", handler.NewGetLicenseHandlerKbw(theGraphServiceKbw))
 	}
 
-	protocol := r.Group("/")
-	protocol.Use(cors.Default())
+	protocolMvp := r.Group("/")
+	protocolMvp.Use(cors.Default())
 	{
 		// Endpoint to get franchises
-		protocol.GET("/franchise", handler.NewGetFranchisesHandler(theGraphServiceMvp, httpClient))
+		protocolMvp.GET("/franchise", handler.NewGetFranchisesHandler(theGraphServiceMvp, httpClient))
 
 		// Endpoint to get a franchise
-		protocol.GET("/franchise/:franchiseId", handler.NewGetFranchiseHandler(theGraphServiceMvp, httpClient))
+		protocolMvp.GET("/franchise/:franchiseId", handler.NewGetFranchiseHandler(theGraphServiceMvp, httpClient))
 
+		// Endpoint to get ip assets from a franchise
+		protocolMvp.GET("/ipasset", handler.NewGetIpAssetsHandler(theGraphServiceMvp, httpClient))
+
+		// Endpoint to get a single ip asset from a franchise
+		protocolMvp.GET("/ipasset/:ipAssetId", handler.NewGetIpAssetHandler(theGraphServiceMvp, httpClient))
+
+		// Endpoint to get licenses from an ip asset
+		protocolMvp.GET("/license", handler.NewGetLicensesHandler(theGraphServiceMvp))
+
+		// Endpoint to get a single license
+		protocolMvp.GET("/license/:licenseId", handler.NewGetLicenseHandler(theGraphServiceMvp))
+
+		// Endpoint to get collections
+		protocolMvp.GET("/collection", handler.NewGetCollectionsHandler(theGraphServiceMvp))
+
+		// Endpoint to get transactions
+		protocolMvp.GET("/transaction", handler.NewGetTransactionsHandler(theGraphServiceMvp))
+
+		// Endpoint to get transaction
+		protocolMvp.GET("/transaction/:transactionId", handler.NewGetTransactionHandler(theGraphServiceMvp))
+	}
+
+	protocol := r.Group("/protocol")
+	protocol.Use(cors.Default())
+	{
 		// Endpoint to list ip orgs
 		protocol.POST("/iporg", handler.NewListIpOrgsHandler(theGraphServiceMvp, httpClient))
 
 		// Endpoint to get an ip org
 		protocol.GET("/iporg/:ipOrgId", handler.NewGetIpOrgHandler(theGraphServiceMvp, httpClient))
 
-		// Endpoint to get ip assets from a franchise
-		protocol.GET("/ipasset", handler.NewGetIpAssetsHandler(theGraphServiceMvp, httpClient))
-
-		// Endpoint to get a single ip asset from a franchise
+		// Endpoint to get a single ip asset
 		protocol.GET("/ipasset/:ipAssetId", handler.NewGetIpAssetHandler(theGraphServiceMvp, httpClient))
 
-		// Endpoint to list ip assets from an ip org
+		// Endpoint to list ip assets
 		protocol.POST("/ipasset", handler.NewListIpAssetsHandler(theGraphServiceMvp, httpClient))
-
-		// Endpoint to get licenses from an ip asset
-		protocol.GET("/license", handler.NewGetLicensesHandler(theGraphServiceMvp))
 
 		// Endpoint to get a single license
 		protocol.GET("/license/:licenseId", handler.NewGetLicenseHandler(theGraphServiceMvp))
 
 		// Endpoint to list licenses from an ip asset
 		protocol.POST("/license", handler.NewListLicensesHandler(theGraphServiceMvp))
-
-		// Endpoint to get collections
-		protocol.GET("/collection", handler.NewGetCollectionsHandler(theGraphServiceMvp))
-
-		// Endpoint to get transactions
-		protocol.GET("/transaction", handler.NewGetTransactionsHandler(theGraphServiceMvp))
 
 		// Endpoint to get transaction
 		protocol.GET("/transaction/:transactionId", handler.NewGetTransactionHandler(theGraphServiceMvp))

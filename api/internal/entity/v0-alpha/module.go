@@ -8,14 +8,10 @@ type Module struct {
 	PostHooks []*Hook `json:"postHooks,omitempty"`
 }
 
-/*
-{
-	id: string
-	ipOrgId: string
-	interface: string
-	preHooks: Hook[]
-	postHooks: Hook[]
-	registeredAt: string // ISO 8601
-	txHash: string
+type GetModuleResponse struct {
+	Module *Module `json:"module"`
 }
-*/
+
+type ListModulesResponse struct {
+	Modules []*Module `json:"modules"`
+}

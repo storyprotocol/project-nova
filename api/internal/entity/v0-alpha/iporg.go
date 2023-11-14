@@ -14,6 +14,6 @@ type GetIpOrgResponse struct {
 	IPOrg *IPOrg `json:"iporg"`
 }
 
-type ListIpOrgResponse struct {
-	IPOrgs []IPOrg `json:"iporgs"`
+type ListIpOrgsResponse struct {
+	IPOrgs []*IPOrg `json:"iporgs"`
 }

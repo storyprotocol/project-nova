@@ -14,3 +14,11 @@ type Relationship struct {
 	RegisteredAt string `json:"registeredAt,omitempty"`
 	TxHash       string `json:"txHash,omitempty"`
 }
+
+type GetRelationshipResponse struct {
+	Relationship *Relationship `json:"relationship"`
+}
+
+type ListRelationshipsResponse struct {
+	Relationships []*Relationship `json:"relationships"`
+}

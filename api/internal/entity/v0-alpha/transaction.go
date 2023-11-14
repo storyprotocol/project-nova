@@ -46,3 +46,11 @@ var ActionTypes = struct {
 	Unregister: "Unregister",
 	Configure:  "Configure",
 }
+
+type GetTransactionResponse struct {
+	Transaction *Transaction `json:"transaction"`
+}
+
+type ListTransactionsResponse struct {
+	Transactions []*Transaction `json:"transactions"`
+}
