@@ -510,30 +510,61 @@ func NewListTransactionsHandler(graphService thegraph.TheGraphServiceMvp) func(c
 	}
 }
 
+// GET /relationship/:relationshipId
+func NewGetRelationshipHandler(graphService thegraph.TheGraphServiceMvp) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		ttl := int64(1000)
+		c.JSON(http.StatusOK, &v0alpha_entity.GetRelationshipResponse{
+			Relationship: &v0alpha_entity.Relationship{
+				ID:           "1",
+				Type:         "APPEAR_IN",
+				TypeId:       "2",
+				TxHash:       "0x00a1a14e0193144e1d7024428ee242c44e5cacdbd7458c629d17c6366f6c5cb6",
+				SrcContract:  "0x123",
+				SrcTokenId:   "4",
+				SrcName:      "Darth Vader",
+				DstContract:  "0x456",
+				DstTokenId:   "7",
+				DstName:      "Star War",
+				RegisteredAt: "0001-01-01T00:00:00Z",
+				TTL:          &ttl,
+			},
+		})
+	}
+}
+
 // POST /relationship
 func NewListRelationshipsHandler(graphService thegraph.TheGraphServiceMvp) func(c *gin.Context) {
 	return func(c *gin.Context) {
-		c.JSON(http.StatusOK, &v0alpha_entity.ListTransactionsResponse{
-			Transactions: []*v0alpha_entity.Transaction{
+		ttl := int64(1000)
+		c.JSON(http.StatusOK, &v0alpha_entity.ListRelationshipsResponse{
+			Relationships: []*v0alpha_entity.Relationship{
 				{
 					ID:           "1",
+					Type:         "APPEAR_IN",
+					TypeId:       "2",
 					TxHash:       "0x00a1a14e0193144e1d7024428ee242c44e5cacdbd7458c629d17c6366f6c5cb6",
-					IPOrgId:      "7",
-					ResourceId:   "1",
-					ResourceType: v0alpha_entity.ResourceTypes.IPAsset,
-					ActionType:   v0alpha_entity.ActionTypes.Create,
-					Creator:      "0x4f9693ac46f2c7e2f48dd14d8fe1ab44192cd57d",
-					CreatedAt:    "0001-01-01T00:00:00Z",
+					SrcContract:  "0x123",
+					SrcTokenId:   "4",
+					SrcName:      "Darth Vader",
+					DstContract:  "0x456",
+					DstTokenId:   "7",
+					DstName:      "Star War",
+					RegisteredAt: "0001-01-01T00:00:00Z",
+					TTL:          &ttl,
 				},
 				{
 					ID:           "2",
+					Type:         "APPEAR_IN",
+					TypeId:       "2",
 					TxHash:       "0x00a1a14e0193144e1d7024428ee242c44e5cacdbd7458c629d17c6366f6c5cb6",
-					IPOrgId:      "7",
-					ResourceId:   "50",
-					ResourceType: v0alpha_entity.ResourceTypes.License,
-					ActionType:   v0alpha_entity.ActionTypes.Create,
-					Creator:      "0xd84316a1b6f40902c17b8177854cdaeb3c957daf",
-					CreatedAt:    "0001-01-01T00:00:00Z",
+					SrcContract:  "0x123",
+					SrcTokenId:   "4",
+					SrcName:      "Darth Vader",
+					DstContract:  "0x456",
+					DstTokenId:   "7",
+					DstName:      "Star War",
+					RegisteredAt: "0001-01-01T00:00:00Z",
 				},
 			},
 		})

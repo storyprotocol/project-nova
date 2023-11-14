@@ -364,6 +364,9 @@ func main() {
 		// Endpoint to list transactions
 		protocol.POST("/transaction", handler.NewListTransactionsHandler(theGraphServiceMvp))
 
+		// Endpoint to get a relatioinship
+		protocol.GET("/relationship/:relationshipId", handler.NewGetRelationshipHandler(theGraphServiceMvp))
+
 		// Endpoint to list relatioinships
 		protocol.POST("/relationship", handler.NewListRelationshipsHandler(theGraphServiceMvp))
 
