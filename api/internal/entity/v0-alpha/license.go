@@ -9,3 +9,11 @@ type License struct {
 	CreatedAt   string `json:"createdAt,omitempty"`
 	TxHash      string `json:"txHash,omitempty"`
 }
+
+type GetLicenseResponse struct {
+	License *License `json:"license"`
+}
+
+type ListLicensesResponse struct {
+	Licenses []*License `json:"licenses"`
+}

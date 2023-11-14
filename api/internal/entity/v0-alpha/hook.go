@@ -8,11 +8,10 @@ type Hook struct {
 	TxHash       string `json:"txHash,omitempty"`
 }
 
-/*
-{
-	id: string
-	moduleId: string
-	interface: string
-	createdAt: string // ISO 8601
+type GetHookResponse struct {
+	Hook *Hook `json:"hook"`
 }
-*/
+
+type ListHooksResponse struct {
+	Hooks []*Hook `json:"hooks"`
+}

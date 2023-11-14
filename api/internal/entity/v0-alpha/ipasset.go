@@ -2,11 +2,12 @@ package v0alpha
 
 type IPAsset struct {
 	ID          string      `json:"id,omitempty"`
+	Name        string      `json:"name,omitempty"`
 	Type        IPAssetType `json:"type,omitempty"`
 	IPOrgId     string      `json:"ipOrgId,omitempty"`
 	Owner       string      `json:"owner,omitempty"`
 	MetadataUrl string      `json:"metadataUrl,omitempty"`
-	Hash        []byte      `json:"hash,omitempty"`
+	ContentHash []byte      `json:"contentHash,omitempty"`
 	Data        []byte      `json:"data,omitempty"`
 	CreatedAt   string      `json:"createdAt,omitempty"`
 	TxHash      string      `json:"txHash,omitempty"`
@@ -26,4 +27,12 @@ var IpAssetTypes = struct {
 	Art:       "Art",
 	Item:      "Item",
 	Location:  "Location",
+}
+
+type GetIpAssetResponse struct {
+	IPAsset *IPAsset `json:"ipasset"`
+}
+
+type ListIpAssetsResponse struct {
+	IPAssets []*IPAsset `json:"ipassets"`
 }
