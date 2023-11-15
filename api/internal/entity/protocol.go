@@ -219,6 +219,6 @@ type StoriesV2 struct {
 }
 
 type UploadFileRequestBody struct {
-	Base64      string `json:"base64"`
-	ContentType string `json:"contentType"`
+	Base64   string `json:"base64"`
+	MimeType string `json:"mimeType"`
 }

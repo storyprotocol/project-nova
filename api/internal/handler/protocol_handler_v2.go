@@ -256,7 +256,7 @@ func NewUploadFileHandlerV2(
 		resp, err := web3Gateway.UploadContent(&web3_gateway.UploadContentReq{
 			Storage:     web3_gateway.StorageType_ARWEAVE,
 			Content:     decoded,
-			ContentType: requestBody.ContentType,
+			ContentType: requestBody.MimeType,
 		})
 		if err != nil {
 			logger.Errorf("Failed to upload content to web3-gateway: %v", err)
