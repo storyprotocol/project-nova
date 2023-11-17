@@ -8,21 +8,27 @@ Story Protocol backend provides the protocol data indexing and API services for 
 * Install Make: Run `xcode-select --install`
 * Install Docker: Follow instructions at [Docker for Mac](https://docs.docker.com/docker-for-mac/install/)
 * Install Golang: Guide available [here](https://jimkang.medium.com/install-go-on-mac-with-homebrew-5fa421fc55f5)
-* Install Protoc: Execute `go get -u github.com/golang/protobuf/{proto,protoc-gen-go}`
+* Install Proto: Execute `go get -u github.com/golang/protobuf/{proto,proto-gen-go}`
+* Install Protoc-Gen-Go (Use `go install` when outside of a module): `go install github.com/golang/protobuf/protoc-gen-go@latest`
 * Install AWS CLI: Instructions at [AWS CLI Installation](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
 * Install AWS IAM Authenticator: Refer to [AWS IAM Authenticator Installation](https://docs.aws.amazon.com/eks/latest/userguide/install-aws-iam-authenticator.html)
 * Install Kubectl: Guide available at [Kubernetes Tools](https://kubernetes.io/docs/tasks/tools/)
 * Install Kubectx: Run `brew install kubectx`
 * Install K9s: Execute `brew install k9s`
+* Install Typescript: `npm install typescript -g`
 
 ### Infrastructure Setup
 * Request an admin to: 
   1. Create a new profile for you.
   2. Grant access to the Kubernetes (k8s) cluster.
 * Set up your profile using `aws configure set`.
+  * Profiles can be found at `~/.aws/config`
 * Log in to SSO using `aws sso login`.
 * Verify ECR access with `make ecr-auth`. You should see "Login Succeeded".
 * Set up EKS locally (details to be provided).
+  * Update Kube Config with appropriate cluster information `aws eks update-kubeconfig --name CLUSTER_NAME --region CLUSTER_REGION`
+  * Verify attached cluster `eksctl get cluster --profile staging`
+  * Verify Node Group `eksctl get nodegroup --cluster CLUSTER_NAME`
 * Verify EKS access with `k9s`. You should see cluster information without errors.
 
 ### Web3-Gateway
