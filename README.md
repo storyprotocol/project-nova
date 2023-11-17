@@ -27,7 +27,7 @@ Story Protocol backend provides the protocol data indexing and API services for 
 * Verify ECR access with `make ecr-auth`. You should see "Login Succeeded".
 * Set up EKS locally (details to be provided).
   * Update Kube Config with appropriate cluster information `aws eks update-kubeconfig --name CLUSTER_NAME --region CLUSTER_REGION`
-  * Verify attached cluster `eksctl get cluster --profile staging`
+  * Verify attached cluster `eksctl get cluster`
   * Verify Node Group `eksctl get nodegroup --cluster CLUSTER_NAME`
 * Verify EKS access with `k9s`. You should see cluster information without errors.
 
