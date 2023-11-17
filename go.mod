@@ -19,7 +19,7 @@ require (
 	github.com/stretchr/testify v1.8.1
 	go.uber.org/zap v1.17.0
 	google.golang.org/grpc v1.55.0
-	google.golang.org/protobuf v1.30.0
+	google.golang.org/protobuf v1.31.0
 	gopkg.in/validator.v2 v2.0.1
 	gopkg.in/yaml.v2 v2.4.0
 	gorm.io/driver/postgres v1.4.5

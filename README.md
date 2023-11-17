@@ -8,12 +8,14 @@ Story Protocol backend provides the protocol data indexing and API services for 
 * Install Make: Run `xcode-select --install`
 * Install Docker: Follow instructions at [Docker for Mac](https://docs.docker.com/docker-for-mac/install/)
 * Install Golang: Guide available [here](https://jimkang.medium.com/install-go-on-mac-with-homebrew-5fa421fc55f5)
-* Install Protoc: Execute `go get -u github.com/golang/protobuf/{proto,protoc-gen-go}`
+* Install Proto: Execute `go get -u github.com/golang/protobuf/{proto,proto-gen-go}`
+* Install Protoc-Gen-Go (Use `go install` when outside of a module): `go install github.com/golang/protobuf/protoc-gen-go@latest`
 * Install AWS CLI: Instructions at [AWS CLI Installation](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
 * Install AWS IAM Authenticator: Refer to [AWS IAM Authenticator Installation](https://docs.aws.amazon.com/eks/latest/userguide/install-aws-iam-authenticator.html)
 * Install Kubectl: Guide available at [Kubernetes Tools](https://kubernetes.io/docs/tasks/tools/)
 * Install Kubectx: Run `brew install kubectx`
 * Install K9s: Execute `brew install k9s`
+* Install Typescript: `npm install typescript -g`
 
 ### Infrastructure Setup
 * Request an admin to: 
