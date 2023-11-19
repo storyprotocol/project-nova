@@ -9,6 +9,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/project-nova/backend/api/internal/entity"
 	"github.com/project-nova/backend/api/internal/repository"
+	"github.com/project-nova/backend/api/internal/service/thegraph"
 	"github.com/project-nova/backend/pkg/gateway"
 	xhttp "github.com/project-nova/backend/pkg/http"
 	"github.com/project-nova/backend/pkg/logger"
@@ -17,7 +18,7 @@ import (
 )
 
 // GET /franchise/:franchiseId/stories/:storyId
-func NewGetStoryDetailHandlerV2() func(c *gin.Context) {
+func NewGetStoryDetailHandlerV2(graphService thegraph.TheGraphServiceAlpha) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		c.JSON(http.StatusOK, entity.StoryV2{
 			ID:           "1",
@@ -112,8 +113,15 @@ func NewGetStoryDetailHandlerV2() func(c *gin.Context) {
 }
 
 // GET /franchise/:franchiseId/stories
-func NewListFranchiseStoriesHandlerV2() func(c *gin.Context) {
+func NewListFranchiseStoriesHandlerV2(graphService thegraph.TheGraphServiceAlpha) func(c *gin.Context) {
 	return func(c *gin.Context) {
+		l, err := graphService.GetIPOrg("0xde493e03d2de0cd7820b4f580beced57296b0009")
+		if err != nil {
+			logger.Errorf("Failed to get franchises from the graph: %v", err)
+		}
+
+		logger.Infof("Franchises: %+v", l)
+
 		c.JSON(http.StatusOK, entity.StoriesV2{
 			Stories: []*entity.StoryV2{
 				{

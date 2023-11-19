@@ -10,7 +10,11 @@ package v0alpha
 */
 
 /*
-{
-	waitForTransaction?: boolean
-}
+	{
+		waitForTransaction?: boolean
+	}
 */
+type QueryOptions struct {
+	First int
+	Skip  int
+}

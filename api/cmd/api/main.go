@@ -118,6 +118,9 @@ func main() {
 	theGraphClientMvp := graphql.NewClient("https://api.thegraph.com/subgraphs/name/edisonz0718/storyprotocol-v0-mvp")
 	theGraphServiceMvp := thegraph.NewTheGraphServiceMvpImpl(theGraphClientMvp)
 
+	theGraphClientAlpha := graphql.NewClient("https://api.thegraph.com/subgraphs/name/edisonz0718/storyprotocol-v0-alpha")
+	theGraphServiceAlpha := thegraph.NewTheGraphServiceAlphaImpl(theGraphClientAlpha)
+
 	storyBlocksRegistry, err := story_blocks_registry.NewStoryBlocksRegistry(
 		common.HexToAddress(cfg.StoryBlocksRegistry),
 		ethClient,
@@ -272,10 +275,10 @@ func main() {
 		protocolV2.POST("/files/upload", handler.NewUploadFileHandlerV2(web3Gateway))
 
 		// Endpoint for listing all stories in a franchise
-		protocolV2.GET("/franchise/:franchiseId", handler.NewListFranchiseStoriesHandlerV2())
+		protocolV2.GET("/franchise/:franchiseId", handler.NewListFranchiseStoriesHandlerV2(theGraphServiceAlpha))
 
 		// Endpoint for getting the detail information about a franchise story
-		protocolV2.GET("/franchise/:franchiseId/stories/:storyId", handler.NewGetStoryDetailHandlerV2())
+		protocolV2.GET("/franchise/:franchiseId/stories/:storyId", handler.NewGetStoryDetailHandlerV2(theGraphServiceAlpha))
 	}
 
 	protocolKbw := r.Group("/protocol/kbw")
@@ -306,6 +309,7 @@ func main() {
 		protocolKbw.GET("/license/:licenseId", handler.NewGetLicenseHandlerKbw(theGraphServiceKbw))
 	}
 
+	// MVP endpoints
 	protocolMvp := r.Group("/")
 	protocolMvp.Use(cors.Default())
 	{
@@ -337,6 +341,7 @@ func main() {
 		protocolMvp.GET("/transaction/:transactionId", handler.NewGetTransactionHandler(theGraphServiceMvp))
 	}
 
+	// Alpha endpoints
 	protocol := r.Group("/protocol")
 	protocol.Use(cors.Default())
 	{

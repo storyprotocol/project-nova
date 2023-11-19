@@ -17,3 +17,42 @@ type GetIpOrgResponse struct {
 type ListIpOrgsResponse struct {
 	IPOrgs []*IPOrg `json:"iporgs"`
 }
+
+type IPOrgTheGraphAlpha struct {
+	ID             string   `json:"id"`
+	Owner          string   `json:"owner"`
+	IPOrgId        string   `json:"ipOrgId"`
+	Name           string   `json:"name"`
+	Symbol         string   `json:"symbol"`
+	IpAssetTypes   []string `json:"ipAssetTypes"`
+	BaseURI        string   `json:"baseURI"`
+	ContractURI    string   `json:"contractURI"`
+	BlockNumber    string   `json:"blockNumber"`
+	BlockTimestamp string   `json:"blockTimestamp"`
+	TxHash         string   `json:"transactionHash"`
+}
+
+type IpOrgTheGraphAlphaResponse struct {
+	IporgRegistereds []*IPOrgTheGraphAlpha `json:"iporgRegistereds"`
+}
+
+func (i *IpOrgTheGraphAlphaResponse) ToIPOrgs() []*IPOrg {
+	iporgs := []*IPOrg{}
+	for _, iporg := range i.IporgRegistereds {
+		iporgs = append(iporgs, iporg.ToIPOrg())
+	}
+
+	return iporgs
+}
+
+func (i *IPOrgTheGraphAlpha) ToIPOrg() *IPOrg {
+	return &IPOrg{
+		ID:          i.ID,
+		Name:        i.Name,
+		Symbol:      i.Symbol,
+		Owner:       i.Owner,
+		MetadataUrl: i.BaseURI,
+		CreatedAt:   i.BlockTimestamp,
+		TxHash:      i.TxHash,
+	}
+}

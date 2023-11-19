@@ -1,6 +1,9 @@
 package thegraph
 
-import "github.com/project-nova/backend/api/internal/entity"
+import (
+	"github.com/project-nova/backend/api/internal/entity"
+	v0alpha "github.com/project-nova/backend/api/internal/entity/v0-alpha"
+)
 
 type TheGraphServiceKbw interface {
 	GetFranchises() ([]*entity.Franchise, error)
@@ -25,4 +28,20 @@ type TheGraphServiceMvp interface {
 	GetCollections(franchiseId string) ([]*entity.CollectionMVP, error)
 	GetTransactions() ([]*entity.TransactionMVP, error)
 	GetTransaction(transactionId string) (*entity.TransactionMVP, error)
+}
+
+type TheGraphServiceAlpha interface {
+	ListRelationships(contract string, tokenId string, options *v0alpha.QueryOptions) ([]*v0alpha.Relationship, error)
+	ListHooks(moduleId *string, options *v0alpha.QueryOptions) ([]*v0alpha.Hook, error)
+	GetHook(hookId string) (*v0alpha.Hook, error)
+	ListModules(ipOrgId *string, options *v0alpha.QueryOptions) ([]*v0alpha.Module, error)
+	GetModule(moduleId string) (*v0alpha.Module, error)
+	ListIPOrgs(options *v0alpha.QueryOptions) ([]*v0alpha.IPOrg, error)
+	GetIPOrg(iporgId string) (*v0alpha.IPOrg, error)
+	ListIPAssets(iporgId *string, options *v0alpha.QueryOptions) ([]*v0alpha.IPAsset, error)
+	GetIPAsset(iporgId string, ipAssetId string) (*v0alpha.IPAsset, error)
+	ListTransactions(ipOrgId *string, options *v0alpha.QueryOptions) ([]*v0alpha.Transaction, error)
+	GetTransaction(transactionId string) (*v0alpha.Transaction, error)
+	ListLicenses(iporgId *string, ipAssetId *string, options *v0alpha.QueryOptions) ([]*v0alpha.License, error)
+	GetLicense(licenseId string) (*v0alpha.License, error)
 }

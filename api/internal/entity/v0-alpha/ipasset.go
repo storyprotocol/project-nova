@@ -36,3 +36,45 @@ type GetIpAssetResponse struct {
 type ListIpAssetsResponse struct {
 	IPAssets []*IPAsset `json:"ipassets"`
 }
+
+type IPAssetTheGraphAlpha struct {
+	ID             string `json:"id"`
+	IpAssetId      string `json:"ipAssetId"`
+	IpOrgId        string `json:"ipOrgId"`
+	IpOrgAssetId   string `json:"ipOrgAssetId"`
+	Owner          string `json:"owner"`
+	Name           string `json:"name"`
+	IpAssetType    string `json:"ipAssetType"`
+	ContentHash    string `json:"contentHash"`
+	MediaUrl       string `json:"mediaUrl"`
+	BlockNumber    string `json:"blockNumber"`
+	BlockTimestamp string `json:"blockTimestamp"`
+	TxHash         string `json:"transactionHash"`
+}
+
+type IpAssetTheGraphAlphaResponse struct {
+	IpassetRegistereds []*IPAssetTheGraphAlpha `json:"ipassetRegistereds"`
+}
+
+func (i *IpAssetTheGraphAlphaResponse) ToIPAssets() []*IPAsset {
+	ipassets := []*IPAsset{}
+	for _, ipasset := range i.IpassetRegistereds {
+		ipassets = append(ipassets, ipasset.ToIPAsset())
+	}
+
+	return ipassets
+}
+
+func (i *IPAssetTheGraphAlpha) ToIPAsset() *IPAsset {
+	return &IPAsset{
+		ID:          i.ID,
+		Name:        i.Name,
+		Type:        IPAssetType(i.IpAssetType),
+		IPOrgId:     i.IpOrgId,
+		Owner:       i.Owner,
+		MetadataUrl: i.MediaUrl,
+		ContentHash: []byte(i.ContentHash),
+		CreatedAt:   i.BlockTimestamp,
+		TxHash:      i.TxHash,
+	}
+}
