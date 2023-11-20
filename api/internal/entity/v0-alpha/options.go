@@ -15,6 +15,6 @@ package v0alpha
 	}
 */
 type QueryOptions struct {
-	First int
-	Skip  int
+	Offset int
+	Limit  int
 }

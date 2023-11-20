@@ -51,6 +51,11 @@ type GetTransactionResponse struct {
 	Transaction *Transaction `json:"transaction"`
 }
 
+type ListTransactionsRequest struct {
+	IpOrgId *string       `json:"ipOrgId"`
+	Options *QueryOptions `json:"options"`
+}
+
 type ListTransactionsResponse struct {
 	Transactions []*Transaction `json:"transactions"`
 }

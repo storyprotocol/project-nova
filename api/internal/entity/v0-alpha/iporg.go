@@ -14,6 +14,10 @@ type GetIpOrgResponse struct {
 	IPOrg *IPOrg `json:"iporg"`
 }
 
+type ListIpOrgsRequest struct {
+	Options *QueryOptions `json:"options"`
+}
+
 type ListIpOrgsResponse struct {
 	IPOrgs []*IPOrg `json:"iporgs"`
 }

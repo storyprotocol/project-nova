@@ -13,6 +13,11 @@ type GetModuleResponse struct {
 	Module *Module `json:"module"`
 }
 
+type ListModulesRequest struct {
+	IpOrgId *string       `json:"ipOrgId"`
+	Options *QueryOptions `json:"options"`
+}
+
 type ListModulesResponse struct {
 	Modules []*Module `json:"modules"`
 }
@@ -28,7 +33,7 @@ type ModuleTheGraphAlpha struct {
 }
 
 type ModuleTheGraphAlphaResponse struct {
-	Modules []*ModuleTheGraphAlpha `json:"modules"`
+	Modules []*ModuleTheGraphAlpha `json:"moduleRegisterreds"`
 }
 
 func (m *ModuleTheGraphAlphaResponse) ToModules() []*Module {

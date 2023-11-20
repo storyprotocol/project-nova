@@ -31,17 +31,41 @@ type TheGraphServiceMvp interface {
 }
 
 type TheGraphServiceAlpha interface {
-	ListRelationships(contract string, tokenId string, options *v0alpha.QueryOptions) ([]*v0alpha.Relationship, error)
-	ListHooks(moduleId *string, options *v0alpha.QueryOptions) ([]*v0alpha.Hook, error)
+	GetRelationship(relationshipId string) (*v0alpha.Relationship, error)
+	ListRelationships(contract string, tokenId string, options *TheGraphQueryOptions) ([]*v0alpha.Relationship, error)
+	ListHooks(moduleId *string, options *TheGraphQueryOptions) ([]*v0alpha.Hook, error)
 	GetHook(hookId string) (*v0alpha.Hook, error)
-	ListModules(ipOrgId *string, options *v0alpha.QueryOptions) ([]*v0alpha.Module, error)
+	ListModules(ipOrgId *string, options *TheGraphQueryOptions) ([]*v0alpha.Module, error)
 	GetModule(moduleId string) (*v0alpha.Module, error)
-	ListIPOrgs(options *v0alpha.QueryOptions) ([]*v0alpha.IPOrg, error)
+	ListIPOrgs(options *TheGraphQueryOptions) ([]*v0alpha.IPOrg, error)
 	GetIPOrg(iporgId string) (*v0alpha.IPOrg, error)
-	ListIPAssets(iporgId *string, options *v0alpha.QueryOptions) ([]*v0alpha.IPAsset, error)
-	GetIPAsset(iporgId string, ipAssetId string) (*v0alpha.IPAsset, error)
-	ListTransactions(ipOrgId *string, options *v0alpha.QueryOptions) ([]*v0alpha.Transaction, error)
+	ListIPAssets(iporgId *string, options *TheGraphQueryOptions) ([]*v0alpha.IPAsset, error)
+	GetIPAsset(ipAssetId string) (*v0alpha.IPAsset, error)
+	ListTransactions(ipOrgId *string, options *TheGraphQueryOptions) ([]*v0alpha.Transaction, error)
 	GetTransaction(transactionId string) (*v0alpha.Transaction, error)
-	ListLicenses(iporgId *string, ipAssetId *string, options *v0alpha.QueryOptions) ([]*v0alpha.License, error)
+	ListLicenses(iporgId *string, ipAssetId *string, options *TheGraphQueryOptions) ([]*v0alpha.License, error)
 	GetLicense(licenseId string) (*v0alpha.License, error)
+}
+
+type TheGraphQueryOptions struct {
+	First int
+	Skip  int
+}
+
+func FromRequestQueryOptions(options *v0alpha.QueryOptions) *TheGraphQueryOptions {
+	if options == nil {
+		return &TheGraphQueryOptions{
+			First: 100,
+			Skip:  0,
+		}
+	}
+
+	if options.Limit == 0 {
+		options.Limit = 100
+	}
+
+	return &TheGraphQueryOptions{
+		First: options.Limit,
+		Skip:  options.Offset,
+	}
 }

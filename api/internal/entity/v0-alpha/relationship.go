@@ -19,6 +19,12 @@ type GetRelationshipResponse struct {
 	Relationship *Relationship `json:"relationship"`
 }
 
+type ListRelationshipRequest struct {
+	Contract string        `json:"contract"`
+	TokenId  string        `json:"tokenId"`
+	Options  *QueryOptions `json:"options"`
+}
+
 type ListRelationshipsResponse struct {
 	Relationships []*Relationship `json:"relationships"`
 }
@@ -38,21 +44,19 @@ type RelationshipTheGraphAlpha struct {
 
 type RelationshipTypeTheGraphAlpha struct {
 	ID               string `json:"id"`
+	RelationshipId   string `json:"relationshipId"`
 	RelationshipType string `json:"relType"`
-	IpOrgId          string `json:"ipOrgId"`
-	Src              string `json:"src"`
-	SrcRelatable     string `json:"srcRelatable"`
-	SrcSubtypesMask  string `json:"srcSubtypesMask"`
-	Dst              string `json:"dst"`
-	DstRelatable     string `json:"dstRelatable"`
-	DstSubtypesMask  string `json:"dstSubtypesMask"`
+	SrcAddress       string `json:"srcAddress"`
+	SrcId            string `json:"srcId"`
+	DstAddress       string `json:"dstAddress"`
+	DstId            string `json:"dstId"`
 	BlockNumber      string `json:"blockNumber"`
 	BlockTimestamp   string `json:"blockTimestamp"`
 	TxHash           string `json:"transactionHash"`
 }
 
 type RelationshipTheGraphAlphaResponse struct {
-	Relationships []*RelationshipTheGraphAlpha `json:"relationships"`
+	Relationships []*RelationshipTheGraphAlpha `json:"relationshipCreateds"`
 }
 
 func (r *RelationshipTheGraphAlphaResponse) ToRelationships() []*Relationship {

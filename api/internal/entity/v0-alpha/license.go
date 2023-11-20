@@ -14,6 +14,12 @@ type GetLicenseResponse struct {
 	License *License `json:"license"`
 }
 
+type ListLicensesRequest struct {
+	IpOrgId   *string       `json:"ipOrgId"`
+	IpAssetId *string       `json:"ipAssetId"`
+	Options   *QueryOptions `json:"options"`
+}
+
 type ListLicensesResponse struct {
 	Licenses []*License `json:"licenses"`
 }

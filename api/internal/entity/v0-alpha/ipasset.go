@@ -33,6 +33,10 @@ type GetIpAssetResponse struct {
 	IPAsset *IPAsset `json:"ipasset"`
 }
 
+type ListIpAssetsRequest struct {
+	Options *QueryOptions `json:"options"`
+}
+
 type ListIpAssetsResponse struct {
 	IPAssets []*IPAsset `json:"ipassets"`
 }

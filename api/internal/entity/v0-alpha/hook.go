@@ -12,6 +12,11 @@ type GetHookResponse struct {
 	Hook *Hook `json:"hook"`
 }
 
+type ListHooksRequest struct {
+	ModuleId *string       `json:"moduleId"`
+	Options  *QueryOptions `json:"options"`
+}
+
 type ListHooksResponse struct {
 	Hooks []*Hook `json:"hooks"`
 }

@@ -18,17 +18,54 @@ type theGraphServiceAlphaImpl struct {
 	client *graphql.Client
 }
 
-func (s *theGraphServiceAlphaImpl) ListRelationships(contract string, tokenId string, options *v0alpha.QueryOptions) ([]*v0alpha.Relationship, error) {
+func (s *theGraphServiceAlphaImpl) GetRelationship(relationshipId string) (*v0alpha.Relationship, error) {
+	req := graphql.NewRequest(`
+		query($relationshipId: String) {
+			relationshipCreated(where: {relationshipId: $relationshipId}) {
+				id
+				relationshipId
+				relType
+				srcAddress
+				srcId
+				dstAddress
+				dstId
+				blockNumber
+				blockTimestamp
+				transactionHash
+			}
+		}
+	}`)
+	req.Var("relationshipId", relationshipId)
+	ctx := context.Background()
+	var relationshipsResponse v0alpha.RelationshipTheGraphAlphaResponse
+	if err := s.client.Run(ctx, req, &relationshipsResponse); err != nil {
+		return nil, fmt.Errorf("failed to get the relationships from the graph. error: %v", err)
+	}
+
+	return relationshipsResponse.Relationships[0].ToRelationship(), nil
+
+}
+
+func (s *theGraphServiceAlphaImpl) ListRelationships(contract string, tokenId string, options *TheGraphQueryOptions) ([]*v0alpha.Relationship, error) {
 	options = s.setQueryOptions(options)
 	req := graphql.NewRequest(`
 		query($contract: String, $tokenId: String, $first: Int, $skip: Int) {
-			relationships(where: {contract: $contract, tokenId: $tokenId}, first: $first, skip: $skip) {
+			relationshipCreateds(where: {
+				or: [
+					{ srcAddress: $contract, srcId: $tokenId },
+					{ dstAddress: $contract, dstId: $tokenId }
+				]
+			}, first: $first, skip: $skip) {
 				id
-				contract
-				tokenId
-				owner
-				relatedTokenId
-				relationshipType
+				relationshipId
+				relType
+				srcAddress
+				srcId
+				dstAddress
+				dstId
+				blockNumber
+				blockTimestamp
+				transactionHash
 			}
 		}
 	`)
@@ -46,11 +83,11 @@ func (s *theGraphServiceAlphaImpl) ListRelationships(contract string, tokenId st
 	return relationshipsResponse.ToRelationships(), nil
 }
 
-func (s *theGraphServiceAlphaImpl) ListHooks(moduleId *string, options *v0alpha.QueryOptions) ([]*v0alpha.Hook, error) {
+func (s *theGraphServiceAlphaImpl) ListHooks(moduleId *string, options *TheGraphQueryOptions) ([]*v0alpha.Hook, error) {
 	options = s.setQueryOptions(options)
 	req := graphql.NewRequest(`
 		query($moduleId: String, $first: Int, $skip: Int) {
-			hooks(where: {moduleId: $moduleId}, first: $first, skip: $skip) {
+			hookRegistereds(where: {moduleId: $moduleId}, first: $first, skip: $skip) {
 				id
 				moduleId
 				hookType
@@ -97,19 +134,31 @@ func (s *theGraphServiceAlphaImpl) GetHook(hookId string) (*v0alpha.Hook, error)
 	return hooksResponse.Hooks[0].ToHook(), nil
 }
 
-func (s *theGraphServiceAlphaImpl) ListModules(ipOrgId *string, options *v0alpha.QueryOptions) ([]*v0alpha.Module, error) {
+func (s *theGraphServiceAlphaImpl) ListModules(ipOrgId *string, options *TheGraphQueryOptions) ([]*v0alpha.Module, error) {
 	options = s.setQueryOptions(options)
-	req := graphql.NewRequest(`
-		query($ipOrgId: String, $first: Int, $skip: Int) {
-			modules(where: {ipOrgId: $ipOrgId}, first: $first, skip: $skip) {
+	queryInterface := "$ipOrgId: String, $first: Int, $skip: Int"
+	queryValue := "where: {ipOrgId: $ipOrgId}, first: $first, skip: $skip"
+	if ipOrgId == nil || *ipOrgId == "" {
+		queryInterface = "$first: Int, $skip: Int"
+		queryValue = "first: $first, skip: $skip"
+	}
+	req := graphql.NewRequest(fmt.Sprintf(`
+		query(%s) {
+			moduleRegisterreds(%s) {
 				id
 				ipOrgId
-				moduleType
-				moduleData
+				blockNumber
+				blockTimestamp
+				moduleId
+				moduleKey
+				transactionHash
 			}
 		}
-	`)
-	req.Var("ipOrgId", *ipOrgId)
+	`, queryInterface, queryValue))
+	if ipOrgId != nil {
+		req.Var("ipOrgId", *ipOrgId)
+	}
+
 	req.Var("first", options.First)
 	req.Var("skip", options.Skip)
 
@@ -125,11 +174,14 @@ func (s *theGraphServiceAlphaImpl) ListModules(ipOrgId *string, options *v0alpha
 func (s *theGraphServiceAlphaImpl) GetModule(moduleId string) (*v0alpha.Module, error) {
 	req := graphql.NewRequest(`
 		query($moduleId: String) {
-			modules(where: {id: $moduleId}) {
+			moduleRegisterreds(where: {moduleId: $moduleId}) {
+				blockNumber
+				blockTimestamp
 				id
 				ipOrgId
-				moduleType
-				moduleData
+				moduleId
+				moduleKey
+				transactionHash
 			}
 		}
 	`)
@@ -148,7 +200,7 @@ func (s *theGraphServiceAlphaImpl) GetModule(moduleId string) (*v0alpha.Module, 
 	return modulesResponse.Modules[0].ToModule(), nil
 }
 
-func (s *theGraphServiceAlphaImpl) ListIPOrgs(options *v0alpha.QueryOptions) ([]*v0alpha.IPOrg, error) {
+func (s *theGraphServiceAlphaImpl) ListIPOrgs(options *TheGraphQueryOptions) ([]*v0alpha.IPOrg, error) {
 	options = s.setQueryOptions(options)
 	req := graphql.NewRequest(`
 		query($first: Int, $skip: Int) {
@@ -212,27 +264,37 @@ func (s *theGraphServiceAlphaImpl) GetIPOrg(iporgId string) (*v0alpha.IPOrg, err
 	return ipOrgsResponse.IporgRegistereds[0].ToIPOrg(), nil
 }
 
-func (s *theGraphServiceAlphaImpl) ListIPAssets(iporgId *string, options *v0alpha.QueryOptions) ([]*v0alpha.IPAsset, error) {
+func (s *theGraphServiceAlphaImpl) ListIPAssets(iporgId *string, options *TheGraphQueryOptions) ([]*v0alpha.IPAsset, error) {
 	options = s.setQueryOptions(options)
-	req := graphql.NewRequest(`
-		query($iporgId: BigInt, $first: Int, $skip: Int) {
-			ipassetRegistereds(where: {ipOrgId: $iporgId}, first: $first, skip: $skip) {
-				id
-				ipOrgId
-				ipAssetId
-				ipOrgAssetId
-				owner
-				name
-				ipAssetType
-				contentHash
-				mediaUrl
+
+	queryInterface := "$ipOrgId: String, $first: Int, $skip: Int"
+	queryValue := "where: {ipOrgId: $ipOrgId}, first: $first, skip: $skip"
+	if iporgId == nil || *iporgId == "" {
+		queryInterface = "$first: Int, $skip: Int"
+		queryValue = "first: $first, skip: $skip"
+	}
+
+	req := graphql.NewRequest(fmt.Sprintf(`
+		query(%s) {
+			ipassetRegistereds(%s) {
 				blockNumber
 				blockTimestamp
+				contentHash
+				id
+				ipAssetId
+				ipAssetType
+				ipOrgAssetId
+				ipOrgId
+				mediaUrl
+				name
+				owner
 				transactionHash
 			}
 		}
-	`)
-	req.Var("iporgId", iporgId)
+	`, queryInterface, queryValue))
+	if iporgId != nil {
+		req.Var("ipOrgId", iporgId)
+	}
 	req.Var("first", options.First)
 	req.Var("skip", options.Skip)
 
@@ -244,10 +306,10 @@ func (s *theGraphServiceAlphaImpl) ListIPAssets(iporgId *string, options *v0alph
 	return ipAssetsResponse.ToIPAssets(), nil
 }
 
-func (s *theGraphServiceAlphaImpl) GetIPAsset(iporgId string, ipAssetId string) (*v0alpha.IPAsset, error) {
+func (s *theGraphServiceAlphaImpl) GetIPAsset(ipAssetId string) (*v0alpha.IPAsset, error) {
 	req := graphql.NewRequest(`
-		query($iporgId: BigInt, $ipAssetId: BigInt) {
-			iporgRegistereds(where: {id: $ipAssetId, ipOrgId: $iporgId}) {
+		query($ipAssetId: String) {
+			ipassetRegistereds(where: {ipAssetId: $ipAssetId}) {
 				id
 				ipAssetId
 				ipOrgId
@@ -263,7 +325,6 @@ func (s *theGraphServiceAlphaImpl) GetIPAsset(iporgId string, ipAssetId string) 
 			}
 		}
 	`)
-	req.Var("iporgId", iporgId)
 	req.Var("ipAssetId", ipAssetId)
 
 	ctx := context.Background()
@@ -279,22 +340,33 @@ func (s *theGraphServiceAlphaImpl) GetIPAsset(iporgId string, ipAssetId string) 
 	return ipAssetsResponse.IpassetRegistereds[0].ToIPAsset(), nil
 }
 
-func (s *theGraphServiceAlphaImpl) ListTransactions(ipOrgId *string, options *v0alpha.QueryOptions) ([]*v0alpha.Transaction, error) {
-	// TODO(Rex): support optional iporgid
+func (s *theGraphServiceAlphaImpl) ListTransactions(ipOrgId *string, options *TheGraphQueryOptions) ([]*v0alpha.Transaction, error) {
 	options = s.setQueryOptions(options)
-	req := graphql.NewRequest(`
-		query($iporgId: BigInt, $first: Int, $skip: Int) {
-			transactions(where: {ipOrgId: $iporgId}, first: $first, skip: $skip) {
-				id
-				ipOrgId
-				ipAssetId
-				transactionHash
+	queryInterface := "$ipOrgId: String, $first: Int, $skip: Int"
+	queryValue := "where: {ipOrgId: $ipOrgId}, first: $first, skip: $skip"
+	if ipOrgId == nil || *ipOrgId == "" {
+		queryInterface = "$first: Int, $skip: Int"
+		queryValue = "first: $first, skip: $skip"
+	}
+
+	req := graphql.NewRequest(fmt.Sprintf(`
+		query(%s) {
+			transactions(%s) {
+				actionType
 				blockNumber
 				blockTimestamp
+				id
+				initiator
+				ipOrgId
+				resourceId
+				resourceType
+				transactionHash
 			}
 		}
-	`)
-	req.Var("iporgId", ipOrgId)
+	`, queryInterface, queryValue))
+	if ipOrgId != nil {
+		req.Var("ipOrgId", ipOrgId)
+	}
 	req.Var("first", options.First)
 	req.Var("skip", options.Skip)
 
@@ -309,15 +381,17 @@ func (s *theGraphServiceAlphaImpl) ListTransactions(ipOrgId *string, options *v0
 
 func (s *theGraphServiceAlphaImpl) GetTransaction(transactionId string) (*v0alpha.Transaction, error) {
 	req := graphql.NewRequest(`
-
 		query($transactionId: BigInt) {
 			transactions(where: {id: $transactionId}) {
-				id
-				ipOrgId
-				ipAssetId
-				transactionHash
+				actionType
 				blockNumber
 				blockTimestamp
+				id
+				initiator
+				ipOrgId
+				resourceId
+				resourceType
+				transactionHash
 			}
 		}
 	`)
@@ -336,9 +410,8 @@ func (s *theGraphServiceAlphaImpl) GetTransaction(transactionId string) (*v0alph
 	return transactionsResponse.Transactions[0].ToTransaction(), nil
 }
 
-func (s *theGraphServiceAlphaImpl) ListLicenses(iporgId *string, ipAssetId *string, options *v0alpha.QueryOptions) ([]*v0alpha.License, error) {
+func (s *theGraphServiceAlphaImpl) ListLicenses(iporgId *string, ipAssetId *string, options *TheGraphQueryOptions) ([]*v0alpha.License, error) {
 	options = s.setQueryOptions(options)
-
 	req := graphql.NewRequest(`
 		query($iporgId: String, $ipAssetId: String, $first: Int, $skip: Int) {
 			licenses(where: {ipOrgId: $iporgId, ipAssetId: $ipAssetId}, first: $first, skip: $skip) {
@@ -393,9 +466,9 @@ func (s *theGraphServiceAlphaImpl) GetLicense(licenseId string) (*v0alpha.Licens
 	return licenseResponse.LicenseRegistereds[0].ToLicense(), nil
 }
 
-func (s *theGraphServiceAlphaImpl) setQueryOptions(options *v0alpha.QueryOptions) *v0alpha.QueryOptions {
+func (s *theGraphServiceAlphaImpl) setQueryOptions(options *TheGraphQueryOptions) *TheGraphQueryOptions {
 	if options == nil {
-		options = &v0alpha.QueryOptions{
+		options = &TheGraphQueryOptions{
 			First: 100,
 			Skip:  0,
 		}
