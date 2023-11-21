@@ -24,8 +24,7 @@ func (p *AlphaProtocolHandler) ListIpOrgsHandler(c *gin.Context) {
 	var requestBody v0alpha_entity.ListIpOrgsRequest
 	if err := c.BindJSON(&requestBody); err != nil {
 		logger.Errorf("Failed to read request body: %v", err)
-		c.JSON(http.StatusBadRequest, ErrorMessage("invalid request body"))
-		return
+		requestBody = v0alpha_entity.ListIpOrgsRequest{}
 	}
 
 	iporgs, err := p.graphServiceAlpha.ListIPOrgs(thegraph.FromRequestQueryOptions(requestBody.Options))
