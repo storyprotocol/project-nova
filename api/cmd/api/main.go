@@ -118,6 +118,9 @@ func main() {
 	theGraphClientMvp := graphql.NewClient("https://api.thegraph.com/subgraphs/name/edisonz0718/storyprotocol-v0-mvp")
 	theGraphServiceMvp := thegraph.NewTheGraphServiceMvpImpl(theGraphClientMvp)
 
+	theGraphClientAlpha := graphql.NewClient("https://api.thegraph.com/subgraphs/name/edisonz0718/storyprotocol-v0-alpha")
+	theGraphServiceAlpha := thegraph.NewTheGraphServiceAlphaImpl(theGraphClientAlpha)
+
 	storyBlocksRegistry, err := story_blocks_registry.NewStoryBlocksRegistry(
 		common.HexToAddress(cfg.StoryBlocksRegistry),
 		ethClient,
@@ -125,6 +128,9 @@ func main() {
 	if err != nil {
 		logger.Fatalf("Failed to create story blocks registry client: %v", err)
 	}
+
+	// initialize handlers
+	protocolHandler := handler.NewProtocolHandler(theGraphServiceAlpha, httpClient)
 
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, "Hello")
@@ -306,6 +312,7 @@ func main() {
 		protocolKbw.GET("/license/:licenseId", handler.NewGetLicenseHandlerKbw(theGraphServiceKbw))
 	}
 
+	// MVP endpoints
 	protocolMvp := r.Group("/")
 	protocolMvp.Use(cors.Default())
 	{
@@ -337,50 +344,51 @@ func main() {
 		protocolMvp.GET("/transaction/:transactionId", handler.NewGetTransactionHandler(theGraphServiceMvp))
 	}
 
+	// Alpha endpoints
 	protocol := r.Group("/protocol")
 	protocol.Use(cors.Default())
 	{
 		// Endpoint to list ip orgs
-		protocol.POST("/iporg", handler.NewListIpOrgsHandler(theGraphServiceMvp, httpClient))
+		protocol.POST("/iporg", protocolHandler.ListIpOrgsHandler)
 
 		// Endpoint to get an ip org
-		protocol.GET("/iporg/:ipOrgId", handler.NewGetIpOrgHandler(theGraphServiceMvp, httpClient))
+		protocol.GET("/iporg/:ipOrgId", protocolHandler.GetIpOrgHandler)
 
 		// Endpoint to get a single ip asset
-		protocol.GET("/ipasset/:ipAssetId", handler.NewGetIpAssetHandler(theGraphServiceMvp, httpClient))
+		protocol.GET("/ipasset/:ipAssetId", protocolHandler.GetIpAssetHandler)
 
 		// Endpoint to list ip assets
-		protocol.POST("/ipasset", handler.NewListIpAssetsHandler(theGraphServiceMvp, httpClient))
+		protocol.POST("/ipasset", protocolHandler.ListIpAssetsHandler)
 
 		// Endpoint to get a single license
-		protocol.GET("/license/:licenseId", handler.NewGetLicenseHandler(theGraphServiceMvp))
+		protocol.GET("/license/:licenseId", protocolHandler.GetLicenseHandler)
 
 		// Endpoint to list licenses from an ip asset
-		protocol.POST("/license", handler.NewListLicensesHandler(theGraphServiceMvp))
+		protocol.POST("/license", protocolHandler.ListLicensesHandler)
 
 		// Endpoint to get transaction
-		protocol.GET("/transaction/:transactionId", handler.NewGetTransactionHandler(theGraphServiceMvp))
+		protocol.GET("/transaction/:transactionId", protocolHandler.GetTransactionHandler)
 
 		// Endpoint to list transactions
-		protocol.POST("/transaction", handler.NewListTransactionsHandler(theGraphServiceMvp))
+		protocol.POST("/transaction", protocolHandler.ListTransactionsHandler)
 
 		// Endpoint to get a relatioinship
-		protocol.GET("/relationship/:relationshipId", handler.NewGetRelationshipHandler(theGraphServiceMvp))
+		protocol.GET("/relationship/:relationshipId", protocolHandler.GetRelationshipHandler)
 
 		// Endpoint to list relatioinships
-		protocol.POST("/relationship", handler.NewListRelationshipsHandler(theGraphServiceMvp))
+		protocol.POST("/relationship", protocolHandler.ListRelationshipsHandler)
 
 		// Endpoint to list modules
-		protocol.POST("/module", handler.NewListModulesHandler(theGraphServiceMvp))
+		protocol.POST("/module", protocolHandler.ListModulesHandler)
 
 		// Endpoint to get a module
-		protocol.GET("/module/:moduleId", handler.NewGetModuleHandler(theGraphServiceMvp))
+		protocol.GET("/module/:moduleId", protocolHandler.GetModuleHandler)
 
 		// Endpoint to list hooks
-		protocol.POST("/hook", handler.NewListHooksHandler(theGraphServiceMvp))
+		protocol.POST("/hook", protocolHandler.ListHooksHandler)
 
 		// Endpoint to get a hook
-		protocol.GET("/hook/:hookId", handler.NewGetHookHandler(theGraphServiceMvp))
+		protocol.GET("/hook/:hookId", protocolHandler.GetHookHandler)
 	}
 
 	port := fmt.Sprintf(":%d", cfg.Port)

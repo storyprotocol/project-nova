@@ -2,9 +2,69 @@
 
 Story Protocol backend provides the protocol data indexing and API services for other products and services 
 
-## Prerequisites
-- Install Docker
-- Install Go
+## Onboarding
+
+### Tool Installation
+* Install Make: Run `xcode-select --install`
+* Install Docker: Follow instructions at [Docker for Mac](https://docs.docker.com/docker-for-mac/install/)
+* Install Golang: Guide available [here](https://jimkang.medium.com/install-go-on-mac-with-homebrew-5fa421fc55f5)
+* Install Proto: Execute `go get -u github.com/golang/protobuf/{proto,proto-gen-go}`
+* Install Protoc-Gen-Go (Use `go install` when outside of a module): `go install github.com/golang/protobuf/protoc-gen-go@latest`
+* Install AWS CLI: Instructions at [AWS CLI Installation](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
+* Install AWS IAM Authenticator: Refer to [AWS IAM Authenticator Installation](https://docs.aws.amazon.com/eks/latest/userguide/install-aws-iam-authenticator.html)
+* Install Kubectl: Guide available at [Kubernetes Tools](https://kubernetes.io/docs/tasks/tools/)
+* Install Kubectx: Run `brew install kubectx`
+* Install K9s: Execute `brew install k9s`
+* Install Typescript: `npm install typescript -g`
+
+### Infrastructure Setup
+* Request an admin to: 
+  1. Create a new profile for you.
+  2. Grant access to the Kubernetes (k8s) cluster.
+* Set up your profile using `aws configure set`.
+  * Profiles can be found at `~/.aws/config`
+* Log in to SSO using `aws sso login`.
+* Verify ECR access with `make ecr-auth`. You should see "Login Succeeded".
+* Set up EKS locally (details to be provided).
+  * Update Kube Config with appropriate cluster information `aws eks update-kubeconfig --name CLUSTER_NAME --region CLUSTER_REGION`
+  * Verify attached cluster `eksctl get cluster`
+  * Verify Node Group `eksctl get nodegroup --cluster CLUSTER_NAME`
+* Verify EKS access with `k9s`. You should see cluster information without errors.
+
+### Web3-Gateway
+The Web3-Gateway service is located in `project-nova/web3-gateway`.
+* Install PNPM: `npm install -g pnpm`
+* Install TypeScript: `pnpm add typescript -D`
+* Run `pnpm install` in the root directory of Web3-Gateway.
+* Create a `local.yaml` file in `web3-gateway/config` with the following content:
+    ```
+    env: local
+    wallet_key: <request a wallet key>
+    server:
+      port: 10002
+    ```
+* Return to the root directory of `project-nova` and run `make build-proto` to generate proto files.
+* Start the server with `make runweb3gateway`.
+
+* Steps to release a new build for Web3-Gateway service:
+  1. Build a Docker image with `make build-web3-gateway` (run `make ecr-auth` first for access).
+  2. Push the Docker image to ECR using `make push-web3-gateway`.
+  3. Deploy the Docker image to the EKS cluster with `make deploy-web3-gateway`.
+
+### API Service
+The API service is located in `project-nova/api`.
+* Create `local.yaml` and `secrets.yaml` in `project-nova/api/config`. Obtain `local.yaml` contents from a teammate and leave `secrets.yaml` empty.
+* Set up a local PostgreSQL for the API service: `docker-compose up -d api-database`.
+* Set up the database schema: `make db_up`.
+* Start the server with `make runserver`. You should see `[GIN-debug] Listening and serving HTTP on :10001`.
+
+* Steps to release a new build:
+  1. Commit your local changes to Git.
+  2. Run `make build-api`.
+  3. Execute `make push-api`.
+  4. Update the `newTag` field in [this file](https://github.com/storyprotocol/project-nova-cd/blob/main/deploy/envs/stag/kustomization.yml) on GitHub (edit directly on GitHub, but first obtain repository access).
+  5. Argo CD will automatically deploy the new tag after a few minutes.
+
 
 ## Quick Start 
 The Makefile handles most of the local development operation tasks

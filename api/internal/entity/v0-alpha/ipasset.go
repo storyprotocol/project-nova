@@ -30,9 +30,56 @@ var IpAssetTypes = struct {
 }
 
 type GetIpAssetResponse struct {
-	IPAsset *IPAsset `json:"ipasset"`
+	IPAsset *IPAsset `json:"ipAssets"`
+}
+
+type ListIpAssetsRequest struct {
+	IpOrgId string        `json:"ipOrgId"`
+	Options *QueryOptions `json:"options"`
 }
 
 type ListIpAssetsResponse struct {
-	IPAssets []*IPAsset `json:"ipassets"`
+	IPAssets []*IPAsset `json:"ipAssets"`
+}
+
+type IPAssetTheGraphAlpha struct {
+	ID             string `json:"id"`
+	IpAssetId      string `json:"ipAssetId"`
+	IpOrgId        string `json:"ipOrgId"`
+	IpOrgAssetId   string `json:"ipOrgAssetId"`
+	Owner          string `json:"owner"`
+	Name           string `json:"name"`
+	IpAssetType    string `json:"ipAssetType"`
+	ContentHash    string `json:"contentHash"`
+	MediaUrl       string `json:"mediaUrl"`
+	BlockNumber    string `json:"blockNumber"`
+	BlockTimestamp string `json:"blockTimestamp"`
+	TxHash         string `json:"transactionHash"`
+}
+
+type IpAssetTheGraphAlphaResponse struct {
+	IpassetRegistereds []*IPAssetTheGraphAlpha `json:"ipassetRegistereds"`
+}
+
+func (i *IpAssetTheGraphAlphaResponse) ToIPAssets() []*IPAsset {
+	ipassets := []*IPAsset{}
+	for _, ipasset := range i.IpassetRegistereds {
+		ipassets = append(ipassets, ipasset.ToIPAsset())
+	}
+
+	return ipassets
+}
+
+func (i *IPAssetTheGraphAlpha) ToIPAsset() *IPAsset {
+	return &IPAsset{
+		ID:          i.ID,
+		Name:        i.Name,
+		Type:        IPAssetType(i.IpAssetType),
+		IPOrgId:     i.IpOrgId,
+		Owner:       i.Owner,
+		MetadataUrl: i.MediaUrl,
+		ContentHash: []byte(i.ContentHash),
+		CreatedAt:   i.BlockTimestamp,
+		TxHash:      i.TxHash,
+	}
 }
