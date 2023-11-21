@@ -21,7 +21,7 @@ type ListLicensesRequest struct {
 }
 
 type ListLicensesResponse struct {
-	Licenses []*License `json:"licenses"`
+	Licenses []*License `json:"licenseRegisterreds"`
 }
 
 type LicenseRegistryTheGraphAlpha struct {
@@ -43,7 +43,7 @@ type LicenseRegistryTheGraphAlpha struct {
 }
 
 type LicenseTheGraphAlphaResponse struct {
-	LicenseRegistereds []*LicenseRegistryTheGraphAlpha `json:"licenseRegistereds"`
+	LicenseRegistereds []*LicenseRegistryTheGraphAlpha `json:"licenseRegisterreds"`
 }
 
 func (l *LicenseTheGraphAlphaResponse) ToLicenses() []*License {

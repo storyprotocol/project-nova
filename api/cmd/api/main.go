@@ -129,6 +129,9 @@ func main() {
 		logger.Fatalf("Failed to create story blocks registry client: %v", err)
 	}
 
+	// initialize handlers
+	protocolHandler := handler.NewProtocolHandler(theGraphServiceAlpha, httpClient)
+
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, "Hello")
 	})
@@ -346,46 +349,46 @@ func main() {
 	protocol.Use(cors.Default())
 	{
 		// Endpoint to list ip orgs
-		protocol.POST("/iporg", handler.NewListIpOrgsHandlerAlpha(theGraphServiceAlpha, httpClient))
+		protocol.POST("/ipOrg", protocolHandler.ListIpOrgsHandler)
 
 		// Endpoint to get an ip org
-		protocol.GET("/iporg/:ipOrgId", handler.NewGetIpOrgHandlerAlpha(theGraphServiceAlpha, httpClient))
+		protocol.GET("/ipOrg/:ipOrgId", protocolHandler.GetIpOrgHandler)
 
 		// Endpoint to get a single ip asset
-		protocol.GET("/ipasset/:ipAssetId", handler.NewGetIpAssetHandlerAlpha(theGraphServiceAlpha, httpClient))
+		protocol.GET("/ipAsset/:ipAssetId", protocolHandler.GetIpAssetHandler)
 
 		// Endpoint to list ip assets
-		protocol.POST("/ipasset", handler.NewListIpAssetsHandlerAlpha(theGraphServiceAlpha, httpClient))
+		protocol.POST("/ipAsset", protocolHandler.ListIpAssetsHandler)
 
 		// Endpoint to get a single license
-		protocol.GET("/license/:licenseId", handler.NewGetLicenseHandlerAlpha(theGraphServiceAlpha))
+		protocol.GET("/license/:licenseId", protocolHandler.GetLicenseHandler)
 
 		// Endpoint to list licenses from an ip asset
-		protocol.POST("/license", handler.NewListLicensesHandlerAlpha(theGraphServiceAlpha))
+		protocol.POST("/license", protocolHandler.ListLicensesHandler)
 
 		// Endpoint to get transaction
-		protocol.GET("/transaction/:transactionId", handler.NewGetTransactionHandlerAlpha(theGraphServiceAlpha))
+		protocol.GET("/transaction/:transactionId", protocolHandler.GetTransactionHandler)
 
 		// Endpoint to list transactions
-		protocol.POST("/transaction", handler.NewListTransactionsHandlerAlpha(theGraphServiceAlpha))
+		protocol.POST("/transaction", protocolHandler.ListTransactionsHandler)
 
 		// Endpoint to get a relatioinship
-		protocol.GET("/relationship/:relationshipId", handler.NewGetRelationshipHandlerAlpha(theGraphServiceAlpha))
+		protocol.GET("/relationship/:relationshipId", protocolHandler.GetRelationshipHandler)
 
 		// Endpoint to list relatioinships
-		protocol.POST("/relationship", handler.NewListRelationshipsHandlerAlpha(theGraphServiceAlpha))
+		protocol.POST("/relationship", protocolHandler.ListRelationshipsHandler)
 
 		// Endpoint to list modules
-		protocol.POST("/module", handler.NewListModulesHandlerAlpha(theGraphServiceAlpha))
+		protocol.POST("/module", protocolHandler.ListModulesHandler)
 
 		// Endpoint to get a module
-		protocol.GET("/module/:moduleId", handler.NewGetModuleHandlerAlpha(theGraphServiceAlpha))
+		protocol.GET("/module/:moduleId", protocolHandler.GetModuleHandler)
 
 		// Endpoint to list hooks
-		protocol.POST("/hook", handler.NewListHooksHandlerAlpha(theGraphServiceAlpha))
+		protocol.POST("/hook", protocolHandler.ListHooksHandler)
 
 		// Endpoint to get a hook
-		protocol.GET("/hook/:hookId", handler.NewGetHookHandlerAlpha(theGraphServiceAlpha))
+		protocol.GET("/hook/:hookId", protocolHandler.GetHookHandler)
 	}
 
 	port := fmt.Sprintf(":%d", cfg.Port)

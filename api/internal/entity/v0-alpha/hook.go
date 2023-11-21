@@ -17,6 +17,11 @@ type ListHooksRequest struct {
 	Options  *QueryOptions `json:"options"`
 }
 
+type ListHookRequest struct {
+	ModuleId *string       `json:"moduleId"`
+	Options  *QueryOptions `json:"options"`
+}
+
 type ListHooksResponse struct {
 	Hooks []*Hook `json:"hooks"`
 }
@@ -24,15 +29,16 @@ type ListHooksResponse struct {
 type HookTheGraphAlpha struct {
 	ID             string `json:"id"`
 	HookId         string `json:"hookId"`
-	ModuleKey      string `json:"moduleKey"`
-	HookType       string `json:"hookType"`
+	ModuleId       string `json:"moduleId"`
+	Type           int64  `json:"type"`
+	RegistryKey    string `json:"registryKey"`
 	BlockNumber    string `json:"blockNumber"`
 	BlockTimestamp string `json:"blockTimestamp"`
 	TxHash         string `json:"transactionHash"`
 }
 
 type HookTheGraphAlphaResponse struct {
-	Hooks []*HookTheGraphAlpha `json:"hooks"`
+	Hooks []*HookTheGraphAlpha `json:"hookRegistereds"`
 }
 
 func (h *HookTheGraphAlphaResponse) ToHooks() []*Hook {
@@ -47,8 +53,8 @@ func (h *HookTheGraphAlphaResponse) ToHooks() []*Hook {
 func (h *HookTheGraphAlpha) ToHook() *Hook {
 	return &Hook{
 		ID:           h.ID,
-		ModuleId:     h.ModuleKey,
-		Interface:    h.HookType,
+		ModuleId:     h.ModuleId,
+		Interface:    "",
 		RegisteredAt: h.BlockTimestamp,
 		TxHash:       h.TxHash,
 	}

@@ -3,9 +3,11 @@ package thegraph
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/machinebox/graphql"
 	v0alpha "github.com/project-nova/backend/api/internal/entity/v0-alpha"
+	"github.com/project-nova/backend/pkg/logger"
 )
 
 func NewTheGraphServiceAlphaImpl(client *graphql.Client) TheGraphServiceAlpha {
@@ -21,21 +23,21 @@ type theGraphServiceAlphaImpl struct {
 func (s *theGraphServiceAlphaImpl) GetRelationship(relationshipId string) (*v0alpha.Relationship, error) {
 	req := graphql.NewRequest(`
 		query($relationshipId: String) {
-			relationshipCreated(where: {relationshipId: $relationshipId}) {
-				id
+			relationshipCreateds(where: {relationshipId: $relationshipId}) {
+				transactionHash
+				srcId
+				srcAddress
 				relationshipId
 				relType
-				srcAddress
-				srcId
-				dstAddress
+				id
 				dstId
-				blockNumber
+				dstAddress
 				blockTimestamp
-				transactionHash
-			}
+				blockNumber
 		}
 	}`)
 	req.Var("relationshipId", relationshipId)
+
 	ctx := context.Background()
 	var relationshipsResponse v0alpha.RelationshipTheGraphAlphaResponse
 	if err := s.client.Run(ctx, req, &relationshipsResponse); err != nil {
@@ -85,17 +87,31 @@ func (s *theGraphServiceAlphaImpl) ListRelationships(contract string, tokenId st
 
 func (s *theGraphServiceAlphaImpl) ListHooks(moduleId *string, options *TheGraphQueryOptions) ([]*v0alpha.Hook, error) {
 	options = s.setQueryOptions(options)
-	req := graphql.NewRequest(`
-		query($moduleId: String, $first: Int, $skip: Int) {
-			hookRegistereds(where: {moduleId: $moduleId}, first: $first, skip: $skip) {
+
+	queryInterface := "$moduleId: String, $first: Int, $skip: Int"
+	queryValue := "where: {moduleId: $moduleId}, first: $first, skip: $skip"
+	if moduleId == nil || *moduleId == "" {
+		queryInterface = "$first: Int, $skip: Int"
+		queryValue = "first: $first, skip: $skip"
+	}
+
+	req := graphql.NewRequest(fmt.Sprintf(`
+		query(%s) {
+			hookRegistereds(%s) {
+				blockNumber
+				blockTimestamp
 				id
 				moduleId
-				hookType
-				hookData
+				registryKey
+				transactionHash
+				type
 			}
 		}
-	`)
-	req.Var("moduleId", *moduleId)
+	`, queryInterface, queryValue))
+
+	if moduleId != nil {
+		req.Var("moduleId", *moduleId)
+	}
 	req.Var("first", options.First)
 	req.Var("skip", options.Skip)
 
@@ -111,11 +127,14 @@ func (s *theGraphServiceAlphaImpl) ListHooks(moduleId *string, options *TheGraph
 func (s *theGraphServiceAlphaImpl) GetHook(hookId string) (*v0alpha.Hook, error) {
 	req := graphql.NewRequest(`
 		query($hookId: String) {
-			hooks(where: {id: $hookId}) {
+			hookRegistereds(where: {id: $hookId}) {
+				blockNumber
+				blockTimestamp
 				id
 				moduleId
-				hookType
-				hookData
+				registryKey
+				transactionHash
+				type
 			}
 		}
 	`)
@@ -410,22 +429,52 @@ func (s *theGraphServiceAlphaImpl) GetTransaction(transactionId string) (*v0alph
 	return transactionsResponse.Transactions[0].ToTransaction(), nil
 }
 
-func (s *theGraphServiceAlphaImpl) ListLicenses(iporgId *string, ipAssetId *string, options *TheGraphQueryOptions) ([]*v0alpha.License, error) {
+func (s *theGraphServiceAlphaImpl) ListLicenses(ipOrgId *string, ipAssetId *string, options *TheGraphQueryOptions) ([]*v0alpha.License, error) {
 	options = s.setQueryOptions(options)
-	req := graphql.NewRequest(`
-		query($iporgId: String, $ipAssetId: String, $first: Int, $skip: Int) {
-			licenses(where: {ipOrgId: $iporgId, ipAssetId: $ipAssetId}, first: $first, skip: $skip) {
-				id
+	queryInterface := "$first: Int, $skip: Int"
+	queryValue := "first: $first, skip: $skip"
+	whereClause := []string{}
+	if ipOrgId != nil && *ipOrgId != "" {
+		queryInterface += ", $ipOrgId: String"
+		whereClause = append(whereClause, "ipOrgId: $ipOrgId")
+	}
+	if ipAssetId != nil && *ipAssetId != "" {
+		queryInterface += ", $ipAssetId: String"
+		whereClause = append(whereClause, "ipAssetId: $ipAssetId")
+	}
+	if len(whereClause) > 0 {
+		queryValue = fmt.Sprintf("where: {%s}, %s", strings.Join(whereClause, ","), queryValue)
+	}
+
+	logger.Infof(">>> %s", queryInterface)
+	logger.Infof(">>> %s", queryValue)
+	req := graphql.NewRequest(fmt.Sprintf(`
+		query(%s) {
+			licenseRegisterreds(%s) {
+				transactionHash
+				termsData
+				termIds
+				status
+				revoker
+				parentLicenseId
+				licensor
+				licenseeType
+				licenseId
+				isCommercial
 				ipOrgId
 				ipAssetId
-				licenseType
-				issuedAt
-				expiredAt
+				id
+				blockTimestamp
+				blockNumber
 			}
 		}
-	`)
-	req.Var("iporgId", iporgId)
-	req.Var("ipAssetId", ipAssetId)
+	`, queryInterface, queryValue))
+	if ipOrgId != nil && *ipOrgId != "" {
+		req.Var("ipOrgId", ipOrgId)
+	}
+	if ipAssetId != nil && *ipAssetId != "" {
+		req.Var("ipAssetId", ipAssetId)
+	}
 	req.Var("first", options.First)
 	req.Var("skip", options.Skip)
 
@@ -434,20 +483,29 @@ func (s *theGraphServiceAlphaImpl) ListLicenses(iporgId *string, ipAssetId *stri
 	if err := s.client.Run(ctx, req, &licensesResponse); err != nil {
 		return nil, fmt.Errorf("failed to get the licenses from the graph. error: %v", err)
 	}
-
+	logger.Infof(">>> %v", licensesResponse)
 	return licensesResponse.ToLicenses(), nil
 }
 
 func (s *theGraphServiceAlphaImpl) GetLicense(licenseId string) (*v0alpha.License, error) {
-	req := graphql.NewRequest(`
+	req := graphql.NewRequest(` 
 		query($licenseId: String) {
-			license(id: $licenseId) {
-				id
+			licenseRegisterreds(licenseId: $licenseId) {
+				transactionHash
+				termsData
+				termIds
+				status
+				revoker
+				parentLicenseId
+				licensor
+				licenseeType
+				licenseId
+				isCommercial
 				ipOrgId
 				ipAssetId
-				licenseType
-				issuedAt
-				expiredAt
+				id
+				blockTimestamp
+				blockNumber
 			}
 		}
 	`)

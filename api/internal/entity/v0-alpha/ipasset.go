@@ -34,6 +34,7 @@ type GetIpAssetResponse struct {
 }
 
 type ListIpAssetsRequest struct {
+	IpOrgId string        `json:"ipOrgId"`
 	Options *QueryOptions `json:"options"`
 }
 
