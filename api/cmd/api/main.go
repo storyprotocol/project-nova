@@ -278,10 +278,10 @@ func main() {
 		protocolV2.POST("/files/upload", handler.NewUploadFileHandlerV2(web3Gateway))
 
 		// Endpoint for listing all stories in a franchise
-		protocolV2.GET("/franchise/:franchiseId", handler.NewListFranchiseStoriesHandlerV2(theGraphServiceAlpha))
+		protocolV2.GET("/franchise/:franchiseId", handler.NewListFranchiseStoriesHandlerV2())
 
 		// Endpoint for getting the detail information about a franchise story
-		protocolV2.GET("/franchise/:franchiseId/stories/:storyId", handler.NewGetStoryDetailHandlerV2(theGraphServiceAlpha))
+		protocolV2.GET("/franchise/:franchiseId/stories/:storyId", handler.NewGetStoryDetailHandlerV2())
 	}
 
 	protocolKbw := r.Group("/protocol/kbw")
@@ -349,16 +349,16 @@ func main() {
 	protocol.Use(cors.Default())
 	{
 		// Endpoint to list ip orgs
-		protocol.POST("/ipOrg", protocolHandler.ListIpOrgsHandler)
+		protocol.POST("/iporg", protocolHandler.ListIpOrgsHandler)
 
 		// Endpoint to get an ip org
-		protocol.GET("/ipOrg/:ipOrgId", protocolHandler.GetIpOrgHandler)
+		protocol.GET("/iporg/:ipOrgId", protocolHandler.GetIpOrgHandler)
 
 		// Endpoint to get a single ip asset
-		protocol.GET("/ipAsset/:ipAssetId", protocolHandler.GetIpAssetHandler)
+		protocol.GET("/ipasset/:ipAssetId", protocolHandler.GetIpAssetHandler)
 
 		// Endpoint to list ip assets
-		protocol.POST("/ipAsset", protocolHandler.ListIpAssetsHandler)
+		protocol.POST("/ipasset", protocolHandler.ListIpAssetsHandler)
 
 		// Endpoint to get a single license
 		protocol.GET("/license/:licenseId", protocolHandler.GetLicenseHandler)

@@ -11,7 +11,7 @@ type IPOrg struct {
 }
 
 type GetIpOrgResponse struct {
-	IPOrg *IPOrg `json:"iporg"`
+	IPOrg *IPOrg `json:"ipOrg"`
 }
 
 type ListIpOrgsRequest struct {
@@ -19,7 +19,7 @@ type ListIpOrgsRequest struct {
 }
 
 type ListIpOrgsResponse struct {
-	IPOrgs []*IPOrg `json:"iporgs"`
+	IPOrgs []*IPOrg `json:"ipOrgs"`
 }
 
 type IPOrgTheGraphAlpha struct {

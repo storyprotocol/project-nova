@@ -30,7 +30,7 @@ var IpAssetTypes = struct {
 }
 
 type GetIpAssetResponse struct {
-	IPAsset *IPAsset `json:"ipasset"`
+	IPAsset *IPAsset `json:"ipAssets"`
 }
 
 type ListIpAssetsRequest struct {
@@ -39,7 +39,7 @@ type ListIpAssetsRequest struct {
 }
 
 type ListIpAssetsResponse struct {
-	IPAssets []*IPAsset `json:"ipassets"`
+	IPAssets []*IPAsset `json:"ipAssets"`
 }
 
 type IPAssetTheGraphAlpha struct {
