@@ -1,16 +1,16 @@
 package v0alpha
 
 type IPAsset struct {
-	ID          string      `json:"id,omitempty"`
-	Name        string      `json:"name,omitempty"`
-	Type        IPAssetType `json:"type,omitempty"`
-	IPOrgId     string      `json:"ipOrgId,omitempty"`
-	Owner       string      `json:"owner,omitempty"`
-	MediaUrl    string      `json:"mediaUrl,omitempty"`
-	ContentHash []byte      `json:"contentHash,omitempty"`
-	Data        []byte      `json:"data,omitempty"`
-	CreatedAt   string      `json:"createdAt,omitempty"`
-	TxHash      string      `json:"txHash,omitempty"`
+	ID          string `json:"id,omitempty"`
+	Name        string `json:"name,omitempty"`
+	Type        int64  `json:"type,omitempty"`
+	IPOrgId     string `json:"ipOrgId,omitempty"`
+	Owner       string `json:"owner,omitempty"`
+	MediaUrl    string `json:"mediaUrl,omitempty"`
+	ContentHash []byte `json:"contentHash,omitempty"`
+	Data        []byte `json:"data,omitempty"`
+	CreatedAt   string `json:"createdAt,omitempty"`
+	TxHash      string `json:"txHash,omitempty"`
 }
 
 type IPAssetType string
@@ -49,7 +49,7 @@ type IPAssetTheGraphAlpha struct {
 	IPOrgAssetId   string `json:"ipOrgAssetId"`
 	Owner          string `json:"owner"`
 	Name           string `json:"name"`
-	IPAssetType    string `json:"ipAssetType"`
+	IPAssetType    int64  `json:"ipAssetType"`
 	ContentHash    string `json:"contentHash"`
 	MediaUrl       string `json:"mediaUrl"`
 	BlockNumber    string `json:"blockNumber"`
@@ -74,7 +74,7 @@ func (i *IPAssetTheGraphAlpha) ToIPAsset() *IPAsset {
 	return &IPAsset{
 		ID:          i.IPAssetId,
 		Name:        i.Name,
-		Type:        IPAssetType(i.IPAssetType),
+		Type:        i.IPAssetType,
 		IPOrgId:     i.IPOrgId,
 		Owner:       i.Owner,
 		MediaUrl:    i.MediaUrl,

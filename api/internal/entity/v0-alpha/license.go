@@ -1,7 +1,7 @@
 package v0alpha
 
 type License struct {
-	ID              string   `json:"licenseId,omitempty"`
+	ID              string   `json:"id,omitempty"`
 	IsCommercial    bool     `json:"isCommercial,omitempty"`
 	Status          int      `json:"status,omitempty"`
 	Licensor        string   `json:"licensor,omitempty"`
