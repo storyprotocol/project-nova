@@ -1,13 +1,15 @@
 package v0alpha
 
 type IPOrg struct {
-	ID          string `json:"id,omitempty"`
-	Name        string `json:"name,omitempty"`
-	Symbol      string `json:"symbol,omitempty"`
-	Owner       string `json:"owner,omitempty"`
-	MetadataUrl string `json:"metadataUrl,omitempty"`
-	CreatedAt   string `json:"createdAt,omitempty"`
-	TxHash      string `json:"txHash,omitempty"`
+	ID           string   `json:"id,omitempty"`
+	Name         string   `json:"name,omitempty"`
+	Symbol       string   `json:"symbol,omitempty"`
+	Owner        string   `json:"owner,omitempty"`
+	BaseUri      string   `json:"baseUri,omitempty"`
+	ContractUri  string   `json:"contractUri,omitempty"`
+	IPAssetTypes []string `json:"ipAssetTypes"`
+	CreatedAt    string   `json:"createdAt,omitempty"`
+	TxHash       string   `json:"txHash,omitempty"`
 }
 
 type GetIpOrgResponse struct {
@@ -28,7 +30,7 @@ type IPOrgTheGraphAlpha struct {
 	IPOrgId        string   `json:"ipOrgId"`
 	Name           string   `json:"name"`
 	Symbol         string   `json:"symbol"`
-	IpAssetTypes   []string `json:"ipAssetTypes"`
+	IPAssetTypes   []string `json:"ipAssetTypes"`
 	BaseURI        string   `json:"baseURI"`
 	ContractURI    string   `json:"contractURI"`
 	BlockNumber    string   `json:"blockNumber"`
@@ -51,12 +53,14 @@ func (i *IpOrgTheGraphAlphaResponse) ToIPOrgs() []*IPOrg {
 
 func (i *IPOrgTheGraphAlpha) ToIPOrg() *IPOrg {
 	return &IPOrg{
-		ID:          i.ID,
-		Name:        i.Name,
-		Symbol:      i.Symbol,
-		Owner:       i.Owner,
-		MetadataUrl: i.BaseURI,
-		CreatedAt:   i.BlockTimestamp,
-		TxHash:      i.TxHash,
+		ID:           i.IPOrgId,
+		Name:         i.Name,
+		Symbol:       i.Symbol,
+		Owner:        i.Owner,
+		BaseUri:      i.BaseURI,
+		ContractUri:  i.ContractURI,
+		IPAssetTypes: i.IPAssetTypes,
+		CreatedAt:    i.BlockTimestamp,
+		TxHash:       i.TxHash,
 	}
 }

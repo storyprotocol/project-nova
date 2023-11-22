@@ -1,13 +1,19 @@
 package v0alpha
 
 type License struct {
-	ID          string `json:"licenseId,omitempty"`
-	IPAssetId   string `json:"ipAssetId,omitempty"`
-	IPOrgId     string `json:"ipOrgId,omitempty"`
-	Owner       string `json:"owner,omitempty"`
-	MetadataUri string `json:"meataUri,omitempty"`
-	CreatedAt   string `json:"createdAt,omitempty"`
-	TxHash      string `json:"txHash,omitempty"`
+	ID              string   `json:"licenseId,omitempty"`
+	IsCommercial    bool     `json:"isCommercial,omitempty"`
+	Status          int      `json:"status,omitempty"`
+	Licensor        string   `json:"licensor,omitempty"`
+	Revoker         string   `json:"revoker,omitempty"`
+	IPOrgId         string   `json:"ipOrgId,omitempty"`
+	LicenseeType    int      `json:"licenseeType,omitempty"`
+	IPAssetId       string   `json:"ipAssetId,omitempty"`
+	ParentLicenseId string   `json:"parentLicenseId,omitempty"`
+	TermIds         []string `json:"termIds,omitempty"`
+	TermsData       []string `json:"termsData,omitempty"`
+	CreatedAt       string   `json:"createdAt,omitempty"`
+	TxHash          string   `json:"txHash,omitempty"`
 }
 
 type GetLicenseResponse struct {
@@ -57,12 +63,18 @@ func (l *LicenseTheGraphAlphaResponse) ToLicenses() []*License {
 
 func (l *LicenseRegistryTheGraphAlpha) ToLicense() *License {
 	return &License{
-		ID:          l.ID,
-		IPAssetId:   l.IpAssetId,
-		IPOrgId:     l.IpOrgId,
-		Owner:       l.Licensor,
-		MetadataUri: l.TermsData[0],
-		CreatedAt:   l.BlockTimestamp,
-		TxHash:      l.TxHash,
+		ID:              l.LicenseId,
+		IsCommercial:    l.IsCommercial,
+		Status:          l.Status,
+		Licensor:        l.Licensor,
+		Revoker:         l.Revoker,
+		IPOrgId:         l.IpOrgId,
+		LicenseeType:    l.LicenseeType,
+		IPAssetId:       l.IpAssetId,
+		ParentLicenseId: l.ParentLicenseId,
+		TermIds:         l.TermIds,
+		TermsData:       l.TermsData,
+		CreatedAt:       l.BlockTimestamp,
+		TxHash:          l.TxHash,
 	}
 }
