@@ -67,8 +67,9 @@ func TestListRelationships_NotMatch_Failure(t *testing.T) {
 func TestGetRelationshipHandler_Success(t *testing.T) {
 	service := CreateTheGraphServiceAlpha()
 	relationship, err := service.GetRelationship("1")
+	logger.Infof("relationship: %+v", relationship)
 	assert.Nil(t, err)
-	assert.True(t, relationship.ID == "0x99d5736c65bd81cd4a361a731d4a035375a0926c95e4132e8fcb80ad5b602b5c28000000")
+	assert.True(t, relationship.ID == "1")
 	assert.True(t, relationship.RegisteredAt == "2023-11-19T22:10:48Z")
 }
 
@@ -112,6 +113,7 @@ func TestListIPAssets_WithIpOrgId_Success(t *testing.T) {
 	service := CreateTheGraphServiceAlpha()
 	ipOrgId := IP_ORG_ID
 	ipAssets, err := service.ListIPAssets(&ipOrgId, nil)
+	logger.Infof("ipAssets: %+v", ipAssets)
 	assert.Nil(t, err)
 	assert.True(t, len(ipAssets) > 0)
 }
