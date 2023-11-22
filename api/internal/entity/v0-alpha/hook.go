@@ -1,10 +1,12 @@
 package v0alpha
 
+import "github.com/project-nova/backend/pkg/utils"
+
 type Hook struct {
 	ID           string `json:"id,omitempty"`
 	ModuleId     string `json:"moduleId,omitempty"`
 	Interface    string `json:"interface,omitempty"`
-	HookType     int64  `json:"hookType,omitempty"`
+	HookType     int64  `json:"hookType"`
 	RegistryKey  string `json:"registryKey,omitempty"`
 	RegisteredAt string `json:"registeredAt,omitempty"`
 	TxHash       string `json:"txHash,omitempty"`
@@ -57,7 +59,7 @@ func (h *HookTheGraphAlpha) ToHook() *Hook {
 		ModuleId:     h.ModuleId,
 		HookType:     h.Type,
 		RegistryKey:  h.RegistryKey,
-		RegisteredAt: h.BlockTimestamp,
+		RegisteredAt: utils.TimestampInSecondsToISO8601(h.BlockTimestamp),
 		TxHash:       h.TxHash,
 	}
 }

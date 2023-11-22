@@ -7,7 +7,6 @@ import (
 
 	"github.com/machinebox/graphql"
 	v0alpha "github.com/project-nova/backend/api/internal/entity/v0-alpha"
-	"github.com/project-nova/backend/pkg/logger"
 )
 
 func NewTheGraphServiceAlphaImpl(client *graphql.Client) TheGraphServiceAlpha {
@@ -42,6 +41,10 @@ func (s *theGraphServiceAlphaImpl) GetRelationship(relationshipId string) (*v0al
 	var relationshipsResponse v0alpha.RelationshipTheGraphAlphaResponse
 	if err := s.client.Run(ctx, req, &relationshipsResponse); err != nil {
 		return nil, fmt.Errorf("failed to get the relationships from the graph. error: %v", err)
+	}
+
+	if len(relationshipsResponse.Relationships) == 0 {
+		return nil, nil
 	}
 
 	return relationshipsResponse.Relationships[0].ToRelationship(), nil
@@ -147,7 +150,7 @@ func (s *theGraphServiceAlphaImpl) GetHook(hookId string) (*v0alpha.Hook, error)
 	}
 
 	if len(hooksResponse.Hooks) == 0 {
-		return nil, fmt.Errorf("failed to find the hook")
+		return nil, nil
 	}
 
 	return hooksResponse.Hooks[0].ToHook(), nil
@@ -213,7 +216,7 @@ func (s *theGraphServiceAlphaImpl) GetModule(moduleId string) (*v0alpha.Module, 
 	}
 
 	if len(modulesResponse.Modules) == 0 {
-		return nil, fmt.Errorf("failed to find the module")
+		return nil, nil
 	}
 
 	return modulesResponse.Modules[0].ToModule(), nil
@@ -277,7 +280,7 @@ func (s *theGraphServiceAlphaImpl) GetIPOrg(iporgId string) (*v0alpha.IPOrg, err
 	}
 
 	if len(ipOrgsResponse.IporgRegistereds) == 0 {
-		return nil, fmt.Errorf("failed to find the iporg")
+		return nil, nil
 	}
 
 	return ipOrgsResponse.IporgRegistereds[0].ToIPOrg(), nil
@@ -353,7 +356,7 @@ func (s *theGraphServiceAlphaImpl) GetIPAsset(ipAssetId string) (*v0alpha.IPAsse
 	}
 
 	if len(ipAssetsResponse.IpassetRegistereds) == 0 {
-		return nil, fmt.Errorf("failed to find the iporg")
+		return nil, nil
 	}
 
 	return ipAssetsResponse.IpassetRegistereds[0].ToIPAsset(), nil
@@ -423,7 +426,7 @@ func (s *theGraphServiceAlphaImpl) GetTransaction(transactionId string) (*v0alph
 	}
 
 	if len(transactionsResponse.Transactions) == 0 {
-		return nil, fmt.Errorf("failed to find the transaction")
+		return nil, nil
 	}
 
 	return transactionsResponse.Transactions[0].ToTransaction(), nil
@@ -446,8 +449,6 @@ func (s *theGraphServiceAlphaImpl) ListLicenses(ipOrgId *string, ipAssetId *stri
 		queryValue = fmt.Sprintf("where: {%s}, %s", strings.Join(whereClause, ","), queryValue)
 	}
 
-	logger.Infof(">>> %s", queryInterface)
-	logger.Infof(">>> %s", queryValue)
 	req := graphql.NewRequest(fmt.Sprintf(`
 		query(%s) {
 			licenseRegisterreds(%s) {
@@ -483,29 +484,29 @@ func (s *theGraphServiceAlphaImpl) ListLicenses(ipOrgId *string, ipAssetId *stri
 	if err := s.client.Run(ctx, req, &licensesResponse); err != nil {
 		return nil, fmt.Errorf("failed to get the licenses from the graph. error: %v", err)
 	}
-	logger.Infof(">>> %v", licensesResponse)
+
 	return licensesResponse.ToLicenses(), nil
 }
 
 func (s *theGraphServiceAlphaImpl) GetLicense(licenseId string) (*v0alpha.License, error) {
 	req := graphql.NewRequest(` 
 		query($licenseId: String) {
-			licenseRegisterreds(licenseId: $licenseId) {
-				transactionHash
-				termsData
-				termIds
-				status
-				revoker
-				parentLicenseId
-				licensor
-				licenseeType
+			licenseRegisterreds(where: {licenseId: $licenseId}) {
+				blockNumber
+				blockTimestamp
+				id
+				ipAssetId
+				ipOrgId
 				licenseId
 				isCommercial
-				ipOrgId
-				ipAssetId
-				id
-				blockTimestamp
-				blockNumber
+				licenseeType
+				licensor
+				parentLicenseId
+				revoker
+				status
+				termIds
+				termsData
+				transactionHash
 			}
 		}
 	`)
@@ -518,7 +519,7 @@ func (s *theGraphServiceAlphaImpl) GetLicense(licenseId string) (*v0alpha.Licens
 	}
 
 	if len(licenseResponse.LicenseRegistereds) == 0 {
-		return nil, fmt.Errorf("license not found")
+		return nil, nil
 	}
 
 	return licenseResponse.LicenseRegistereds[0].ToLicense(), nil

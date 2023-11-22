@@ -49,6 +49,11 @@ func (p *AlphaProtocolHandler) GetIpOrgHandler(c *gin.Context) {
 		return
 	}
 
+	if ipOrg == nil {
+		c.JSON(http.StatusNotFound, ErrorMessage("Not found"))
+		return
+	}
+
 	c.JSON(http.StatusOK, v0alpha_entity.GetIpOrgResponse{
 		IPOrg: ipOrg,
 	})
@@ -61,6 +66,11 @@ func (p *AlphaProtocolHandler) GetIpAssetHandler(c *gin.Context) {
 	if err != nil {
 		logger.Errorf("Failed to get ipasset: %v", err)
 		c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+		return
+	}
+
+	if ipAsset == nil {
+		c.JSON(http.StatusNotFound, ErrorMessage("Not found"))
 		return
 	}
 
@@ -77,6 +87,7 @@ func (p *AlphaProtocolHandler) ListIpAssetsHandler(c *gin.Context) {
 		requestBody = v0alpha_entity.ListIpAssetsRequest{}
 	}
 
+	logger.Infof("requestBody: %+v", requestBody)
 	ipAssets, err := p.graphServiceAlpha.ListIPAssets(&requestBody.IpOrgId, thegraph.FromRequestQueryOptions(requestBody.Options))
 	if err != nil {
 		logger.Errorf("Failed to get ip assets: %v", err)
@@ -96,6 +107,11 @@ func (p *AlphaProtocolHandler) GetRelationshipHandler(c *gin.Context) {
 	if err != nil {
 		logger.Errorf("Failed to get relationship: %v", err)
 		c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+		return
+	}
+
+	if relationship == nil {
+		c.JSON(http.StatusNotFound, ErrorMessage("Not found"))
 		return
 	}
 
@@ -154,6 +170,11 @@ func (p *AlphaProtocolHandler) GetModuleHandler(c *gin.Context) {
 		return
 	}
 
+	if module == nil {
+		c.JSON(http.StatusNotFound, ErrorMessage("Not found"))
+		return
+	}
+
 	c.JSON(http.StatusOK, v0alpha_entity.GetModuleResponse{
 		Module: module,
 	})
@@ -189,6 +210,11 @@ func (p *AlphaProtocolHandler) GetHookHandler(c *gin.Context) {
 		return
 	}
 
+	if hook == nil {
+		c.JSON(http.StatusNotFound, ErrorMessage("Not found"))
+		return
+	}
+
 	c.JSON(http.StatusOK, v0alpha_entity.GetHookResponse{
 		Hook: hook,
 	})
@@ -204,6 +230,11 @@ func (p *AlphaProtocolHandler) GetTransactionHandler(c *gin.Context) {
 		return
 	}
 
+	if transaction == nil {
+		c.JSON(http.StatusNotFound, ErrorMessage("Not found"))
+		return
+	}
+
 	c.JSON(http.StatusOK, v0alpha_entity.GetTransactionResponse{
 		Transaction: transaction,
 	})
@@ -216,6 +247,11 @@ func (p *AlphaProtocolHandler) GetLicenseHandler(c *gin.Context) {
 	if err != nil {
 		logger.Errorf("Failed to get license: %v", err)
 		c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+		return
+	}
+
+	if license == nil {
+		c.JSON(http.StatusNotFound, ErrorMessage("Not found"))
 		return
 	}
 

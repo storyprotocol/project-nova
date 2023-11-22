@@ -1,5 +1,9 @@
 package v0alpha
 
+import (
+	"github.com/project-nova/backend/pkg/utils"
+)
+
 type License struct {
 	ID              string   `json:"id,omitempty"`
 	IsCommercial    bool     `json:"isCommercial,omitempty"`
@@ -7,7 +11,7 @@ type License struct {
 	Licensor        string   `json:"licensor,omitempty"`
 	Revoker         string   `json:"revoker,omitempty"`
 	IPOrgId         string   `json:"ipOrgId,omitempty"`
-	LicenseeType    int      `json:"licenseeType,omitempty"`
+	LicenseeType    int      `json:"licenseeType"`
 	IPAssetId       string   `json:"ipAssetId,omitempty"`
 	ParentLicenseId string   `json:"parentLicenseId,omitempty"`
 	TermIds         []string `json:"termIds,omitempty"`
@@ -62,6 +66,7 @@ func (l *LicenseTheGraphAlphaResponse) ToLicenses() []*License {
 }
 
 func (l *LicenseRegistryTheGraphAlpha) ToLicense() *License {
+
 	return &License{
 		ID:              l.LicenseId,
 		IsCommercial:    l.IsCommercial,
@@ -74,7 +79,7 @@ func (l *LicenseRegistryTheGraphAlpha) ToLicense() *License {
 		ParentLicenseId: l.ParentLicenseId,
 		TermIds:         l.TermIds,
 		TermsData:       l.TermsData,
-		CreatedAt:       l.BlockTimestamp,
+		CreatedAt:       utils.TimestampInSecondsToISO8601(l.BlockTimestamp),
 		TxHash:          l.TxHash,
 	}
 }

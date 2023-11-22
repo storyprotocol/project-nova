@@ -1,5 +1,7 @@
 package v0alpha
 
+import "github.com/project-nova/backend/pkg/utils"
+
 type Transaction struct {
 	ID           string       `json:"id,omitempty"`
 	TxHash       string       `json:"txHash,omitempty"`
@@ -93,6 +95,6 @@ func (t *TransactionTheGraphAlpha) ToTransaction() *Transaction {
 		ResourceType: ResourceType(t.ResourceType),
 		ActionType:   ActionType(t.ActionType),
 		Initiator:    t.Initiator,
-		CreatedAt:    t.BlockTimestamp,
+		CreatedAt:    utils.TimestampInSecondsToISO8601(t.BlockTimestamp),
 	}
 }

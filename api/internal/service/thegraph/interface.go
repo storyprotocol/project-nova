@@ -60,12 +60,12 @@ func FromRequestQueryOptions(options *v0alpha.QueryOptions) *TheGraphQueryOption
 		}
 	}
 
-	if options.Limit == 0 {
-		options.Limit = 100
+	if options.Pagination.Limit == 0 {
+		options.Pagination.Limit = 100
 	}
 
 	return &TheGraphQueryOptions{
-		First: options.Limit,
-		Skip:  options.Offset,
+		First: options.Pagination.Limit,
+		Skip:  options.Pagination.Offset,
 	}
 }

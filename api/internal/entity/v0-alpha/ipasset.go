@@ -1,9 +1,15 @@
 package v0alpha
 
+import (
+	"strconv"
+
+	"github.com/project-nova/backend/pkg/utils"
+)
+
 type IPAsset struct {
 	ID          string `json:"id,omitempty"`
 	Name        string `json:"name,omitempty"`
-	Type        int64  `json:"type,omitempty"`
+	Type        int64  `json:"type"`
 	IPOrgId     string `json:"ipOrgId,omitempty"`
 	Owner       string `json:"owner,omitempty"`
 	MediaUrl    string `json:"mediaUrl,omitempty"`
@@ -49,7 +55,7 @@ type IPAssetTheGraphAlpha struct {
 	IPOrgAssetId   string `json:"ipOrgAssetId"`
 	Owner          string `json:"owner"`
 	Name           string `json:"name"`
-	IPAssetType    int64  `json:"ipAssetType"`
+	IPAssetType    string `json:"ipAssetType"`
 	ContentHash    string `json:"contentHash"`
 	MediaUrl       string `json:"mediaUrl"`
 	BlockNumber    string `json:"blockNumber"`
@@ -71,15 +77,16 @@ func (i *IpAssetTheGraphAlphaResponse) ToIPAssets() []*IPAsset {
 }
 
 func (i *IPAssetTheGraphAlpha) ToIPAsset() *IPAsset {
+	ipAssetType, _ := strconv.ParseInt(i.IPAssetType, 10, 64)
 	return &IPAsset{
 		ID:          i.IPAssetId,
 		Name:        i.Name,
-		Type:        i.IPAssetType,
+		Type:        ipAssetType,
 		IPOrgId:     i.IPOrgId,
 		Owner:       i.Owner,
 		MediaUrl:    i.MediaUrl,
 		ContentHash: []byte(i.ContentHash),
-		CreatedAt:   i.BlockTimestamp,
+		CreatedAt:   utils.TimestampInSecondsToISO8601(i.BlockTimestamp),
 		TxHash:      i.TxHash,
 	}
 }
