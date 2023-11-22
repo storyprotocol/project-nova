@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/machinebox/graphql"
+	"github.com/project-nova/backend/pkg/logger"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -114,6 +115,17 @@ func TestListIPAssets_WithIpOrgId_Success(t *testing.T) {
 	assert.True(t, len(ipAssets) > 0)
 }
 
+func TestListIPAssets_WithIpOrgId_WithLimit_Success(t *testing.T) {
+	service := CreateTheGraphServiceAlpha()
+	ipOrgId := IP_ORG_ID
+	ipAssets, err := service.ListIPAssets(&ipOrgId, &TheGraphQueryOptions{
+		First: 2,
+		Skip:  0,
+	})
+	assert.Nil(t, err)
+	assert.True(t, len(ipAssets) == 2)
+}
+
 func TestListIPAssets_WithoutIpOrgId_Success(t *testing.T) {
 	service := CreateTheGraphServiceAlpha()
 	ipAssets, err := service.ListIPAssets(nil, nil)
@@ -124,6 +136,7 @@ func TestListIPAssets_WithoutIpOrgId_Success(t *testing.T) {
 func TestGetIPAsset_Success(t *testing.T) {
 	service := CreateTheGraphServiceAlpha()
 	ipAsset, err := service.GetIPAsset("1")
+	logger.Infof("ipAsset: %+v", ipAsset)
 	assert.Nil(t, err)
 	assert.True(t, ipAsset.ID == "1")
 	assert.True(t, ipAsset.CreatedAt == "2023-11-19T18:46:24Z")

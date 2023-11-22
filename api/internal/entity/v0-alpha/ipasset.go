@@ -9,7 +9,7 @@ import (
 type IPAsset struct {
 	ID          string `json:"id,omitempty"`
 	Name        string `json:"name,omitempty"`
-	Type        int64  `json:"type,omitempty"`
+	Type        int64  `json:"type"`
 	IPOrgId     string `json:"ipOrgId,omitempty"`
 	Owner       string `json:"owner,omitempty"`
 	MediaUrl    string `json:"mediaUrl,omitempty"`

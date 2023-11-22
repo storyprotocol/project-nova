@@ -68,7 +68,7 @@ func TestListIpAssethandler_Success(t *testing.T) {
 		"queryOptions": map[string]interface{}{
 			"pagination": map[string]interface{}{
 				"offset": 0,
-				"limit":  10,
+				"limit":  1,
 			},
 		},
 	})

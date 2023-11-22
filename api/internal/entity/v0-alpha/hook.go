@@ -6,7 +6,7 @@ type Hook struct {
 	ID           string `json:"id,omitempty"`
 	ModuleId     string `json:"moduleId,omitempty"`
 	Interface    string `json:"interface,omitempty"`
-	HookType     int64  `json:"hookType,omitempty"`
+	HookType     int64  `json:"hookType"`
 	RegistryKey  string `json:"registryKey,omitempty"`
 	RegisteredAt string `json:"registeredAt,omitempty"`
 	TxHash       string `json:"txHash,omitempty"`

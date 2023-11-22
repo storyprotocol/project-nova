@@ -11,7 +11,7 @@ type License struct {
 	Licensor        string   `json:"licensor,omitempty"`
 	Revoker         string   `json:"revoker,omitempty"`
 	IPOrgId         string   `json:"ipOrgId,omitempty"`
-	LicenseeType    int      `json:"licenseeType,omitempty"`
+	LicenseeType    int      `json:"licenseeType"`
 	IPAssetId       string   `json:"ipAssetId,omitempty"`
 	ParentLicenseId string   `json:"parentLicenseId,omitempty"`
 	TermIds         []string `json:"termIds,omitempty"`
