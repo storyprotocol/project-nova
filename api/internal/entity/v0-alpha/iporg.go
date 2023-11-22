@@ -53,7 +53,7 @@ func (i *IpOrgTheGraphAlphaResponse) ToIPOrgs() []*IPOrg {
 
 func (i *IPOrgTheGraphAlpha) ToIPOrg() *IPOrg {
 	return &IPOrg{
-		ID:           i.ID,
+		ID:           i.IPOrgId,
 		Name:         i.Name,
 		Symbol:       i.Symbol,
 		Owner:        i.Owner,

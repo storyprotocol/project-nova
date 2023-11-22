@@ -44,12 +44,12 @@ type ListIpAssetsResponse struct {
 
 type IPAssetTheGraphAlpha struct {
 	ID             string `json:"id"`
-	IpAssetId      string `json:"ipAssetId"`
-	IpOrgId        string `json:"ipOrgId"`
-	IpOrgAssetId   string `json:"ipOrgAssetId"`
+	IPAssetId      string `json:"ipAssetId"`
+	IPOrgId        string `json:"ipOrgId"`
+	IPOrgAssetId   string `json:"ipOrgAssetId"`
 	Owner          string `json:"owner"`
 	Name           string `json:"name"`
-	IpAssetType    string `json:"ipAssetType"`
+	IPAssetType    string `json:"ipAssetType"`
 	ContentHash    string `json:"contentHash"`
 	MediaUrl       string `json:"mediaUrl"`
 	BlockNumber    string `json:"blockNumber"`
@@ -72,10 +72,10 @@ func (i *IpAssetTheGraphAlphaResponse) ToIPAssets() []*IPAsset {
 
 func (i *IPAssetTheGraphAlpha) ToIPAsset() *IPAsset {
 	return &IPAsset{
-		ID:          i.ID,
+		ID:          i.IPAssetId,
 		Name:        i.Name,
-		Type:        IPAssetType(i.IpAssetType),
-		IPOrgId:     i.IpOrgId,
+		Type:        IPAssetType(i.IPAssetType),
+		IPOrgId:     i.IPOrgId,
 		Owner:       i.Owner,
 		MediaUrl:    i.MediaUrl,
 		ContentHash: []byte(i.ContentHash),

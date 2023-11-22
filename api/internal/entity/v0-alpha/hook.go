@@ -54,11 +54,10 @@ func (h *HookTheGraphAlphaResponse) ToHooks() []*Hook {
 
 func (h *HookTheGraphAlpha) ToHook() *Hook {
 	return &Hook{
-		ID:           h.ID,
+		ID:           h.HookId,
 		ModuleId:     h.ModuleId,
 		HookType:     h.Type,
 		RegistryKey:  h.RegistryKey,
-		Interface:    "",
 		RegisteredAt: h.BlockTimestamp,
 		TxHash:       h.TxHash,
 	}
