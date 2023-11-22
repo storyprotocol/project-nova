@@ -4,6 +4,8 @@ type Hook struct {
 	ID           string `json:"id,omitempty"`
 	ModuleId     string `json:"moduleId,omitempty"`
 	Interface    string `json:"interface,omitempty"`
+	HookType     int64  `json:"hookType,omitempty"`
+	RegistryKey  string `json:"registryKey,omitempty"`
 	RegisteredAt string `json:"registeredAt,omitempty"`
 	TxHash       string `json:"txHash,omitempty"`
 }
@@ -54,6 +56,8 @@ func (h *HookTheGraphAlpha) ToHook() *Hook {
 	return &Hook{
 		ID:           h.ID,
 		ModuleId:     h.ModuleId,
+		HookType:     h.Type,
+		RegistryKey:  h.RegistryKey,
 		Interface:    "",
 		RegisteredAt: h.BlockTimestamp,
 		TxHash:       h.TxHash,

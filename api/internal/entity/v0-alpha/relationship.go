@@ -3,7 +3,6 @@ package v0alpha
 type Relationship struct {
 	ID           string `json:"id,omitempty"`
 	Type         string `json:"type,omitempty"`
-	TypeId       string `json:"typeId,omitempty"`
 	SrcContract  string `json:"srcContract,omitempty"`
 	SrcTokenId   string `json:"srcTokenId,omitempty"`
 	SrcName      string `json:"srcName,omitempty"`
@@ -74,9 +73,8 @@ type RelationshipTypeTheGraphAlphaResponse struct {
 
 func (r *RelationshipTheGraphAlpha) ToRelationship() *Relationship {
 	return &Relationship{
-		ID:           r.ID,
+		ID:           r.RelationshipId,
 		Type:         r.RelationshipType,
-		TypeId:       r.RelationshipId,
 		SrcContract:  r.SrcAddress,
 		SrcTokenId:   r.SrcId,
 		DstContract:  r.DstAddress,

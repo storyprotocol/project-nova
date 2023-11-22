@@ -6,7 +6,7 @@ type IPAsset struct {
 	Type        IPAssetType `json:"type,omitempty"`
 	IPOrgId     string      `json:"ipOrgId,omitempty"`
 	Owner       string      `json:"owner,omitempty"`
-	MetadataUrl string      `json:"metadataUrl,omitempty"`
+	MediaUrl    string      `json:"mediaUrl,omitempty"`
 	ContentHash []byte      `json:"contentHash,omitempty"`
 	Data        []byte      `json:"data,omitempty"`
 	CreatedAt   string      `json:"createdAt,omitempty"`
@@ -77,7 +77,7 @@ func (i *IPAssetTheGraphAlpha) ToIPAsset() *IPAsset {
 		Type:        IPAssetType(i.IpAssetType),
 		IPOrgId:     i.IpOrgId,
 		Owner:       i.Owner,
-		MetadataUrl: i.MediaUrl,
+		MediaUrl:    i.MediaUrl,
 		ContentHash: []byte(i.ContentHash),
 		CreatedAt:   i.BlockTimestamp,
 		TxHash:      i.TxHash,

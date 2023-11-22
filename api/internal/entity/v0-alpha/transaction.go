@@ -7,7 +7,7 @@ type Transaction struct {
 	ResourceId   string       `json:"resourceId,omitempty"`
 	ResourceType ResourceType `json:"resourceType,omitempty"`
 	ActionType   ActionType   `json:"actionType,omitempty"`
-	Creator      string       `json:"creator,omitempty"`
+	Initiator    string       `json:"initiator,omitempty"`
 	CreatedAt    string       `json:"createdAt,omitempty"`
 }
 
@@ -92,7 +92,7 @@ func (t *TransactionTheGraphAlpha) ToTransaction() *Transaction {
 		ResourceId:   t.ResourceId,
 		ResourceType: ResourceType(t.ResourceType),
 		ActionType:   ActionType(t.ActionType),
-		Creator:      t.Initiator,
+		Initiator:    t.Initiator,
 		CreatedAt:    t.BlockTimestamp,
 	}
 }
