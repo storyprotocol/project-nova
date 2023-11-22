@@ -30,7 +30,6 @@ type ListHooksResponse struct {
 
 type HookTheGraphAlpha struct {
 	ID             string `json:"id"`
-	HookId         string `json:"hookId"`
 	ModuleId       string `json:"moduleId"`
 	Type           int64  `json:"type"`
 	RegistryKey    string `json:"registryKey"`
@@ -54,7 +53,7 @@ func (h *HookTheGraphAlphaResponse) ToHooks() []*Hook {
 
 func (h *HookTheGraphAlpha) ToHook() *Hook {
 	return &Hook{
-		ID:           h.HookId,
+		ID:           h.ID,
 		ModuleId:     h.ModuleId,
 		HookType:     h.Type,
 		RegistryKey:  h.RegistryKey,
