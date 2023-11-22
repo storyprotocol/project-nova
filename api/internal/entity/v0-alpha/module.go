@@ -47,7 +47,7 @@ func (m *ModuleTheGraphAlphaResponse) ToModules() []*Module {
 
 func (m *ModuleTheGraphAlpha) ToModule() *Module {
 	return &Module{
-		ID:        m.ID,
+		ID:        m.ModuleId,
 		IPOrgId:   m.IPOrgId,
 		ModuleKey: m.ModuleKey,
 	}
