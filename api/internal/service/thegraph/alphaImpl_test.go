@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/machinebox/graphql"
-	"github.com/project-nova/backend/pkg/logger"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -28,7 +27,6 @@ func TestListIPOrgs_Success(t *testing.T) {
 func TestGetIPOrgs_Success(t *testing.T) {
 	service := CreateTheGraphServiceAlpha()
 	iporg, err := service.GetIPOrg("0xde493e03d2de0cd7820b4f580beced57296b0009")
-	logger.Infof("iporg: %v", iporg)
 	assert.Nil(t, err)
 	assert.NotNil(t, iporg)
 	assert.True(t, iporg.ID == "0xde493e03d2de0cd7820b4f580beced57296b0009")
@@ -67,7 +65,6 @@ func TestListRelationships_NotMatch_Failure(t *testing.T) {
 func TestGetRelationshipHandler_Success(t *testing.T) {
 	service := CreateTheGraphServiceAlpha()
 	relationship, err := service.GetRelationship("1")
-	logger.Infof("relationship: %+v", relationship)
 	assert.Nil(t, err)
 	assert.True(t, relationship.ID == "1")
 	assert.True(t, relationship.RegisteredAt == "2023-11-19T22:10:48Z")
@@ -113,7 +110,6 @@ func TestListIPAssets_WithIpOrgId_Success(t *testing.T) {
 	service := CreateTheGraphServiceAlpha()
 	ipOrgId := IP_ORG_ID
 	ipAssets, err := service.ListIPAssets(&ipOrgId, nil)
-	logger.Infof("ipAssets: %+v", ipAssets)
 	assert.Nil(t, err)
 	assert.True(t, len(ipAssets) > 0)
 }
@@ -129,7 +125,7 @@ func TestGetIPAsset_Success(t *testing.T) {
 	service := CreateTheGraphServiceAlpha()
 	ipAsset, err := service.GetIPAsset("1")
 	assert.Nil(t, err)
-	assert.True(t, ipAsset.ID == "0x158f74772af1bf9e5d1eb9d6633bb6a602eea97bbbd552b16696d7d2d3fa007703000000")
+	assert.True(t, ipAsset.ID == "1")
 	assert.True(t, ipAsset.CreatedAt == "2023-11-19T18:46:24Z")
 }
 
@@ -237,13 +233,13 @@ func TestGetLicense_Success(t *testing.T) {
 	service := CreateTheGraphServiceAlpha()
 	license, err := service.GetLicense("1")
 	assert.Nil(t, err)
-	assert.True(t, license.ID == "0x3f6aa75c359baf4af470aaf63cb7a10e6840c07c5a3a5d96144966d9fd7b27cf16000000")
+	assert.True(t, license.ID == "1")
 	assert.True(t, license.CreatedAt == "2023-11-21T02:20:24Z")
 }
 
 func TestGetLicense_NotFound_Failure(t *testing.T) {
 	service := CreateTheGraphServiceAlpha()
 	license, err := service.GetLicense("1123")
-	logger.Info(license)
 	assert.Nil(t, err)
+	assert.Nil(t, license)
 }
