@@ -1,5 +1,7 @@
 package v0alpha
 
+import "github.com/project-nova/backend/pkg/utils"
+
 type IPAsset struct {
 	ID          string `json:"id,omitempty"`
 	Name        string `json:"name,omitempty"`
@@ -79,7 +81,7 @@ func (i *IPAssetTheGraphAlpha) ToIPAsset() *IPAsset {
 		Owner:       i.Owner,
 		MediaUrl:    i.MediaUrl,
 		ContentHash: []byte(i.ContentHash),
-		CreatedAt:   i.BlockTimestamp,
+		CreatedAt:   utils.TimestampInSecondsToISO8601(i.BlockTimestamp),
 		TxHash:      i.TxHash,
 	}
 }

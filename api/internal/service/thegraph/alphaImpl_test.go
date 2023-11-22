@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/machinebox/graphql"
+	"github.com/project-nova/backend/pkg/logger"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -27,10 +28,18 @@ func TestListIPOrgs_Success(t *testing.T) {
 func TestGetIPOrgs_Success(t *testing.T) {
 	service := CreateTheGraphServiceAlpha()
 	iporg, err := service.GetIPOrg("0xde493e03d2de0cd7820b4f580beced57296b0009")
-
+	logger.Infof("iporg: %v", iporg)
 	assert.Nil(t, err)
 	assert.NotNil(t, iporg)
 	assert.True(t, iporg.ID == "0xde493e03d2de0cd7820b4f580beced57296b0009")
+	assert.True(t, iporg.CreatedAt == "2023-11-18T06:44:12Z")
+}
+
+func TestGetIPOrgs_NotFound_Failure(t *testing.T) {
+	service := CreateTheGraphServiceAlpha()
+	iporg, err := service.GetIPOrg("0xde493e03d2de0cd7820b4f580beced57296b0011")
+	assert.Nil(t, err)
+	assert.Nil(t, iporg)
 }
 
 func TestListRelationships_MatchSource_Success(t *testing.T) {
@@ -38,6 +47,7 @@ func TestListRelationships_MatchSource_Success(t *testing.T) {
 	relationships, err := service.ListRelationships("0x177175a4b26f6ea050676f8c9a14d395f896492c", "4", nil)
 	assert.Nil(t, err)
 	assert.True(t, len(relationships) > 0)
+	assert.True(t, relationships[0].RegisteredAt == "2023-11-22T03:37:48Z")
 }
 
 func TestListRelationships_MatchDestination_Success(t *testing.T) {
@@ -47,11 +57,26 @@ func TestListRelationships_MatchDestination_Success(t *testing.T) {
 	assert.True(t, len(relationships) > 0)
 }
 
+func TestListRelationships_NotMatch_Failure(t *testing.T) {
+	service := CreateTheGraphServiceAlpha()
+	relationships, err := service.ListRelationships("0x177175a4b26f6ea050676f8c9a14d395f896492c", "51", nil)
+	assert.Nil(t, err)
+	assert.True(t, len(relationships) == 0)
+}
+
 func TestGetRelationshipHandler_Success(t *testing.T) {
 	service := CreateTheGraphServiceAlpha()
 	relationship, err := service.GetRelationship("1")
 	assert.Nil(t, err)
 	assert.True(t, relationship.ID == "0x99d5736c65bd81cd4a361a731d4a035375a0926c95e4132e8fcb80ad5b602b5c28000000")
+	assert.True(t, relationship.RegisteredAt == "2023-11-19T22:10:48Z")
+}
+
+func TestGetRelationshipHandler_NotFound_Failure(t *testing.T) {
+	service := CreateTheGraphServiceAlpha()
+	relationship, err := service.GetRelationship("123123")
+	assert.Nil(t, err)
+	assert.Nil(t, relationship)
 }
 
 func TestListModules_WithIpOrgId_Success(t *testing.T) {
@@ -76,6 +101,13 @@ func TestGetModule_Success(t *testing.T) {
 	assert.True(t, module.ModuleKey == "LICENSING_MODULE")
 }
 
+func TestGetModule_NotFound_Failure(t *testing.T) {
+	service := CreateTheGraphServiceAlpha()
+	module, err := service.GetModule("0xa906e2589a7f8385a376babbb70a39dad551604b")
+	assert.Nil(t, err)
+	assert.Nil(t, module)
+}
+
 func TestListIPAssets_WithIpOrgId_Success(t *testing.T) {
 	service := CreateTheGraphServiceAlpha()
 	ipOrgId := IP_ORG_ID
@@ -96,6 +128,14 @@ func TestGetIPAsset_Success(t *testing.T) {
 	ipAsset, err := service.GetIPAsset("1")
 	assert.Nil(t, err)
 	assert.True(t, ipAsset.ID == "0x158f74772af1bf9e5d1eb9d6633bb6a602eea97bbbd552b16696d7d2d3fa007703000000")
+	assert.True(t, ipAsset.CreatedAt == "2023-11-19T18:46:24Z")
+}
+
+func TestGetIPAsset_NotFound_Failure(t *testing.T) {
+	service := CreateTheGraphServiceAlpha()
+	ipAsset, err := service.GetIPAsset("12312")
+	assert.Nil(t, err)
+	assert.Nil(t, ipAsset)
 }
 
 func TestListTransactions_WithIpOrgId_Success(t *testing.T) {
@@ -118,6 +158,14 @@ func TestGetTransaction_Success(t *testing.T) {
 	transaction, err := service.GetTransaction("0x158f74772af1bf9e5d1eb9d6633bb6a602eea97bbbd552b16696d7d2d3fa007703000000")
 	assert.Nil(t, err)
 	assert.True(t, transaction.ID == "0x158f74772af1bf9e5d1eb9d6633bb6a602eea97bbbd552b16696d7d2d3fa007703000000")
+	assert.True(t, transaction.CreatedAt == "2023-11-19T18:46:24Z")
+}
+
+func TestGetTransaction_Failure(t *testing.T) {
+	service := CreateTheGraphServiceAlpha()
+	transaction, err := service.GetTransaction("0x158f74772af1bf9e5d1eb9d6633bb6a602eea97bbbd552b16696d7d1d3fa007703000000")
+	assert.Nil(t, err)
+	assert.Nil(t, transaction)
 }
 
 func TestListHooks_WithModuleID_Success(t *testing.T) {
@@ -140,6 +188,15 @@ func TestGetHook_Success(t *testing.T) {
 	hook, err := service.GetHook("0xc0f6e387ac0b324ec18eacf22ee7271207dce3d5")
 	assert.Nil(t, err)
 	assert.True(t, hook.ID == "0xc0f6e387ac0b324ec18eacf22ee7271207dce3d5")
+	assert.True(t, hook.RegisteredAt == "2023-11-18T06:44:24Z")
+
+}
+
+func TestGetHook_NotFound_Failure(t *testing.T) {
+	service := CreateTheGraphServiceAlpha()
+	hook, err := service.GetHook("0xc0f6e387ac0b324ec18eacf22ee7271207dce2d5")
+	assert.Nil(t, err)
+	assert.Nil(t, hook)
 }
 
 func TestListLicenses_WithIpOrgIdAndIpAssetId_Success(t *testing.T) {
@@ -179,4 +236,12 @@ func TestGetLicense_Success(t *testing.T) {
 	license, err := service.GetLicense("1")
 	assert.Nil(t, err)
 	assert.True(t, license.ID == "0x3f6aa75c359baf4af470aaf63cb7a10e6840c07c5a3a5d96144966d9fd7b27cf16000000")
+	assert.True(t, license.CreatedAt == "2023-11-21T02:20:24Z")
+}
+
+func TestGetLicense_NotFound_Failure(t *testing.T) {
+	service := CreateTheGraphServiceAlpha()
+	license, err := service.GetLicense("1123")
+	logger.Info(license)
+	assert.Nil(t, err)
 }

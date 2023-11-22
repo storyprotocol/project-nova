@@ -1,5 +1,7 @@
 package v0alpha
 
+import "github.com/project-nova/backend/pkg/utils"
+
 type IPOrg struct {
 	ID           string   `json:"id,omitempty"`
 	Name         string   `json:"name,omitempty"`
@@ -60,7 +62,7 @@ func (i *IPOrgTheGraphAlpha) ToIPOrg() *IPOrg {
 		BaseUri:      i.BaseURI,
 		ContractUri:  i.ContractURI,
 		IPAssetTypes: i.IPAssetTypes,
-		CreatedAt:    i.BlockTimestamp,
+		CreatedAt:    utils.TimestampInSecondsToISO8601(i.BlockTimestamp),
 		TxHash:       i.TxHash,
 	}
 }

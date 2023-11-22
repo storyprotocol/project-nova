@@ -1,5 +1,7 @@
 package v0alpha
 
+import "github.com/project-nova/backend/pkg/utils"
+
 type Relationship struct {
 	ID           string `json:"id,omitempty"`
 	Type         string `json:"type,omitempty"`
@@ -79,7 +81,7 @@ func (r *RelationshipTheGraphAlpha) ToRelationship() *Relationship {
 		SrcTokenId:   r.SrcId,
 		DstContract:  r.DstAddress,
 		DstTokenId:   r.DstId,
-		RegisteredAt: r.BlockTimestamp,
+		RegisteredAt: utils.TimestampInSecondsToISO8601(r.BlockTimestamp),
 		TxHash:       r.TxHash,
 	}
 }

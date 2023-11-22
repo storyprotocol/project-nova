@@ -15,6 +15,8 @@ package v0alpha
 	}
 */
 type QueryOptions struct {
-	Offset int `json:"offset,omitempty"`
-	Limit  int `json:"limit,omitempty"`
+	Pagination struct {
+		Offset int `json:"offset,omitempty"`
+		Limit  int `json:"limit,omitempty"`
+	} `json:"pagination,omitempty"`
 }
