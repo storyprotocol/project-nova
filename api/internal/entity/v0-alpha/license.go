@@ -31,7 +31,7 @@ type ListLicensesRequest struct {
 }
 
 type ListLicensesResponse struct {
-	Licenses []*License `json:"licenseRegisterreds"`
+	Licenses []*License `json:"licenses"`
 }
 
 type LicenseRegistryTheGraphAlpha struct {
