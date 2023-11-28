@@ -140,6 +140,7 @@ func (p *AlphaProtocolHandler) ListRelationshipsHandler(c *gin.Context) {
 	})
 }
 
+// GET /relationship-type
 func (p *AlphaProtocolHandler) GetRelationshipTypeHandler(c *gin.Context) {
 	var requestBody v0alpha_entity.GetRelationshipTypeRequest
 	if err := c.BindJSON(&requestBody); err != nil {
@@ -164,6 +165,7 @@ func (p *AlphaProtocolHandler) GetRelationshipTypeHandler(c *gin.Context) {
 	})
 }
 
+// POST /relationship-type
 func (p *AlphaProtocolHandler) ListRelationshipTypesHandler(c *gin.Context) {
 	var requestBody v0alpha_entity.ListRelationshipTypesRequest
 	if err := c.BindJSON(&requestBody); err != nil {

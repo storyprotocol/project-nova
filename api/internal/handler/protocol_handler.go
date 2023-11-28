@@ -8,20 +8,22 @@ import (
 )
 
 type ProtocolHandlerInterface interface {
-	ListIpOrgsHandler(c *gin.Context)        // POST /iporg
-	GetIpOrgHandler(c *gin.Context)          // GET /iporg/:ipOrgId
-	GetIpAssetHandler(c *gin.Context)        // GET /ipasset/:ipAssetId
-	ListIpAssetsHandler(c *gin.Context)      // POST /ipasset
-	ListTransactionsHandler(c *gin.Context)  // POST /transaction
-	GetRelationshipHandler(c *gin.Context)   // GET /relationship/:relationshipId
-	ListRelationshipsHandler(c *gin.Context) // POST /relationship
-	ListModulesHandler(c *gin.Context)       // POST /module
-	GetModuleHandler(c *gin.Context)         // GET /module/:moduleId
-	ListHooksHandler(c *gin.Context)         // POST /hook
-	GetHookHandler(c *gin.Context)           // GET /hook/:hookId
-	GetTransactionHandler(c *gin.Context)    // GET /transaction/:transactionId
-	GetLicenseHandler(c *gin.Context)        // GET /license/:licenseId
-	ListLicensesHandler(c *gin.Context)      // POST /license
+	ListIpOrgsHandler(c *gin.Context)            // POST /iporg
+	GetIpOrgHandler(c *gin.Context)              // GET /iporg/:ipOrgId
+	GetIpAssetHandler(c *gin.Context)            // GET /ipasset/:ipAssetId
+	ListIpAssetsHandler(c *gin.Context)          // POST /ipasset
+	ListTransactionsHandler(c *gin.Context)      // POST /transaction
+	GetRelationshipHandler(c *gin.Context)       // GET /relationship/:relationshipId
+	ListRelationshipsHandler(c *gin.Context)     // POST /relationship
+	ListModulesHandler(c *gin.Context)           // POST /module
+	GetModuleHandler(c *gin.Context)             // GET /module/:moduleId
+	ListHooksHandler(c *gin.Context)             // POST /hook
+	GetHookHandler(c *gin.Context)               // GET /hook/:hookId
+	GetTransactionHandler(c *gin.Context)        // GET /transaction/:transactionId
+	GetLicenseHandler(c *gin.Context)            // GET /license/:licenseId
+	ListLicensesHandler(c *gin.Context)          // POST /license
+	GetRelationshipTypeHandler(c *gin.Context)   // GET /relationship-type
+	ListRelationshipTypesHandler(c *gin.Context) // POST /relationship-type
 }
 
 type protocolHandler struct {
@@ -102,6 +104,26 @@ func (ph *protocolHandler) ListRelationshipsHandler(c *gin.Context) {
 		ph.alphaProtocolHandlers.ListRelationshipsHandler(c)
 	default:
 		ph.alphaProtocolHandlers.ListRelationshipsHandler(c)
+	}
+}
+
+func (ph *protocolHandler) GetRelationshipTypeHandler(c *gin.Context) {
+	version := c.GetHeader(entity.HTTP_HEADER_VERSION)
+	switch version {
+	case entity.VERSION_V0_ALPHA:
+		ph.alphaProtocolHandlers.GetRelationshipTypeHandler(c)
+	default:
+		ph.alphaProtocolHandlers.GetRelationshipTypeHandler(c)
+	}
+}
+
+func (ph *protocolHandler) ListRelationshipTypesHandler(c *gin.Context) {
+	version := c.GetHeader(entity.HTTP_HEADER_VERSION)
+	switch version {
+	case entity.VERSION_V0_ALPHA:
+		ph.alphaProtocolHandlers.ListRelationshipTypesHandler(c)
+	default:
+		ph.alphaProtocolHandlers.ListRelationshipTypesHandler(c)
 	}
 }
 
