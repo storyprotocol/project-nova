@@ -11,6 +11,10 @@ export class ArweaveService {
     this.cfg = cfg;
   }
 
+  public async fundIrysAccount(amountInWei: number) {
+    return await this.bundler.fund(amountInWei)
+  }
+
   /**
    * Uploads content to Arweave.
    * @param {Buffer} content - The content to upload.

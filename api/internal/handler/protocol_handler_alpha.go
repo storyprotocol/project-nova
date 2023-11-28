@@ -140,6 +140,49 @@ func (p *AlphaProtocolHandler) ListRelationshipsHandler(c *gin.Context) {
 	})
 }
 
+func (p *AlphaProtocolHandler) GetRelationshipTypeHandler(c *gin.Context) {
+	var requestBody v0alpha_entity.GetRelationshipTypeRequest
+	if err := c.BindJSON(&requestBody); err != nil {
+		logger.Errorf("Failed to read request body: %v", err)
+		c.JSON(http.StatusBadRequest, ErrorMessage("invalid request body"))
+		return
+	}
+	relationshipType, err := p.graphServiceAlpha.GetRelationshipType(&requestBody.RelType, &requestBody.IpOrgId)
+	if err != nil {
+		logger.Errorf("Failed to get relationship types: %v", err)
+		c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+		return
+	}
+
+	if relationshipType == nil {
+		c.JSON(http.StatusNotFound, ErrorMessage("Not found"))
+		return
+	}
+
+	c.JSON(http.StatusOK, v0alpha_entity.GetRelationshipTypeResponse{
+		RelationshipType: relationshipType,
+	})
+}
+
+func (p *AlphaProtocolHandler) ListRelationshipTypesHandler(c *gin.Context) {
+	var requestBody v0alpha_entity.ListRelationshipTypesRequest
+	if err := c.BindJSON(&requestBody); err != nil {
+		logger.Errorf("Failed to read request body: %v", err)
+		c.JSON(http.StatusBadRequest, ErrorMessage("invalid request body"))
+		return
+	}
+	relationshipTypes, err := p.graphServiceAlpha.ListRelationshipTypes(&requestBody.IpOrgId, thegraph.FromRequestQueryOptions(requestBody.Options))
+	if err != nil {
+		logger.Errorf("Failed to get relationship types: %v", err)
+		c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+		return
+	}
+
+	c.JSON(http.StatusOK, v0alpha_entity.ListRelationshipTypesResponse{
+		RelationshipTypes: relationshipTypes,
+	})
+}
+
 // POST /module
 func (p *AlphaProtocolHandler) ListModulesHandler(c *gin.Context) {
 	var requestBody v0alpha_entity.ListModulesRequest

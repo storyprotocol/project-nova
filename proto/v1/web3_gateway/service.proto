@@ -7,6 +7,6 @@ import "proto/v1/web3_gateway/storage.proto";
 option go_package = "github.com/project-nova/backend/proto/v1/web3_gateway";
 
 service StorageService {
-    rpc UploadContent(UploadContentReq) returns (UploadContentResp) {
-    };
+    rpc UploadContent(UploadContentReq) returns (UploadContentResp) {};
+    rpc FundIrysAccount(FundIrysReq) returns (FundIrysResp) {};
 }

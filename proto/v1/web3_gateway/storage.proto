@@ -25,3 +25,14 @@ message UploadContentReq {
 message UploadContentResp {
   string content_url = 1;
 }
+
+message FundIrysReq {
+  int64 amountInWei = 1;
+}
+
+message FundIrysResp {
+  string reward = 1;
+  string target = 2;
+  string quantity = 3;
+  string id = 4;
+}

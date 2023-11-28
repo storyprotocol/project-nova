@@ -49,6 +49,52 @@ func TestListRelationships_MatchSource_Success(t *testing.T) {
 	assert.True(t, relationships[0].RegisteredAt == "2023-11-22T03:37:48Z")
 }
 
+func TestGetRelationshipType_Success(t *testing.T) {
+	service := CreateTheGraphServiceAlpha()
+	relationshipType, err := service.GetRelationshipType(nil, nil)
+	assert.Nil(t, err)
+	assert.NotNil(t, relationshipType)
+}
+
+func TestGetRelationshipType_FindByRelType_Success(t *testing.T) {
+	service := CreateTheGraphServiceAlpha()
+	relType := "0xc12a5f0d1e5a95f4fc32ff629c53defa11273a372e29ae51ab24323e4af84fc3"
+	relationshipType, err := service.GetRelationshipType(&relType, nil)
+	assert.Nil(t, err)
+	assert.True(t, relationshipType.IpOrgId == "0xb422e54932c1dae83e78267a4dd2805aa64a8061")
+}
+
+func TestGetRelationshipType_FindByIpOrgId_Success(t *testing.T) {
+	service := CreateTheGraphServiceAlpha()
+	ipOrgId := "0xb422e54932c1dae83e78267a4dd2805aa64a8061"
+	relationshipType, err := service.GetRelationshipType(nil, &ipOrgId)
+	assert.Nil(t, err)
+	assert.True(t, relationshipType.IpOrgId == "0xb422e54932c1dae83e78267a4dd2805aa64a8061")
+}
+
+func TestGetRelationshipType_Failure(t *testing.T) {
+	service := CreateTheGraphServiceAlpha()
+	relType := "0x177175a4b26f6ea050676f8c9a14d395f896492c"
+	relationshipTypes, err := service.GetRelationshipType(&relType, nil)
+	assert.Nil(t, err)
+	assert.Nil(t, relationshipTypes)
+}
+
+func TestListRelationshipTypes_Success(t *testing.T) {
+	service := CreateTheGraphServiceAlpha()
+	relationshipTypes, err := service.ListRelationshipTypes(nil, nil)
+	assert.Nil(t, err)
+	assert.True(t, len(relationshipTypes) > 0)
+}
+
+func TestListRelationshipTypes_WithIpOrgId_Success(t *testing.T) {
+	service := CreateTheGraphServiceAlpha()
+	ipOrgId := "0xb422e54932c1dae83e78267a4dd2805aa64a8061"
+	relationshipTypes, err := service.ListRelationshipTypes(&ipOrgId, nil)
+	assert.Nil(t, err)
+	assert.True(t, len(relationshipTypes) > 0)
+}
+
 func TestListRelationships_MatchDestination_Success(t *testing.T) {
 	service := CreateTheGraphServiceAlpha()
 	relationships, err := service.ListRelationships("0x177175a4b26f6ea050676f8c9a14d395f896492c", "5", nil)
