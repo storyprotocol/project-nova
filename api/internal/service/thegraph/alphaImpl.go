@@ -527,6 +527,7 @@ func (s *theGraphServiceAlphaImpl) GetTransaction(transactionId string) (*v0alph
 		return nil, fmt.Errorf("failed to get the transactions from the graph. error: %v", err)
 	}
 
+	logger.Infof(">>>> %+v", transactionsResponse)
 	if len(transactionsResponse.Transactions) == 0 {
 		return nil, nil
 	}

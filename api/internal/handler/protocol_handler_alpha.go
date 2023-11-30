@@ -268,6 +268,7 @@ func (p *AlphaProtocolHandler) GetHookHandler(c *gin.Context) {
 // GET /transaction/:transactionId
 func (p *AlphaProtocolHandler) GetTransactionHandler(c *gin.Context) {
 	transactionId := c.Param("transactionId")
+	logger.Infof("transactionId: %s", transactionId)
 	transaction, err := p.graphServiceAlpha.GetTransaction(transactionId)
 	if err != nil {
 		logger.Errorf("Failed to get transaction: %v", err)

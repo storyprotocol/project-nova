@@ -24,7 +24,7 @@ func TestListIpOrgsHandler_Success(t *testing.T) {
 func TestGetIpOrgHandler_Success(t *testing.T) {
 	c, w := test.MockGin(map[string]interface{}{})
 	c.Params = gin.Params{
-		{Key: "ipOrgId", Value: "0xde493e03d2de0cd7820b4f580beced57296b0009"},
+		{Key: "ipOrgId", Value: "0x0dad65978b6c637598674ea03b1c6f3333d00f5b"},
 	}
 	ph := NewAlphaProtocolHandler(test.CreateTheGraphServiceAlpha())
 	ph.GetIpOrgHandler(c)
@@ -34,7 +34,7 @@ func TestGetIpOrgHandler_Success(t *testing.T) {
 func TestGetIpOrgHandler_NotFound_Failure(t *testing.T) {
 	c, w := test.MockGin(map[string]interface{}{})
 	c.Params = gin.Params{
-		{Key: "ipOrgId", Value: "0xde493e03d2de0cd7820b4f580beced57296b0011"},
+		{Key: "ipOrgId", Value: "0x0dad65978b6c637598674ea03b1c6f4333d00f5b"},
 	}
 	ph := NewAlphaProtocolHandler(test.CreateTheGraphServiceAlpha())
 	ph.GetIpOrgHandler(c)
@@ -174,7 +174,7 @@ func TestListModulesHandler_Success(t *testing.T) {
 func TestGetModuleHandler_Success(t *testing.T) {
 	c, w := test.MockGin(map[string]interface{}{})
 	c.Params = gin.Params{
-		{Key: "moduleId", Value: "0x091e5f55135155bb8cb5868adb39e5c34eb32cfd"},
+		{Key: "moduleId", Value: "0xd692de739fe1c1aaa31c3d0847dc17976afc05ff"},
 	}
 	ph := NewAlphaProtocolHandler(test.CreateTheGraphServiceAlpha())
 	ph.GetModuleHandler(c)
@@ -193,7 +193,7 @@ func TestGetModuleHandler_NotFound_Failure(t *testing.T) {
 
 func TestListHooksHandler_Success(t *testing.T) {
 	c, w := test.MockGin(map[string]interface{}{
-		"moduleId": "0x091e5f55135155bb8cb5868adb39e5c34eb32cfd",
+		"moduleId": "0x948f67e1c4f75bc89c5fb42147d96356fb4b359f",
 		"queryOptions": map[string]interface{}{
 			"pagination": map[string]interface{}{
 				"offset": 0,
@@ -209,7 +209,7 @@ func TestListHooksHandler_Success(t *testing.T) {
 func TestGetHookHandler_Success(t *testing.T) {
 	c, w := test.MockGin(map[string]interface{}{})
 	c.Params = gin.Params{
-		{Key: "hookId", Value: "0xc0f6e387ac0b324ec18eacf22ee7271207dce3d5"},
+		{Key: "hookId", Value: "0xa26ba8224fb6173063f63388685f80708a6f4d96"},
 	}
 	ph := NewAlphaProtocolHandler(test.CreateTheGraphServiceAlpha())
 	ph.GetHookHandler(c)
@@ -229,7 +229,7 @@ func TestGetHookHandler_NotFound_Failure(t *testing.T) {
 func TestGetTransactionHandler_Success(t *testing.T) {
 	c, w := test.MockGin(map[string]interface{}{})
 	c.Params = gin.Params{
-		{Key: "transactionId", Value: "0x158f74772af1bf9e5d1eb9d6633bb6a602eea97bbbd552b16696d7d2d3fa007703000000"},
+		{Key: "transactionId", Value: "0x07da84387bbd29bf5476b0684677628f95d6b551fdb145c4fccb27b6342cdfd12e000000"},
 	}
 	ph := NewAlphaProtocolHandler(test.CreateTheGraphServiceAlpha())
 	ph.GetTransactionHandler(c)
@@ -239,7 +239,7 @@ func TestGetTransactionHandler_Success(t *testing.T) {
 func TestGetTransactionHandler_NotFound_Failure(t *testing.T) {
 	c, w := test.MockGin(map[string]interface{}{})
 	c.Params = gin.Params{
-		{Key: "transactionId", Value: "0x158f74772af1bf9e5d1eb9d6633bb6a602eea97bbbd552b16696d7d2d3fa007703000001"},
+		{Key: "transactionId", Value: "0x07da84387bbd29bf5476b0684677628f95d6b551fdb145c4accb27b6342cdfd12e000000"},
 	}
 	ph := NewAlphaProtocolHandler(test.CreateTheGraphServiceAlpha())
 	ph.GetTransactionHandler(c)
