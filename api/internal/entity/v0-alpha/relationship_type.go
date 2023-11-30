@@ -20,9 +20,8 @@ type RelationshipType struct {
 }
 
 type GetRelationshipTypeRequest struct {
-	IpOrgId string        `json:"ipOrgId"`
-	RelType string        `json:"relType"`
-	Options *QueryOptions `json:"options"`
+	IpOrgId string `form:"ipOrgId"`
+	RelType string `form:"relType"`
 }
 
 type GetRelationshipTypeResponse struct {

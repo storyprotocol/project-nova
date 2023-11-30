@@ -143,11 +143,12 @@ func (p *AlphaProtocolHandler) ListRelationshipsHandler(c *gin.Context) {
 // GET /relationship-type
 func (p *AlphaProtocolHandler) GetRelationshipTypeHandler(c *gin.Context) {
 	var requestBody v0alpha_entity.GetRelationshipTypeRequest
-	if err := c.BindJSON(&requestBody); err != nil {
+	if err := c.BindQuery(&requestBody); err != nil {
 		logger.Errorf("Failed to read request body: %v", err)
 		c.JSON(http.StatusBadRequest, ErrorMessage("invalid request body"))
 		return
 	}
+
 	relationshipType, err := p.graphServiceAlpha.GetRelationshipType(&requestBody.RelType, &requestBody.IpOrgId)
 	if err != nil {
 		logger.Errorf("Failed to get relationship types: %v", err)
