@@ -3,7 +3,7 @@ package test
 import (
 	"bytes"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -18,7 +18,7 @@ func CreateTheGraphServiceAlpha() thegraph.TheGraphServiceAlpha {
 	return thegraph.NewTheGraphServiceAlphaImpl(theGraphClientAlpha)
 }
 
-func MockGin(requestBody map[string]interface{}) (*gin.Context, *httptest.ResponseRecorder) {
+func MockGin(requestBody map[string]interface{}, queryParams map[string]interface{}) (*gin.Context, *httptest.ResponseRecorder) {
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
 
@@ -33,10 +33,17 @@ func MockGin(requestBody map[string]interface{}) (*gin.Context, *httptest.Respon
 	if err != nil {
 		panic(err)
 	}
-	req.Body = ioutil.NopCloser(bytes.NewBuffer(jsonBody))
+	req.Body = io.NopCloser(bytes.NewBuffer(jsonBody))
 
 	// example: req.Header.Add("Accept", "application/json")
 
+	if queryParams != nil {
+		q := req.URL.Query()
+		for k, v := range queryParams {
+			q.Add(k, v.(string))
+		}
+		req.URL.RawQuery = q.Encode()
+	}
 	// // request query
 	// testQuery := weldprogs.QueryParam{ /* init fields */ }
 

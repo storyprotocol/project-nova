@@ -7,7 +7,11 @@ import (
 
 	"github.com/machinebox/graphql"
 	v0alpha "github.com/project-nova/backend/api/internal/entity/v0-alpha"
-	"github.com/project-nova/backend/pkg/logger"
+)
+
+const (
+	QUERY_INTERFACE = "$first: Int, $skip: Int, $orderBy: String, $orderDirection: String"
+	QUERY_VALUE     = "first: $first, skip: $skip, orderBy: $orderBy, orderDirection: $orderDirection"
 )
 
 func NewTheGraphServiceAlphaImpl(client *graphql.Client) TheGraphServiceAlpha {
@@ -51,22 +55,12 @@ func (s *theGraphServiceAlphaImpl) GetRelationship(relationshipId string) (*v0al
 	return relationshipsResponse.Relationships[0].ToRelationship(), nil
 }
 
-func (s *theGraphServiceAlphaImpl) GetRelationshipType(relType *string, ipOrgId *string) (*v0alpha.RelationshipType, error) {
-	options := s.setQueryOptions(nil)
-	queryInterface := "$relType: String, $ipOrgId: String, $first: Int, $skip: Int"
-	queryValue := "where: {relType: $relType, ipOrgId: $ipOrgId}, first: $first, skip: $skip"
-	if relType == nil || *relType == "" {
-		queryInterface = "$ipOrgId: String, $first: Int, $skip: Int"
-		queryValue = "where: {ipOrgId: $ipOrgId}, first: $first, skip: $skip"
+func (s *theGraphServiceAlphaImpl) GetRelationshipType(relType string, ipOrgId string) (*v0alpha.RelationshipType, error) {
+	if relType == "" || ipOrgId == "" {
+		return nil, fmt.Errorf("relType and ipOrgId cannot be empty")
 	}
-	if ipOrgId == nil || *ipOrgId == "" {
-		queryInterface = "$relType: String, $first: Int, $skip: Int"
-		queryValue = "where: {relType: $relType}, first: $first, skip: $skip"
-	}
-	if (relType == nil || *relType == "") && (ipOrgId == nil || *ipOrgId == "") {
-		queryInterface = "$first: Int, $skip: Int"
-		queryValue = "first: $first, skip: $skip"
-	}
+	queryInterface := "$relType: String, $ipOrgId: String"
+	queryValue := "where: {relType: $relType, ipOrgId: $ipOrgId}"
 
 	req := graphql.NewRequest(fmt.Sprintf(`
 		query(%s) {
@@ -86,21 +80,14 @@ func (s *theGraphServiceAlphaImpl) GetRelationshipType(relType *string, ipOrgId 
 			}
 		}
 	`, queryInterface, queryValue))
-	if relType != nil {
-		req.Var("relType", *relType)
-	}
-	if ipOrgId != nil {
-		req.Var("ipOrgId", *ipOrgId)
-	}
-	req.Var("first", options.First)
-	req.Var("skip", options.Skip)
+	req.Var("relType", relType)
+	req.Var("ipOrgId", ipOrgId)
 
 	ctx := context.Background()
 	var relationshipTypesResponse v0alpha.RelationshipTypeTheGraphAlphaResponse
 	if err := s.client.Run(ctx, req, &relationshipTypesResponse); err != nil {
 		return nil, fmt.Errorf("failed to get the relationship types from the graph. error: %v", err)
 	}
-	logger.Infof(">>>> %+v %+v", relationshipTypesResponse, options)
 
 	if len(relationshipTypesResponse.RelationshipTypes) == 0 {
 		return nil, nil
@@ -111,11 +98,11 @@ func (s *theGraphServiceAlphaImpl) GetRelationshipType(relType *string, ipOrgId 
 
 func (s *theGraphServiceAlphaImpl) ListRelationshipTypes(ipOrgId *string, options *TheGraphQueryOptions) ([]*v0alpha.RelationshipType, error) {
 	options = s.setQueryOptions(options)
-	queryInterface := "$ipOrgId: String, $first: Int, $skip: Int"
-	queryValue := "where: {ipOrgId: $ipOrgId}, first: $first, skip: $skip"
+	queryInterface := fmt.Sprintf("$ipOrgId: String, %s", QUERY_INTERFACE)
+	queryValue := fmt.Sprintf("where: {ipOrgId: $ipOrgId}, %s", QUERY_VALUE)
 	if ipOrgId == nil || *ipOrgId == "" {
-		queryInterface = "$first: Int, $skip: Int"
-		queryValue = "first: $first, skip: $skip"
+		queryInterface = QUERY_INTERFACE
+		queryValue = QUERY_VALUE
 	}
 
 	req := graphql.NewRequest(fmt.Sprintf(`
@@ -142,6 +129,8 @@ func (s *theGraphServiceAlphaImpl) ListRelationshipTypes(ipOrgId *string, option
 
 	req.Var("first", options.First)
 	req.Var("skip", options.Skip)
+	req.Var("orderBy", options.OrderBy)
+	req.Var("orderDirection", options.OrderDirection)
 
 	ctx := context.Background()
 	var relationshipTypesResponse v0alpha.RelationshipTypeTheGraphAlphaResponse
@@ -155,14 +144,14 @@ func (s *theGraphServiceAlphaImpl) ListRelationshipTypes(ipOrgId *string, option
 
 func (s *theGraphServiceAlphaImpl) ListRelationships(contract string, tokenId string, options *TheGraphQueryOptions) ([]*v0alpha.Relationship, error) {
 	options = s.setQueryOptions(options)
-	req := graphql.NewRequest(`
-		query($contract: String, $tokenId: String, $first: Int, $skip: Int) {
+	req := graphql.NewRequest(fmt.Sprintf(`
+		query($contract: String, $tokenId: String, %s) {
 			relationshipCreateds(where: {
 				or: [
 					{ srcAddress: $contract, srcId: $tokenId },
 					{ dstAddress: $contract, dstId: $tokenId }
 				]
-			}, first: $first, skip: $skip) {
+			}, %s) {
 				id
 				relationshipId
 				relType
@@ -175,12 +164,13 @@ func (s *theGraphServiceAlphaImpl) ListRelationships(contract string, tokenId st
 				transactionHash
 			}
 		}
-	`)
+	`, QUERY_INTERFACE, QUERY_VALUE))
 	req.Var("contract", contract)
 	req.Var("tokenId", tokenId)
 	req.Var("first", options.First)
 	req.Var("skip", options.Skip)
-
+	req.Var("orderBy", options.OrderBy)
+	req.Var("orderDirection", options.OrderDirection)
 	ctx := context.Background()
 	var relationshipsResponse v0alpha.RelationshipTheGraphAlphaResponse
 	if err := s.client.Run(ctx, req, &relationshipsResponse); err != nil {
@@ -192,12 +182,11 @@ func (s *theGraphServiceAlphaImpl) ListRelationships(contract string, tokenId st
 
 func (s *theGraphServiceAlphaImpl) ListHooks(moduleId *string, options *TheGraphQueryOptions) ([]*v0alpha.Hook, error) {
 	options = s.setQueryOptions(options)
-
-	queryInterface := "$moduleId: String, $first: Int, $skip: Int"
-	queryValue := "where: {moduleId: $moduleId}, first: $first, skip: $skip"
+	queryInterface := fmt.Sprintf("$moduleId: String, %s", QUERY_INTERFACE)
+	queryValue := fmt.Sprintf("where: {moduleId: $moduleId}, %s", QUERY_VALUE)
 	if moduleId == nil || *moduleId == "" {
-		queryInterface = "$first: Int, $skip: Int"
-		queryValue = "first: $first, skip: $skip"
+		queryInterface = QUERY_INTERFACE
+		queryValue = QUERY_VALUE
 	}
 
 	req := graphql.NewRequest(fmt.Sprintf(`
@@ -219,7 +208,8 @@ func (s *theGraphServiceAlphaImpl) ListHooks(moduleId *string, options *TheGraph
 	}
 	req.Var("first", options.First)
 	req.Var("skip", options.Skip)
-
+	req.Var("orderBy", options.OrderBy)
+	req.Var("orderDirection", options.OrderDirection)
 	ctx := context.Background()
 	var hooksResponse v0alpha.HookTheGraphAlphaResponse
 	if err := s.client.Run(ctx, req, &hooksResponse); err != nil {
@@ -260,11 +250,11 @@ func (s *theGraphServiceAlphaImpl) GetHook(hookId string) (*v0alpha.Hook, error)
 
 func (s *theGraphServiceAlphaImpl) ListModules(ipOrgId *string, options *TheGraphQueryOptions) ([]*v0alpha.Module, error) {
 	options = s.setQueryOptions(options)
-	queryInterface := "$ipOrgId: String, $first: Int, $skip: Int"
-	queryValue := "where: {ipOrgId: $ipOrgId}, first: $first, skip: $skip"
+	queryInterface := fmt.Sprintf("$ipOrgId: String, %s", QUERY_INTERFACE)
+	queryValue := fmt.Sprintf("where: {ipOrgId: $ipOrgId}, %s", QUERY_VALUE)
 	if ipOrgId == nil || *ipOrgId == "" {
-		queryInterface = "$first: Int, $skip: Int"
-		queryValue = "first: $first, skip: $skip"
+		queryInterface = QUERY_INTERFACE
+		queryValue = QUERY_VALUE
 	}
 	req := graphql.NewRequest(fmt.Sprintf(`
 		query(%s) {
@@ -285,7 +275,8 @@ func (s *theGraphServiceAlphaImpl) ListModules(ipOrgId *string, options *TheGrap
 
 	req.Var("first", options.First)
 	req.Var("skip", options.Skip)
-
+	req.Var("orderBy", options.OrderBy)
+	req.Var("orderDirection", options.OrderDirection)
 	ctx := context.Background()
 	var modulesResponse v0alpha.ModuleTheGraphAlphaResponse
 	if err := s.client.Run(ctx, req, &modulesResponse); err != nil {
@@ -326,9 +317,9 @@ func (s *theGraphServiceAlphaImpl) GetModule(moduleId string) (*v0alpha.Module, 
 
 func (s *theGraphServiceAlphaImpl) ListIPOrgs(options *TheGraphQueryOptions) ([]*v0alpha.IPOrg, error) {
 	options = s.setQueryOptions(options)
-	req := graphql.NewRequest(`
-		query($first: Int, $skip: Int) {
-			iporgRegistereds(first: $first, skip: $skip) {
+	req := graphql.NewRequest(fmt.Sprintf(`
+		query(%s) {
+			iporgRegistereds(%s) {
 				id
 				owner
 				ipOrgId
@@ -342,10 +333,11 @@ func (s *theGraphServiceAlphaImpl) ListIPOrgs(options *TheGraphQueryOptions) ([]
 				transactionHash
 			}
 		}
-	`)
+	`, QUERY_INTERFACE, QUERY_VALUE))
 	req.Var("first", options.First)
 	req.Var("skip", options.Skip)
-
+	req.Var("orderBy", options.OrderBy)
+	req.Var("orderDirection", options.OrderDirection)
 	ctx := context.Background()
 	var ipOrgsResponse v0alpha.IpOrgTheGraphAlphaResponse
 	if err := s.client.Run(ctx, req, &ipOrgsResponse); err != nil {
@@ -391,11 +383,11 @@ func (s *theGraphServiceAlphaImpl) GetIPOrg(iporgId string) (*v0alpha.IPOrg, err
 func (s *theGraphServiceAlphaImpl) ListIPAssets(iporgId *string, options *TheGraphQueryOptions) ([]*v0alpha.IPAsset, error) {
 	options = s.setQueryOptions(options)
 
-	queryInterface := "$ipOrgId: String, $first: Int, $skip: Int"
-	queryValue := "where: {ipOrgId: $ipOrgId}, first: $first, skip: $skip"
+	queryInterface := fmt.Sprintf("$ipOrgId: String, %s", QUERY_INTERFACE)
+	queryValue := fmt.Sprintf("where: {ipOrgId: $ipOrgId}, %s", QUERY_VALUE)
 	if iporgId == nil || *iporgId == "" {
-		queryInterface = "$first: Int, $skip: Int"
-		queryValue = "first: $first, skip: $skip"
+		queryInterface = QUERY_INTERFACE
+		queryValue = QUERY_VALUE
 	}
 
 	req := graphql.NewRequest(fmt.Sprintf(`
@@ -421,7 +413,8 @@ func (s *theGraphServiceAlphaImpl) ListIPAssets(iporgId *string, options *TheGra
 	}
 	req.Var("first", options.First)
 	req.Var("skip", options.Skip)
-
+	req.Var("orderBy", options.OrderBy)
+	req.Var("orderDirection", options.OrderDirection)
 	ctx := context.Background()
 	var ipAssetsResponse v0alpha.IpAssetTheGraphAlphaResponse
 	if err := s.client.Run(ctx, req, &ipAssetsResponse); err != nil {
@@ -466,11 +459,11 @@ func (s *theGraphServiceAlphaImpl) GetIPAsset(ipAssetId string) (*v0alpha.IPAsse
 
 func (s *theGraphServiceAlphaImpl) ListTransactions(ipOrgId *string, options *TheGraphQueryOptions) ([]*v0alpha.Transaction, error) {
 	options = s.setQueryOptions(options)
-	queryInterface := "$ipOrgId: String, $first: Int, $skip: Int"
-	queryValue := "where: {ipOrgId: $ipOrgId}, first: $first, skip: $skip"
+	queryInterface := fmt.Sprintf("$ipOrgId: String, %s", QUERY_INTERFACE)
+	queryValue := fmt.Sprintf("where: {ipOrgId: $ipOrgId}, %s", QUERY_VALUE)
 	if ipOrgId == nil || *ipOrgId == "" {
-		queryInterface = "$first: Int, $skip: Int"
-		queryValue = "first: $first, skip: $skip"
+		queryInterface = QUERY_INTERFACE
+		queryValue = QUERY_VALUE
 	}
 
 	req := graphql.NewRequest(fmt.Sprintf(`
@@ -493,7 +486,8 @@ func (s *theGraphServiceAlphaImpl) ListTransactions(ipOrgId *string, options *Th
 	}
 	req.Var("first", options.First)
 	req.Var("skip", options.Skip)
-
+	req.Var("orderBy", options.OrderBy)
+	req.Var("orderDirection", options.OrderDirection)
 	ctx := context.Background()
 	var transactionsResponse v0alpha.TransactionTheGraphAlphaResponse
 	if err := s.client.Run(ctx, req, &transactionsResponse); err != nil {
@@ -527,7 +521,6 @@ func (s *theGraphServiceAlphaImpl) GetTransaction(transactionId string) (*v0alph
 		return nil, fmt.Errorf("failed to get the transactions from the graph. error: %v", err)
 	}
 
-	logger.Infof(">>>> %+v", transactionsResponse)
 	if len(transactionsResponse.Transactions) == 0 {
 		return nil, nil
 	}
@@ -537,8 +530,8 @@ func (s *theGraphServiceAlphaImpl) GetTransaction(transactionId string) (*v0alph
 
 func (s *theGraphServiceAlphaImpl) ListLicenses(ipOrgId *string, ipAssetId *string, options *TheGraphQueryOptions) ([]*v0alpha.License, error) {
 	options = s.setQueryOptions(options)
-	queryInterface := "$first: Int, $skip: Int"
-	queryValue := "first: $first, skip: $skip"
+	queryInterface := QUERY_INTERFACE
+	queryValue := QUERY_VALUE
 	whereClause := []string{}
 	if ipOrgId != nil && *ipOrgId != "" {
 		queryInterface += ", $ipOrgId: String"
@@ -581,6 +574,8 @@ func (s *theGraphServiceAlphaImpl) ListLicenses(ipOrgId *string, ipAssetId *stri
 	}
 	req.Var("first", options.First)
 	req.Var("skip", options.Skip)
+	req.Var("orderBy", options.OrderBy)
+	req.Var("orderDirection", options.OrderDirection)
 
 	ctx := context.Background()
 	var licensesResponse v0alpha.LicenseTheGraphAlphaResponse
@@ -639,6 +634,9 @@ func (s *theGraphServiceAlphaImpl) setQueryOptions(options *TheGraphQueryOptions
 	if options.First == 0 {
 		options.First = 100
 	}
+
+	options.OrderBy = "blockTimestamp"
+	options.OrderDirection = "desc"
 
 	return options
 }
