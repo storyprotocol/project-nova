@@ -54,12 +54,13 @@ func TestGetRelationshipType_Success(t *testing.T) {
 	assert.NotNil(t, relationshipType)
 }
 
-func TestGetRelationshipType_FindByRelType_Success(t *testing.T) {
+func TestGetRelationshipType_FindByRelType_AndIpOrgId_Success(t *testing.T) {
 	service := CreateTheGraphServiceAlpha()
 	relType := "0xc12a5f0d1e5a95f4fc32ff629c53defa11273a372e29ae51ab24323e4af84fc3"
-	relationshipType, err := service.GetRelationshipType(&relType, nil)
+	ipOrgId := "0x1ebb43775fcc45cf05eaa96182c8762220e17941"
+	relationshipType, err := service.GetRelationshipType(&relType, &ipOrgId)
 	assert.Nil(t, err)
-	assert.True(t, relationshipType.IpOrgId == "0x1ebb43775fcc45cf05eaa96182c8762220e17941")
+	assert.True(t, relationshipType.IpOrgId == ipOrgId)
 }
 
 func TestGetRelationshipType_FindByIpOrgId_Success(t *testing.T) {

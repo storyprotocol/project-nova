@@ -3,7 +3,7 @@ package test
 import (
 	"bytes"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -33,7 +33,7 @@ func MockGin(requestBody map[string]interface{}, queryParams map[string]interfac
 	if err != nil {
 		panic(err)
 	}
-	req.Body = ioutil.NopCloser(bytes.NewBuffer(jsonBody))
+	req.Body = io.NopCloser(bytes.NewBuffer(jsonBody))
 
 	// example: req.Header.Add("Accept", "application/json")
 
