@@ -50,8 +50,10 @@ type TheGraphServiceAlpha interface {
 }
 
 type TheGraphQueryOptions struct {
-	First int
-	Skip  int
+	First          int
+	Skip           int
+	OrderBy        string
+	OrderDirection string
 }
 
 func FromRequestQueryOptions(options *v0alpha.QueryOptions) *TheGraphQueryOptions {
