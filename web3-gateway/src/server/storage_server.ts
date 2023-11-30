@@ -10,6 +10,8 @@ import {
 } from '../proto/proto/v1/web3_gateway/service';
 import { ArweaveService } from '../service/arweave_service';
 import {
+  FundIrysReq,
+  FundIrysResp,
   StorageType,
   UploadContentReq,
   UploadContentResp,
@@ -23,6 +25,20 @@ export class StorageServer implements StorageServiceServer {
 
   constructor(arweaveService: ArweaveService) {
     this.arweaveService = arweaveService;
+  }
+
+  public async fundIrysAccount(
+    call: ServerUnaryCall<FundIrysReq, FundIrysResp>,
+    callback: sendUnaryData<FundIrysResp>,
+  ): Promise<any> {
+    const { amountInWei } = call.request;
+    const fundIrysRes = await (
+      this.arweaveService as ArweaveService
+    ).fundIrysAccount(amountInWei);
+    callback(
+      null,
+      FundIrysResp.fromJSON(fundIrysRes),
+    );
   }
 
   public async uploadContent(

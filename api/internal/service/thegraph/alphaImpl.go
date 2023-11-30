@@ -7,6 +7,7 @@ import (
 
 	"github.com/machinebox/graphql"
 	v0alpha "github.com/project-nova/backend/api/internal/entity/v0-alpha"
+	"github.com/project-nova/backend/pkg/logger"
 )
 
 func NewTheGraphServiceAlphaImpl(client *graphql.Client) TheGraphServiceAlpha {
@@ -48,6 +49,107 @@ func (s *theGraphServiceAlphaImpl) GetRelationship(relationshipId string) (*v0al
 	}
 
 	return relationshipsResponse.Relationships[0].ToRelationship(), nil
+}
+
+func (s *theGraphServiceAlphaImpl) GetRelationshipType(relType *string, ipOrgId *string) (*v0alpha.RelationshipType, error) {
+	options := s.setQueryOptions(nil)
+	queryInterface := "$relType: String, $ipOrgId: String, $first: Int, $skip: Int"
+	queryValue := "where: {relType: $relType, ipOrgId: $ipOrgId}, first: $first, skip: $skip"
+	if relType == nil || *relType == "" {
+		queryInterface = "$ipOrgId: String, $first: Int, $skip: Int"
+		queryValue = "where: {ipOrgId: $ipOrgId}, first: $first, skip: $skip"
+	}
+	if ipOrgId == nil || *ipOrgId == "" {
+		queryInterface = "$relType: String, $first: Int, $skip: Int"
+		queryValue = "where: {relType: $relType}, first: $first, skip: $skip"
+	}
+	if (relType == nil || *relType == "") && (ipOrgId == nil || *ipOrgId == "") {
+		queryInterface = "$first: Int, $skip: Int"
+		queryValue = "first: $first, skip: $skip"
+	}
+
+	req := graphql.NewRequest(fmt.Sprintf(`
+		query(%s) {
+			relationshipTypeSets(%s) {
+				blockNumber
+				blockTimestamp
+				dst
+				dstRelatable
+				dstSubtypesMask
+				id
+				ipOrgId
+				relType
+				src
+				srcRelatable
+				srcSubtypesMask
+				transactionHash
+			}
+		}
+	`, queryInterface, queryValue))
+	if relType != nil {
+		req.Var("relType", *relType)
+	}
+	if ipOrgId != nil {
+		req.Var("ipOrgId", *ipOrgId)
+	}
+	req.Var("first", options.First)
+	req.Var("skip", options.Skip)
+
+	ctx := context.Background()
+	var relationshipTypesResponse v0alpha.RelationshipTypeTheGraphAlphaResponse
+	if err := s.client.Run(ctx, req, &relationshipTypesResponse); err != nil {
+		return nil, fmt.Errorf("failed to get the relationship types from the graph. error: %v", err)
+	}
+	logger.Infof(">>>> %+v %+v", relationshipTypesResponse, options)
+
+	if len(relationshipTypesResponse.RelationshipTypes) == 0 {
+		return nil, nil
+	}
+
+	return relationshipTypesResponse.RelationshipTypes[0].ToRelationshipType(), nil
+}
+
+func (s *theGraphServiceAlphaImpl) ListRelationshipTypes(ipOrgId *string, options *TheGraphQueryOptions) ([]*v0alpha.RelationshipType, error) {
+	options = s.setQueryOptions(options)
+	queryInterface := "$ipOrgId: String, $first: Int, $skip: Int"
+	queryValue := "where: {ipOrgId: $ipOrgId}, first: $first, skip: $skip"
+	if ipOrgId == nil || *ipOrgId == "" {
+		queryInterface = "$first: Int, $skip: Int"
+		queryValue = "first: $first, skip: $skip"
+	}
+
+	req := graphql.NewRequest(fmt.Sprintf(`
+		query(%s) {
+			relationshipTypeSets(%s) {
+				id
+				relType
+				ipOrgId
+				src
+				srcRelatable
+				srcSubtypesMask
+				dst
+				dstRelatable
+				dstSubtypesMask
+				blockNumber
+				blockTimestamp
+				transactionHash
+			}
+		}
+	`, queryInterface, queryValue))
+	if ipOrgId != nil {
+		req.Var("ipOrgId", *ipOrgId)
+	}
+
+	req.Var("first", options.First)
+	req.Var("skip", options.Skip)
+
+	ctx := context.Background()
+	var relationshipTypesResponse v0alpha.RelationshipTypeTheGraphAlphaResponse
+	if err := s.client.Run(ctx, req, &relationshipTypesResponse); err != nil {
+		return nil, fmt.Errorf("failed to get the relationship types from the graph. error: %v", err)
+	}
+
+	return relationshipTypesResponse.ToRelationshipTypes(), nil
 
 }
 
@@ -425,6 +527,7 @@ func (s *theGraphServiceAlphaImpl) GetTransaction(transactionId string) (*v0alph
 		return nil, fmt.Errorf("failed to get the transactions from the graph. error: %v", err)
 	}
 
+	logger.Infof(">>>> %+v", transactionsResponse)
 	if len(transactionsResponse.Transactions) == 0 {
 		return nil, nil
 	}

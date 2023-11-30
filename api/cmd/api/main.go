@@ -378,6 +378,12 @@ func main() {
 		// Endpoint to list relatioinships
 		protocol.POST("/relationship", protocolHandler.ListRelationshipsHandler)
 
+		// Endpoint to get a relastionship type
+		protocol.GET("/relationship-type", protocolHandler.GetRelationshipTypeHandler)
+
+		// Endpoint to list relastionship types
+		protocol.POST("/relationship-type", protocolHandler.ListRelationshipTypesHandler)
+
 		// Endpoint to list modules
 		protocol.POST("/module", protocolHandler.ListModulesHandler)
 
