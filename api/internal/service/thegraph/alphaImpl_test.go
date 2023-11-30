@@ -47,18 +47,11 @@ func TestListRelationships_MatchSource_Success(t *testing.T) {
 	assert.True(t, len(relationships) > 0)
 }
 
-func TestGetRelationshipType_Success(t *testing.T) {
-	service := CreateTheGraphServiceAlpha()
-	relationshipType, err := service.GetRelationshipType(nil, nil)
-	assert.Nil(t, err)
-	assert.NotNil(t, relationshipType)
-}
-
 func TestGetRelationshipType_FindByRelType_AndIpOrgId_Success(t *testing.T) {
 	service := CreateTheGraphServiceAlpha()
 	relType := "0xc12a5f0d1e5a95f4fc32ff629c53defa11273a372e29ae51ab24323e4af84fc3"
 	ipOrgId := "0x1ebb43775fcc45cf05eaa96182c8762220e17941"
-	relationshipType, err := service.GetRelationshipType(&relType, &ipOrgId)
+	relationshipType, err := service.GetRelationshipType(relType, ipOrgId)
 	assert.Nil(t, err)
 	assert.True(t, relationshipType.IpOrgId == ipOrgId)
 }
@@ -66,17 +59,15 @@ func TestGetRelationshipType_FindByRelType_AndIpOrgId_Success(t *testing.T) {
 func TestGetRelationshipType_FindByIpOrgId_Success(t *testing.T) {
 	service := CreateTheGraphServiceAlpha()
 	ipOrgId := "0xb422e54932c1dae83e78267a4dd2805aa64a8061"
-	relationshipType, err := service.GetRelationshipType(nil, &ipOrgId)
-	assert.Nil(t, err)
-	assert.True(t, relationshipType.IpOrgId == "0xb422e54932c1dae83e78267a4dd2805aa64a8061")
+	_, err := service.GetRelationshipType("", ipOrgId)
+	assert.NotNil(t, err)
 }
 
 func TestGetRelationshipType_Failure(t *testing.T) {
 	service := CreateTheGraphServiceAlpha()
 	relType := "0x177175a4b26f6ea050676f8c9a14d395f896492c"
-	relationshipTypes, err := service.GetRelationshipType(&relType, nil)
-	assert.Nil(t, err)
-	assert.Nil(t, relationshipTypes)
+	_, err := service.GetRelationshipType(relType, "")
+	assert.NotNil(t, err)
 }
 
 func TestListRelationshipTypes_Success(t *testing.T) {

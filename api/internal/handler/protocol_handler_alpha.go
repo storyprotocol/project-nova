@@ -149,7 +149,7 @@ func (p *AlphaProtocolHandler) GetRelationshipTypeHandler(c *gin.Context) {
 		return
 	}
 
-	relationshipType, err := p.graphServiceAlpha.GetRelationshipType(&requestBody.RelType, &requestBody.IpOrgId)
+	relationshipType, err := p.graphServiceAlpha.GetRelationshipType(requestBody.RelType, requestBody.IpOrgId)
 	if err != nil {
 		logger.Errorf("Failed to get relationship types: %v", err)
 		c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))

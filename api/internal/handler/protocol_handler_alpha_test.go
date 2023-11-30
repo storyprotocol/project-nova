@@ -97,29 +97,21 @@ func TestGetRelationshipHandler_NotFound_Failure(t *testing.T) {
 	assert.Equal(t, http.StatusNotFound, w.Code)
 }
 
-func TestGetRelationshipTypeHandler_Success(t *testing.T) {
-	c, w := test.MockGin(nil, nil)
-	ph := NewAlphaProtocolHandler(test.CreateTheGraphServiceAlpha())
-	ph.GetRelationshipTypeHandler(c)
-	assert.Equal(t, http.StatusOK, w.Code)
-}
-
-func TestGetRelationshipTypeHandler_FindByRelType_Success(t *testing.T) {
-	c, w := test.MockGin(map[string]interface{}{
-		"relType": "0xc12a5f0d1e5a95f4fc32ff629c53defa11273a372e29ae51ab24323e4af84fc3",
-	}, nil)
-	ph := NewAlphaProtocolHandler(test.CreateTheGraphServiceAlpha())
-	ph.GetRelationshipTypeHandler(c)
-	assert.Equal(t, http.StatusOK, w.Code)
-}
-
-func TestGetRelationshipTypeHandler_FindByIpOrgId_Success(t *testing.T) {
-	c, w := test.MockGin(map[string]interface{}{
+func TestGetRelationshipTypeHandler_FindByRelType_AndIpOrgId_Success(t *testing.T) {
+	c, w := test.MockGin(nil, map[string]interface{}{
 		"ipOrgId": "0xb422e54932c1dae83e78267a4dd2805aa64a8061",
-	}, nil)
+		"relType": "0xc12a5f0d1e5a95f4fc32ff629c53defa11273a372e29ae51ab24323e4af84fc3",
+	})
 	ph := NewAlphaProtocolHandler(test.CreateTheGraphServiceAlpha())
 	ph.GetRelationshipTypeHandler(c)
 	assert.Equal(t, http.StatusOK, w.Code)
+}
+
+func TestGetRelationshipTypeHandler_MissingParams_Success(t *testing.T) {
+	c, w := test.MockGin(map[string]interface{}{}, nil)
+	ph := NewAlphaProtocolHandler(test.CreateTheGraphServiceAlpha())
+	ph.GetRelationshipTypeHandler(c)
+	assert.Equal(t, http.StatusInternalServerError, w.Code)
 }
 
 func TestGetRelationshipTypeHandler_NotFound_Failure(t *testing.T) {
@@ -128,7 +120,7 @@ func TestGetRelationshipTypeHandler_NotFound_Failure(t *testing.T) {
 	})
 	ph := NewAlphaProtocolHandler(test.CreateTheGraphServiceAlpha())
 	ph.GetRelationshipTypeHandler(c)
-	assert.Equal(t, http.StatusNotFound, w.Code)
+	assert.Equal(t, http.StatusInternalServerError, w.Code)
 }
 
 func TestListRelationshipTypesHandler_Success(t *testing.T) {

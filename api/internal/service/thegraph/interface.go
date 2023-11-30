@@ -45,7 +45,7 @@ type TheGraphServiceAlpha interface {
 	GetTransaction(transactionId string) (*v0alpha.Transaction, error)
 	ListLicenses(iporgId *string, ipAssetId *string, options *TheGraphQueryOptions) ([]*v0alpha.License, error)
 	GetLicense(licenseId string) (*v0alpha.License, error)
-	GetRelationshipType(relType *string, ipOrgId *string) (*v0alpha.RelationshipType, error)
+	GetRelationshipType(relType string, ipOrgId string) (*v0alpha.RelationshipType, error)
 	ListRelationshipTypes(ipOrgId *string, options *TheGraphQueryOptions) ([]*v0alpha.RelationshipType, error)
 }
 

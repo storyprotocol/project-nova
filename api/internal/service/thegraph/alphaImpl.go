@@ -55,22 +55,12 @@ func (s *theGraphServiceAlphaImpl) GetRelationship(relationshipId string) (*v0al
 	return relationshipsResponse.Relationships[0].ToRelationship(), nil
 }
 
-func (s *theGraphServiceAlphaImpl) GetRelationshipType(relType *string, ipOrgId *string) (*v0alpha.RelationshipType, error) {
-	options := s.setQueryOptions(nil)
-	queryInterface := fmt.Sprintf("$relType: String, $ipOrgId: String, %s", QUERY_INTERFACE)
-	queryValue := fmt.Sprintf("where: {relType: $relType, ipOrgId: $ipOrgId}, %s", QUERY_VALUE)
-	if relType == nil || *relType == "" {
-		queryInterface = fmt.Sprintf("$ipOrgId: String, %s", QUERY_INTERFACE)
-		queryValue = fmt.Sprintf("where: {ipOrgId: $ipOrgId}, %s", QUERY_VALUE)
+func (s *theGraphServiceAlphaImpl) GetRelationshipType(relType string, ipOrgId string) (*v0alpha.RelationshipType, error) {
+	if relType == "" || ipOrgId == "" {
+		return nil, fmt.Errorf("relType and ipOrgId cannot be empty")
 	}
-	if ipOrgId == nil || *ipOrgId == "" {
-		queryInterface = fmt.Sprintf("$relType: String, %s", QUERY_INTERFACE)
-		queryValue = fmt.Sprintf("where: {relType: $relType}, %s", QUERY_VALUE)
-	}
-	if (relType == nil || *relType == "") && (ipOrgId == nil || *ipOrgId == "") {
-		queryInterface = QUERY_INTERFACE
-		queryValue = QUERY_VALUE
-	}
+	queryInterface := "$relType: String, $ipOrgId: String"
+	queryValue := "where: {relType: $relType, ipOrgId: $ipOrgId}"
 
 	req := graphql.NewRequest(fmt.Sprintf(`
 		query(%s) {
@@ -90,16 +80,8 @@ func (s *theGraphServiceAlphaImpl) GetRelationshipType(relType *string, ipOrgId 
 			}
 		}
 	`, queryInterface, queryValue))
-	if relType != nil {
-		req.Var("relType", *relType)
-	}
-	if ipOrgId != nil {
-		req.Var("ipOrgId", *ipOrgId)
-	}
-	req.Var("first", options.First)
-	req.Var("skip", options.Skip)
-	req.Var("orderBy", options.OrderBy)
-	req.Var("orderDirection", options.OrderDirection)
+	req.Var("relType", relType)
+	req.Var("ipOrgId", ipOrgId)
 
 	ctx := context.Background()
 	var relationshipTypesResponse v0alpha.RelationshipTypeTheGraphAlphaResponse
