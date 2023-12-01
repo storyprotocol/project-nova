@@ -34,7 +34,7 @@ var IpAssetTypes = struct {
 }
 
 type GetIpAssetResponse struct {
-	IPAsset *IPAsset `json:"ipAssets"`
+	IPAsset *IPAsset `json:"ipAsset"`
 }
 
 type ListIpAssetsRequest struct {

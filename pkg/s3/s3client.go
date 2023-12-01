@@ -14,6 +14,7 @@ import (
 )
 
 type S3Client interface {
+	RequestPreSignedUrl(bucket string, key string) (string, error)
 	DownloadObject(output io.WriterAt, bucket string, key string) (int64, error)
 	UploadObject(bucket string, key string, filename string, public bool) (*s3manager.UploadOutput, error)
 	ListObjectsNonRecursive(bucket string) ([]*string, error)
@@ -31,6 +32,20 @@ func NewS3Client(sess *session.Session) S3Client {
 		downloader: s3manager.NewDownloader(sess),
 		uploader:   s3manager.NewUploader(sess),
 	}
+}
+
+func (s *s3Client) RequestPreSignedUrl(bucket string, key string) (string, error) {
+	req, _ := s.client.PutObjectRequest(&s3.PutObjectInput{
+		Bucket: aws.String(bucket),
+		Key:    aws.String(key),
+	})
+
+	url, err := req.Presign(150 * 60) // 15 minutes
+	if err != nil {
+		return "", fmt.Errorf("failed to sign request: %v", err)
+	}
+
+	return url, nil
 }
 
 // DownloadObject downloads a file from S3 based on the input: bucket and key, and write to the output.
