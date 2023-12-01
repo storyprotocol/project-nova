@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -40,7 +41,7 @@ func (s *s3Client) RequestPreSignedUrl(bucket string, key string) (string, error
 		Key:    aws.String(key),
 	})
 
-	url, err := req.Presign(150 * 60) // 15 minutes
+	url, err := req.Presign(10 * time.Minute)
 	if err != nil {
 		return "", fmt.Errorf("failed to sign request: %v", err)
 	}
