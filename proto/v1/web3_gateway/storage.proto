@@ -20,6 +20,8 @@ message UploadContentReq {
   bytes content = 2;
   string content_type = 3;   
   repeated Tag tags = 4;
+  string s3_bucket = 5;
+  string s3_key = 6;
 }
 
 message UploadContentResp {

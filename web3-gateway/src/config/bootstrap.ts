@@ -5,6 +5,7 @@ import { ArweaveService } from '../service/arweave_service';
 import NodeBundlr from '@bundlr-network/client';
 import { initializeConfig } from './config';
 import { logger } from '../util';
+import { AWSS3Client } from '../client/s3_client';
 
 export const bootstrap = async () => {
   const proto_descriptor_path = 'dist/proto/proto_descriptor.bin';
@@ -19,8 +20,9 @@ export const bootstrap = async () => {
     cfg.arweave_config.wallet_chain,
     cfg.wallet_key,
   );
+  const s3Client = new AWSS3Client(cfg.region);
   const arweaveService = new ArweaveService(bundlr, cfg.arweave_config);
-  const storageServer = new StorageServer(arweaveService);
+  const storageServer = new StorageServer(arweaveService, s3Client);
 
   server.addService(StorageGrpcService, storageServer);
   addReflection(server, proto_descriptor_path);

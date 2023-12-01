@@ -131,7 +131,7 @@ func main() {
 
 	// initialize handlers
 	protocolHandler := handler.NewProtocolHandler(theGraphServiceAlpha, httpClient)
-	platformHandler := handler.NewPlatformProtocolHandler(s3Client)
+	platformHandler := handler.NewPlatformProtocolHandler(s3Client, cfg.S3FileUploadBucketName, web3Gateway)
 
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, "Hello")
