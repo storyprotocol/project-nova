@@ -223,6 +223,11 @@ type UploadFileRequestBody struct {
 	MimeType string `json:"mimeType"`
 }
 
+type UploadFileRequestResp struct {
+	Url string `json:"url"`
+	Key string `json:"key"`
+}
+
 type UploadFileConfirmRequestBody struct {
-	Filename string `json:"filename"`
+	Key string `json:"key"`
 }

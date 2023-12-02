@@ -35,14 +35,14 @@ func (ph *PlatformProtocolHandler) RequestFileUpload(c *gin.Context) {
 	uuidString := uuid.New().String()
 	signedUrl, err := ph.s3Client.RequestPreSignedUrl(ph.s3BucketName, uuidString)
 	if err != nil {
-		c.JSON(500, gin.H{
-			"error": err.Error(),
-		})
+		logger.Errorf("Failed to request pre-signed url: %v", err)
+		c.JSON(http.StatusInternalServerError, ErrorMessage("failed to request pre-signed url"))
 		return
 	}
 
-	c.JSON(http.StatusOK, &entity.FileUploadResp{
-		URI: signedUrl,
+	c.JSON(http.StatusOK, &entity.UploadFileRequestResp{
+		Url: signedUrl,
+		Key: uuidString,
 	})
 }
 
@@ -57,7 +57,7 @@ func (ph *PlatformProtocolHandler) ConfirmFileUpload(c *gin.Context) {
 	resp, err := ph.web3Gateway.UploadContent(&web3_gateway.UploadContentReq{
 		Storage:  web3_gateway.StorageType_ARWEAVE,
 		S3Bucket: ph.s3BucketName,
-		S3Key:    requestBody.Filename,
+		S3Key:    requestBody.Key,
 	})
 
 	if err != nil {
