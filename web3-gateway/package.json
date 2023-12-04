@@ -9,6 +9,7 @@
     "lint": "eslint \"src/**/*.ts\" --fix"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.465.0",
     "@aws-sdk/client-secrets-manager": "^3.53.0",
     "@aws-sdk/types": "^3.53.0",
     "@bundlr-network/client": "^0.11.2",

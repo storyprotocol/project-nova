@@ -12,7 +12,7 @@ export class ArweaveService {
   }
 
   public async fundIrysAccount(amountInWei: number) {
-    return await this.bundler.fund(amountInWei)
+    return await this.bundler.fund(amountInWei);
   }
 
   /**

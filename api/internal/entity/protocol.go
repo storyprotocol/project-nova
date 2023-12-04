@@ -222,3 +222,12 @@ type UploadFileRequestBody struct {
 	Base64   string `json:"base64"`
 	MimeType string `json:"mimeType"`
 }
+
+type UploadFileRequestResp struct {
+	Url string `json:"url"`
+	Key string `json:"key"`
+}
+
+type UploadFileConfirmRequestBody struct {
+	Key string `json:"key"`
+}

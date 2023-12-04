@@ -17,14 +17,17 @@ import {
   UploadContentResp,
 } from '../proto/proto/v1/web3_gateway/storage';
 import { ServiceError, logger } from '../util';
+import { AWSS3Client } from 'src/client/s3_client';
 
 export class StorageServer implements StorageServiceServer {
   [method: string]: UntypedHandleCall;
 
   private readonly arweaveService;
+  private readonly s3Client;
 
-  constructor(arweaveService: ArweaveService) {
+  constructor(arweaveService: ArweaveService, s3Client: AWSS3Client) {
     this.arweaveService = arweaveService;
+    this.s3Client = s3Client;
   }
 
   public async fundIrysAccount(
@@ -35,10 +38,7 @@ export class StorageServer implements StorageServiceServer {
     const fundIrysRes = await (
       this.arweaveService as ArweaveService
     ).fundIrysAccount(amountInWei);
-    callback(
-      null,
-      FundIrysResp.fromJSON(fundIrysRes),
-    );
+    callback(null, FundIrysResp.fromJSON(fundIrysRes));
   }
 
   public async uploadContent(
@@ -46,19 +46,23 @@ export class StorageServer implements StorageServiceServer {
     callback: sendUnaryData<UploadContentResp>,
   ): Promise<any> {
     try {
-      const { storage, content, contentType, tags } = call.request;
+      const { storage, content, contentType, tags, s3Bucket, s3Key } =
+        call.request;
       switch (storage) {
         case StorageType.ARWEAVE: {
-          const contentUrl = await (
-            this.arweaveService as ArweaveService
-          ).uploadContent(content, contentType, tags);
-          logger.info(
-            'Uploaded content to Arweave: ',
-            `${contentUrl}`,
-            `${contentType}`,
-            `${content.length}`,
-            tags,
-          );
+          let contentUrl;
+          if (s3Bucket && s3Key) {
+            const { content, contentType } =
+              await this.s3Client.downloadS3Content(s3Bucket, s3Key);
+            contentUrl = await (
+              this.arweaveService as ArweaveService
+            ).uploadContent(content, contentType, tags);
+          } else if (content && contentType) {
+            contentUrl = await (
+              this.arweaveService as ArweaveService
+            ).uploadContent(content, contentType, tags);
+          }
+          logger.info('Uploaded content to Arweave: ', `${contentUrl}`, tags);
           callback(
             null,
             UploadContentResp.fromJSON({

@@ -10,20 +10,21 @@ import (
 )
 
 type AppConfig struct {
-	AppID               string          `yaml:"app_id"`
-	Region              string          `yaml:"region"`
-	Port                int64           `yaml:"port"`
-	Env                 string          `yaml:"env"`
-	DatabaseURI         string          `yaml:"database_uri"`
-	ProviderURL         string          `yaml:"provider_url"`
-	ContentPath         string          `yaml:"content_path"`
-	PrimitiveTpeAbiPath string          `yaml:"primitive_type_abi_path"`
-	AdminAuthMessage    string          `yaml:"admin_auth_message"`
-	AuthKeyId           string          `yaml:"auth_key_id"`
-	S3ContentBucketName string          `yaml:"s3_content_bucket_name"`
-	Protocol            *ProtocolConfig `yaml:"protocol"`
-	GrpcWeb3Gateway     string          `yaml:"grpc_web3_gateway"`
-	StoryBlocksRegistry string          `yaml:"story_blocks_registry"`
+	AppID                  string          `yaml:"app_id"`
+	Region                 string          `yaml:"region"`
+	Port                   int64           `yaml:"port"`
+	Env                    string          `yaml:"env"`
+	DatabaseURI            string          `yaml:"database_uri"`
+	ProviderURL            string          `yaml:"provider_url"`
+	ContentPath            string          `yaml:"content_path"`
+	PrimitiveTpeAbiPath    string          `yaml:"primitive_type_abi_path"`
+	AdminAuthMessage       string          `yaml:"admin_auth_message"`
+	AuthKeyId              string          `yaml:"auth_key_id"`
+	S3ContentBucketName    string          `yaml:"s3_content_bucket_name"`
+	S3FileUploadBucketName string          `yaml:"s3_file_upload_bucket_name"`
+	Protocol               *ProtocolConfig `yaml:"protocol"`
+	GrpcWeb3Gateway        string          `yaml:"grpc_web3_gateway"`
+	StoryBlocksRegistry    string          `yaml:"story_blocks_registry"`
 }
 
 type StreamerConfig struct {

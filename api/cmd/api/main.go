@@ -131,6 +131,7 @@ func main() {
 
 	// initialize handlers
 	protocolHandler := handler.NewProtocolHandler(theGraphServiceAlpha, httpClient)
+	platformHandler := handler.NewPlatformProtocolHandler(s3Client, cfg.S3FileUploadBucketName, web3Gateway)
 
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, "Hello")
@@ -342,6 +343,17 @@ func main() {
 
 		// Endpoint to get transaction
 		protocolMvp.GET("/transaction/:transactionId", handler.NewGetTransactionHandler(theGraphServiceMvp))
+	}
+
+	// Platform endpoints
+	platform := r.Group("/platform")
+	platform.Use(cors.Default())
+	{
+		// Endpoint for requesting file upload intent and get a s3 pre-signed url
+		platform.POST("/file-upload/request", platformHandler.RequestFileUpload)
+
+		// Endpoint for confirming file upload
+		platform.POST("/file-upload/confirm", platformHandler.ConfirmFileUpload)
 	}
 
 	// Alpha endpoints
