@@ -283,6 +283,12 @@ func main() {
 
 		// Endpoint for getting the detail information about a franchise story
 		protocolV2.GET("/franchise/:franchiseId/stories/:storyId", handler.NewGetStoryDetailHandlerV2())
+
+		// Endpoint for getting information about an author
+		protocolV2.GET("/franchise/:franchiseId/author/:authorId", handler.NewGetAuthorDetailHandlerV2())
+
+		// Endpoint for getting information about an asset
+		protocolV2.GET("/franchise/:franchiseId/asset/:assetId", handler.NewGetAssetDetailHandlerV2())
 	}
 
 	protocolKbw := r.Group("/protocol/kbw")
