@@ -197,6 +197,8 @@ type Asset struct {
 	Name      string           `json:"name"`
 	Image     string           `json:"image"`
 	Addresses []ContentAddress `json:"addresses"`
+	Author    Author           `json:"author"`
+	Stories   []StoryV2        `json:"stories"`
 }
 
 type Chapter struct {
@@ -212,6 +214,7 @@ type Author struct {
 	Introduction string           `json:"introduction"`
 	Image        string           `json:"image"`
 	Addresses    []ContentAddress `json:"addresses"`
+	Stories      []StoryV2        `json:"stories"`
 }
 
 type StoriesV2 struct {
