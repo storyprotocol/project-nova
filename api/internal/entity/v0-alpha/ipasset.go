@@ -4,17 +4,22 @@ import (
 	"github.com/project-nova/backend/pkg/utils"
 )
 
+type IPAssetTypeStruct struct {
+	Index int64  `json:"index"`
+	Value string `json:"value"`
+}
+
 type IPAsset struct {
-	ID          string `json:"id,omitempty"`
-	Name        string `json:"name,omitempty"`
-	Type        int64  `json:"type"`
-	IPOrgId     string `json:"ipOrgId,omitempty"`
-	Owner       string `json:"owner,omitempty"`
-	MediaUrl    string `json:"mediaUrl,omitempty"`
-	ContentHash []byte `json:"contentHash,omitempty"`
-	Data        []byte `json:"data,omitempty"`
-	CreatedAt   string `json:"createdAt,omitempty"`
-	TxHash      string `json:"txHash,omitempty"`
+	ID          string            `json:"id,omitempty"`
+	Name        string            `json:"name,omitempty"`
+	Type        IPAssetTypeStruct `json:"type"`
+	IPOrgId     string            `json:"ipOrgId,omitempty"`
+	Owner       string            `json:"owner,omitempty"`
+	MediaUrl    string            `json:"mediaUrl,omitempty"`
+	ContentHash []byte            `json:"contentHash,omitempty"`
+	Data        []byte            `json:"data,omitempty"`
+	CreatedAt   string            `json:"createdAt,omitempty"`
+	TxHash      string            `json:"txHash,omitempty"`
 }
 
 type IPAssetType string
@@ -55,18 +60,19 @@ type ListIpAssetsResponse struct {
 }
 
 type IPAssetTheGraphAlpha struct {
-	ID             string `json:"id"`
-	IPAssetId      string `json:"ipAssetId"`
-	IPOrgId        string `json:"ipOrgId"`
-	IPOrgAssetId   string `json:"ipOrgAssetId"`
-	Owner          string `json:"owner"`
-	Name           string `json:"name"`
-	IPAssetType    int64  `json:"ipAssetType"`
-	ContentHash    string `json:"contentHash"`
-	MediaUrl       string `json:"mediaUrl"`
-	BlockNumber    string `json:"blockNumber"`
-	BlockTimestamp string `json:"blockTimestamp"`
-	TxHash         string `json:"transactionHash"`
+	ID               string `json:"id"`
+	IPAssetId        string `json:"ipAssetId"`
+	IPOrgId          string `json:"ipOrgId"`
+	IPOrgAssetId     string `json:"ipOrgAssetId"`
+	Owner            string `json:"owner"`
+	Name             string `json:"name"`
+	IPAssetTypeIndex int64  `json:"ipAssetTypeIndex"`
+	IpAssetTypeValue string `json:"ipAssetTypeValue"`
+	ContentHash      string `json:"contentHash"`
+	MediaUrl         string `json:"mediaUrl"`
+	BlockNumber      string `json:"blockNumber"`
+	BlockTimestamp   string `json:"blockTimestamp"`
+	TxHash           string `json:"transactionHash"`
 }
 
 type IpAssetTheGraphAlphaResponse struct {
@@ -86,7 +92,7 @@ func (i *IPAssetTheGraphAlpha) ToIPAsset() *IPAsset {
 	return &IPAsset{
 		ID:          i.IPAssetId,
 		Name:        i.Name,
-		Type:        i.IPAssetType,
+		Type:        IPAssetTypeStruct{Index: i.IPAssetTypeIndex, Value: i.IpAssetTypeValue},
 		IPOrgId:     i.IPOrgId,
 		Owner:       i.Owner,
 		MediaUrl:    i.MediaUrl,
