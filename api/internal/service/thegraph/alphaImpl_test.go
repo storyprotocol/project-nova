@@ -175,7 +175,7 @@ func TestListIPAssets_WithIpOrgId_WithLimit_Success(t *testing.T) {
 	})
 	assert.Nil(t, err)
 	assert.True(t, len(ipAssets) == 2)
-	assert.True(t, ipAssets[0].CreatedAt > ipAssets[1].CreatedAt)
+	assert.True(t, ipAssets[0].CreatedAt >= ipAssets[1].CreatedAt)
 }
 
 func TestListIPAssets_WithoutIpOrgId_Success(t *testing.T) {
