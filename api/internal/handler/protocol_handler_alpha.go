@@ -102,7 +102,7 @@ func (p *AlphaProtocolHandler) ListIpAssetsHandler(c *gin.Context) {
 	}
 
 	logger.Infof("requestBody: %+v", requestBody)
-	ipAssets, err := p.graphServiceAlpha.ListIPAssets(&requestBody.IpOrgId, thegraph.FromRequestQueryOptions(requestBody.Options))
+	ipAssets, err := p.graphServiceAlpha.ListIPAssets(requestBody.IpOrgId, thegraph.FromRequestQueryOptions(requestBody.Options))
 	if err != nil {
 		logger.Errorf("Failed to get ip assets: %v", err)
 		c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
