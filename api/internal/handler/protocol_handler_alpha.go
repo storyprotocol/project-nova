@@ -7,6 +7,7 @@ import (
 	v0alpha_entity "github.com/project-nova/backend/api/internal/entity/v0-alpha"
 	"github.com/project-nova/backend/api/internal/service/thegraph"
 	"github.com/project-nova/backend/pkg/logger"
+	"github.com/project-nova/backend/pkg/utils"
 )
 
 type AlphaProtocolHandler struct {
@@ -42,6 +43,12 @@ func (p *AlphaProtocolHandler) ListIpOrgsHandler(c *gin.Context) {
 // GET /ipOrg/:ipOrgId
 func (p *AlphaProtocolHandler) GetIpOrgHandler(c *gin.Context) {
 	ipOrdId := c.Param("ipOrgId")
+
+	if !utils.IsValidAddress(ipOrdId) {
+		c.JSON(http.StatusBadRequest, ErrorMessage("invalid ipOrgId"))
+		return
+	}
+
 	ipOrg, err := p.graphServiceAlpha.GetIPOrg(ipOrdId)
 	if err != nil {
 		logger.Errorf("Failed to get iporg: %v", err)
@@ -87,6 +94,11 @@ func (p *AlphaProtocolHandler) ListIpAssetsHandler(c *gin.Context) {
 		requestBody = v0alpha_entity.ListIpAssetsRequest{}
 	}
 
+	if !requestBody.Validate() {
+		c.JSON(http.StatusBadRequest, ErrorMessage("invalid request body"))
+		return
+	}
+
 	logger.Infof("requestBody: %+v", requestBody)
 	ipAssets, err := p.graphServiceAlpha.ListIPAssets(&requestBody.IpOrgId, thegraph.FromRequestQueryOptions(requestBody.Options))
 	if err != nil {
@@ -103,6 +115,12 @@ func (p *AlphaProtocolHandler) ListIpAssetsHandler(c *gin.Context) {
 // GET /relationship/:relationshipId
 func (p *AlphaProtocolHandler) GetRelationshipHandler(c *gin.Context) {
 	relationshipId := c.Param("relationshipId")
+
+	if !utils.IsValidNumberString(relationshipId) {
+		c.JSON(http.StatusBadRequest, ErrorMessage("invalid relationshipId"))
+		return
+	}
+
 	relationship, err := p.graphServiceAlpha.GetRelationship(relationshipId)
 	if err != nil {
 		logger.Errorf("Failed to get relationship: %v", err)
@@ -128,6 +146,12 @@ func (p *AlphaProtocolHandler) ListRelationshipsHandler(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, ErrorMessage("invalid request body"))
 		return
 	}
+
+	if !requestBody.Validate() {
+		c.JSON(http.StatusBadRequest, ErrorMessage("invalid request body"))
+		return
+	}
+
 	relationships, err := p.graphServiceAlpha.ListRelationships(requestBody.Contract, requestBody.TokenId, thegraph.FromRequestQueryOptions(requestBody.Options))
 	if err != nil {
 		logger.Errorf("Failed to get relationships: %v", err)
@@ -145,6 +169,11 @@ func (p *AlphaProtocolHandler) GetRelationshipTypeHandler(c *gin.Context) {
 	var requestBody v0alpha_entity.GetRelationshipTypeRequest
 	if err := c.BindQuery(&requestBody); err != nil {
 		logger.Errorf("Failed to read request body: %v", err)
+		c.JSON(http.StatusBadRequest, ErrorMessage("invalid request body"))
+		return
+	}
+
+	if !requestBody.Validate() {
 		c.JSON(http.StatusBadRequest, ErrorMessage("invalid request body"))
 		return
 	}
@@ -174,6 +203,12 @@ func (p *AlphaProtocolHandler) ListRelationshipTypesHandler(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, ErrorMessage("invalid request body"))
 		return
 	}
+
+	if !requestBody.Validate() {
+		c.JSON(http.StatusBadRequest, ErrorMessage("invalid request body"))
+		return
+	}
+
 	relationshipTypes, err := p.graphServiceAlpha.ListRelationshipTypes(&requestBody.IpOrgId, thegraph.FromRequestQueryOptions(requestBody.Options))
 	if err != nil {
 		logger.Errorf("Failed to get relationship types: %v", err)
@@ -194,6 +229,11 @@ func (p *AlphaProtocolHandler) ListModulesHandler(c *gin.Context) {
 		requestBody = v0alpha_entity.ListModulesRequest{}
 	}
 
+	if !requestBody.Validate() {
+		c.JSON(http.StatusBadRequest, ErrorMessage("invalid request body"))
+		return
+	}
+
 	modules, err := p.graphServiceAlpha.ListModules(requestBody.IpOrgId, thegraph.FromRequestQueryOptions(requestBody.Options))
 	if err != nil {
 		logger.Errorf("Failed to get modules: %v", err)
@@ -209,6 +249,12 @@ func (p *AlphaProtocolHandler) ListModulesHandler(c *gin.Context) {
 // GET /module/:moduleId
 func (p *AlphaProtocolHandler) GetModuleHandler(c *gin.Context) {
 	moduleId := c.Param("moduleId")
+
+	if !utils.IsValidAddress(moduleId) {
+		c.JSON(http.StatusBadRequest, ErrorMessage("invalid moduleId"))
+		return
+	}
+
 	module, err := p.graphServiceAlpha.GetModule(moduleId)
 	if err != nil {
 		logger.Errorf("Failed to get module: %v", err)
@@ -234,6 +280,11 @@ func (p *AlphaProtocolHandler) ListHooksHandler(c *gin.Context) {
 		requestBody = v0alpha_entity.ListHooksRequest{}
 	}
 
+	if !requestBody.Validate() {
+		c.JSON(http.StatusBadRequest, ErrorMessage("invalid request body"))
+		return
+	}
+
 	hooks, err := p.graphServiceAlpha.ListHooks(requestBody.ModuleId, thegraph.FromRequestQueryOptions(requestBody.Options))
 	if err != nil {
 		logger.Errorf("Failed to get hooks: %v", err)
@@ -249,6 +300,12 @@ func (p *AlphaProtocolHandler) ListHooksHandler(c *gin.Context) {
 // GET /hook/:hookId
 func (p *AlphaProtocolHandler) GetHookHandler(c *gin.Context) {
 	hookId := c.Param("hookId")
+
+	if !utils.IsValidAddress(hookId) {
+		c.JSON(http.StatusBadRequest, ErrorMessage("invalid hookId"))
+		return
+	}
+
 	hook, err := p.graphServiceAlpha.GetHook(hookId)
 	if err != nil {
 		logger.Errorf("Failed to get hook: %v", err)
@@ -269,7 +326,12 @@ func (p *AlphaProtocolHandler) GetHookHandler(c *gin.Context) {
 // GET /transaction/:transactionId
 func (p *AlphaProtocolHandler) GetTransactionHandler(c *gin.Context) {
 	transactionId := c.Param("transactionId")
-	logger.Infof("transactionId: %s", transactionId)
+
+	if !utils.IsValidTransaction(transactionId) {
+		c.JSON(http.StatusBadRequest, ErrorMessage("invalid transactionId"))
+		return
+	}
+
 	transaction, err := p.graphServiceAlpha.GetTransaction(transactionId)
 	if err != nil {
 		logger.Errorf("Failed to get transaction: %v", err)
@@ -290,6 +352,12 @@ func (p *AlphaProtocolHandler) GetTransactionHandler(c *gin.Context) {
 // GET /license/:licenseId
 func (p *AlphaProtocolHandler) GetLicenseHandler(c *gin.Context) {
 	licenseId := c.Param("licenseId")
+
+	if !utils.IsValidAddress(licenseId) {
+		c.JSON(http.StatusBadRequest, ErrorMessage("invalid licenseId"))
+		return
+	}
+
 	license, err := p.graphServiceAlpha.GetLicense(licenseId)
 	if err != nil {
 		logger.Errorf("Failed to get license: %v", err)
@@ -315,6 +383,11 @@ func (p *AlphaProtocolHandler) ListLicensesHandler(c *gin.Context) {
 		requestBody = v0alpha_entity.ListLicensesRequest{}
 	}
 
+	if !requestBody.Validate() {
+		c.JSON(http.StatusBadRequest, ErrorMessage("invalid request body"))
+		return
+	}
+
 	licenses, err := p.graphServiceAlpha.ListLicenses(requestBody.IpOrgId, requestBody.IpAssetId, thegraph.FromRequestQueryOptions(requestBody.Options))
 	if err != nil {
 		logger.Errorf("Failed to get licenses: %v", err)
@@ -333,6 +406,12 @@ func (p *AlphaProtocolHandler) ListTransactionsHandler(c *gin.Context) {
 	if err := c.BindJSON(&requestBody); err != nil {
 		logger.Errorf("Failed to read request body: %v", err)
 		requestBody = v0alpha_entity.ListTransactionsRequest{}
+	}
+
+	if !requestBody.Validate() {
+		logger.Errorf("Failed to validate request body: %+v", requestBody)
+		c.JSON(http.StatusBadRequest, ErrorMessage("invalid request body"))
+		return
 	}
 
 	transactions, err := p.graphServiceAlpha.ListTransactions(requestBody.IpOrgId, thegraph.FromRequestQueryOptions(requestBody.Options))

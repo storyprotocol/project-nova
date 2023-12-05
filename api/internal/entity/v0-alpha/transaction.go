@@ -58,6 +58,14 @@ type ListTransactionsRequest struct {
 	Options *QueryOptions `json:"options"`
 }
 
+func (l *ListTransactionsRequest) Validate() bool {
+	if l.IpOrgId != nil && !utils.IsValidAddress(*l.IpOrgId) {
+		return false
+	}
+
+	return true
+}
+
 type ListTransactionsResponse struct {
 	Transactions []*Transaction `json:"transactions"`
 }

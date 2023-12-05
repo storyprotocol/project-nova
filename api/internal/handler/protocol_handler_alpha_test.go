@@ -111,16 +111,17 @@ func TestGetRelationshipTypeHandler_MissingParams_Success(t *testing.T) {
 	c, w := test.MockGin(map[string]interface{}{}, nil)
 	ph := NewAlphaProtocolHandler(test.CreateTheGraphServiceAlpha())
 	ph.GetRelationshipTypeHandler(c)
-	assert.Equal(t, http.StatusInternalServerError, w.Code)
+	assert.Equal(t, http.StatusBadRequest, w.Code)
 }
 
 func TestGetRelationshipTypeHandler_NotFound_Failure(t *testing.T) {
 	c, w := test.MockGin(nil, map[string]interface{}{
+		"ipOrgId": "0xb422e54932c1dae83e78267a4dd2805aa64a8062",
 		"relType": "0xc12aaf0d1e5a95f4fc32ff629c53dafa11273a372e29ae51ab24323e4af84fc3",
 	})
 	ph := NewAlphaProtocolHandler(test.CreateTheGraphServiceAlpha())
 	ph.GetRelationshipTypeHandler(c)
-	assert.Equal(t, http.StatusInternalServerError, w.Code)
+	assert.Equal(t, http.StatusNotFound, w.Code)
 }
 
 func TestListRelationshipTypesHandler_Success(t *testing.T) {
@@ -276,7 +277,7 @@ func TestGetTransactionHandler_NotFound_Failure(t *testing.T) {
 
 func TestListTransactionsHandler_Success(t *testing.T) {
 	c, w := test.MockGin(map[string]interface{}{
-		"ipOrgId": "0xde493e03d2de0cd7820b4f580beced57296b0009",
+		"ipOrgId": "0xb422e54932c1dae83e78267a4dd2805aa64a8062",
 		"queryOptions": map[string]interface{}{
 			"pagination": map[string]interface{}{
 				"offset": 0,

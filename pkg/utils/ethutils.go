@@ -21,6 +21,18 @@ func SanitizeAddress(address string) (string, error) {
 	return strings.ToLower(address), nil
 }
 
+// IsValidNumberString validate if it's a valid number string
+func IsValidNumberString(s string) bool {
+	re := regexp.MustCompile("^[0-9]+$")
+	return re.MatchString(s)
+}
+
+// IsValidTransaction validate hex address
+func IsValidTransaction(tx string) bool {
+	re := regexp.MustCompile("^0x[0-9a-fA-F]{72}$")
+	return re.MatchString(tx)
+}
+
 // IsValidAddress validate hex address
 func IsValidAddress(iaddress interface{}) bool {
 	re := regexp.MustCompile("^0x[0-9a-fA-F]{40}$")

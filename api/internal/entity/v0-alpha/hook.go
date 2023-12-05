@@ -21,9 +21,12 @@ type ListHooksRequest struct {
 	Options  *QueryOptions `json:"options"`
 }
 
-type ListHookRequest struct {
-	ModuleId *string       `json:"moduleId"`
-	Options  *QueryOptions `json:"options"`
+func (h *ListHooksRequest) Validate() bool {
+	if h.ModuleId != nil && !utils.IsValidAddress(*h.ModuleId) {
+		return false
+	}
+
+	return true
 }
 
 type ListHooksResponse struct {
