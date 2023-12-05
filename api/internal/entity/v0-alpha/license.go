@@ -30,6 +30,18 @@ type ListLicensesRequest struct {
 	Options   *QueryOptions `json:"options"`
 }
 
+func (l *ListLicensesRequest) Validate() bool {
+	if l.IpOrgId != nil && !utils.IsValidAddress(l.IpOrgId) {
+		return false
+	}
+
+	if l.IpAssetId != nil && !utils.IsValidAddress(l.IpAssetId) {
+		return false
+	}
+
+	return true
+}
+
 type ListLicensesResponse struct {
 	Licenses []*License `json:"licenses"`
 }

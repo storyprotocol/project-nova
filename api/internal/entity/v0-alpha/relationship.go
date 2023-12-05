@@ -26,6 +26,18 @@ type ListRelationshipRequest struct {
 	Options  *QueryOptions `json:"options"`
 }
 
+func (l *ListRelationshipRequest) Validate() bool {
+	if !utils.IsValidAddress(l.Contract) {
+		return false
+	}
+
+	if !utils.IsValidNumberString(l.TokenId) {
+		return false
+	}
+
+	return true
+}
+
 type ListRelationshipsResponse struct {
 	Relationships []*Relationship `json:"relationships"`
 }

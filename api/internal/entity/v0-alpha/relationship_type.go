@@ -24,6 +24,10 @@ type GetRelationshipTypeRequest struct {
 	RelType string `form:"relType"`
 }
 
+func (g *GetRelationshipTypeRequest) Validate() bool {
+	return utils.IsValidAddress(g.IpOrgId)
+}
+
 type GetRelationshipTypeResponse struct {
 	RelationshipType *RelationshipType `json:"relationshipType"`
 }
@@ -31,6 +35,10 @@ type GetRelationshipTypeResponse struct {
 type ListRelationshipTypesRequest struct {
 	IpOrgId string        `json:"ipOrgId"`
 	Options *QueryOptions `json:"options"`
+}
+
+func (l *ListRelationshipTypesRequest) Validate() bool {
+	return utils.IsValidAddress(l.IpOrgId)
 }
 
 type ListRelationshipTypesResponse struct {

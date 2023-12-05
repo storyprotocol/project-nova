@@ -42,6 +42,10 @@ type ListIpAssetsRequest struct {
 	Options *QueryOptions `json:"options"`
 }
 
+func (l *ListIpAssetsRequest) Validate() bool {
+	return utils.IsValidAddress(l.IpOrgId)
+}
+
 type ListIpAssetsResponse struct {
 	IPAssets []*IPAsset `json:"ipAssets"`
 }

@@ -1,5 +1,7 @@
 package v0alpha
 
+import "github.com/project-nova/backend/pkg/utils"
+
 type Module struct {
 	ID        string  `json:"id,omitempty"`
 	IPOrgId   string  `json:"ipOrgId,omitempty"`
@@ -16,6 +18,14 @@ type GetModuleResponse struct {
 type ListModulesRequest struct {
 	IpOrgId *string       `json:"ipOrgId"`
 	Options *QueryOptions `json:"options"`
+}
+
+func (l *ListModulesRequest) Validate() bool {
+	if l.IpOrgId != nil && !utils.IsValidAddress(*l.IpOrgId) {
+		return false
+	}
+
+	return true
 }
 
 type ListModulesResponse struct {
