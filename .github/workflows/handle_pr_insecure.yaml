@@ -4,6 +4,7 @@ on:
   pull_request:
     branches:
       - main
+      - protocol-alpha
 
 env: 
   COMPONENT_BUILDER: builder
@@ -11,7 +12,6 @@ env:
   AWS_ECR_REGION: us-east-2
 
 jobs:
-
   lint-golangci:
     runs-on: ubuntu-latest
     steps:
@@ -95,3 +95,6 @@ jobs:
           image-ref: ${{ env.COMPONENT_API }}:${{ github.sha }}
           trivy-config: .github/trivy.yaml
 
+
+      - name: Run tests
+        run: go test ./...

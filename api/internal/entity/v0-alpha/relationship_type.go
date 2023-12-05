@@ -33,12 +33,16 @@ type GetRelationshipTypeResponse struct {
 }
 
 type ListRelationshipTypesRequest struct {
-	IpOrgId string        `json:"ipOrgId"`
+	IpOrgId *string       `json:"ipOrgId"`
 	Options *QueryOptions `json:"options"`
 }
 
 func (l *ListRelationshipTypesRequest) Validate() bool {
-	return utils.IsValidAddress(l.IpOrgId)
+	if l.IpOrgId != nil && !utils.IsValidAddress(*l.IpOrgId) {
+		return false
+	}
+
+	return true
 }
 
 type ListRelationshipTypesResponse struct {

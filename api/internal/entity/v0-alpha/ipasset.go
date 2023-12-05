@@ -38,12 +38,16 @@ type GetIpAssetResponse struct {
 }
 
 type ListIpAssetsRequest struct {
-	IpOrgId string        `json:"ipOrgId"`
+	IpOrgId *string       `json:"ipOrgId"`
 	Options *QueryOptions `json:"options"`
 }
 
 func (l *ListIpAssetsRequest) Validate() bool {
-	return utils.IsValidAddress(l.IpOrgId)
+	if l.IpOrgId != nil && !utils.IsValidAddress(*l.IpOrgId) {
+		return false
+	}
+
+	return true
 }
 
 type ListIpAssetsResponse struct {

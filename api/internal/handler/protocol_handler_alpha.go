@@ -102,7 +102,7 @@ func (p *AlphaProtocolHandler) ListIpAssetsHandler(c *gin.Context) {
 	}
 
 	logger.Infof("requestBody: %+v", requestBody)
-	ipAssets, err := p.graphServiceAlpha.ListIPAssets(&requestBody.IpOrgId, thegraph.FromRequestQueryOptions(requestBody.Options))
+	ipAssets, err := p.graphServiceAlpha.ListIPAssets(requestBody.IpOrgId, thegraph.FromRequestQueryOptions(requestBody.Options))
 	if err != nil {
 		logger.Errorf("Failed to get ip assets: %v", err)
 		c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
@@ -215,7 +215,7 @@ func (p *AlphaProtocolHandler) ListRelationshipTypesHandler(c *gin.Context) {
 		return
 	}
 
-	relationshipTypes, err := p.graphServiceAlpha.ListRelationshipTypes(&requestBody.IpOrgId, thegraph.FromRequestQueryOptions(requestBody.Options))
+	relationshipTypes, err := p.graphServiceAlpha.ListRelationshipTypes(requestBody.IpOrgId, thegraph.FromRequestQueryOptions(requestBody.Options))
 	if err != nil {
 		logger.Errorf("Failed to get relationship types: %v", err)
 		c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
@@ -289,7 +289,7 @@ func (p *AlphaProtocolHandler) ListHooksHandler(c *gin.Context) {
 	}
 
 	if !requestBody.Validate() {
-		logger.Errorf("Failed to validate request body: %+v", requestBody)
+		logger.Errorf("Invalid request body: %+v", requestBody)
 		c.JSON(http.StatusBadRequest, ErrorMessage("invalid request body"))
 		return
 	}

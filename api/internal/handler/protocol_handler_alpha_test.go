@@ -139,6 +139,20 @@ func TestListRelationshipTypesHandler_Success(t *testing.T) {
 	assert.Equal(t, http.StatusOK, w.Code)
 }
 
+func TestListRelationshipTypesHandler_WithoutParams_Success(t *testing.T) {
+	c, w := test.MockGin(map[string]interface{}{
+		"queryOptions": map[string]interface{}{
+			"pagination": map[string]interface{}{
+				"offset": 0,
+				"limit":  1,
+			},
+		},
+	}, nil)
+	ph := NewAlphaProtocolHandler(test.CreateTheGraphServiceAlpha())
+	ph.ListRelationshipTypesHandler(c)
+	assert.Equal(t, http.StatusOK, w.Code)
+}
+
 func TestListRelationshipsHandler_Success(t *testing.T) {
 	c, w := test.MockGin(map[string]interface{}{
 		"contract": "0x177175a4b26f6ea050676f8c9a14d395f896492c",
@@ -187,6 +201,20 @@ func TestGetModuleHandler_NotFound_Failure(t *testing.T) {
 func TestListHooksHandler_Success(t *testing.T) {
 	c, w := test.MockGin(map[string]interface{}{
 		"moduleId": "0x948f67e1c4f75bc89c5fb42147d96356fb4b359f",
+		"queryOptions": map[string]interface{}{
+			"pagination": map[string]interface{}{
+				"offset": 0,
+				"limit":  10,
+			},
+		},
+	}, nil)
+	ph := NewAlphaProtocolHandler(test.CreateTheGraphServiceAlpha())
+	ph.ListHooksHandler(c)
+	assert.Equal(t, http.StatusOK, w.Code)
+}
+
+func TestListHooksHandler_WithourParams_Success(t *testing.T) {
+	c, w := test.MockGin(map[string]interface{}{
 		"queryOptions": map[string]interface{}{
 			"pagination": map[string]interface{}{
 				"offset": 0,
