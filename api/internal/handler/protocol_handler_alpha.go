@@ -327,7 +327,7 @@ func (p *AlphaProtocolHandler) GetHookHandler(c *gin.Context) {
 func (p *AlphaProtocolHandler) GetTransactionHandler(c *gin.Context) {
 	transactionId := c.Param("transactionId")
 
-	if !utils.IsValidTransaction(transactionId) {
+	if !utils.IsValidHash(transactionId) {
 		c.JSON(http.StatusBadRequest, ErrorMessage("invalid transactionId"))
 		return
 	}

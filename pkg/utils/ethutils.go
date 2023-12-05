@@ -27,8 +27,8 @@ func IsValidNumberString(s string) bool {
 	return re.MatchString(s)
 }
 
-// IsValidTransaction validate hex address
-func IsValidTransaction(tx string) bool {
+// IsValidHash validate hex address
+func IsValidHash(tx string) bool {
 	re := regexp.MustCompile("^0x[0-9a-fA-F]{72}$")
 	return re.MatchString(tx)
 }
