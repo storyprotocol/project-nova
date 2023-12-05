@@ -398,7 +398,8 @@ func (s *theGraphServiceAlphaImpl) ListIPAssets(iporgId *string, options *TheGra
 				contentHash
 				id
 				ipAssetId
-				ipAssetType
+				ipAssetTypeValue
+				ipAssetTypeIndex
 				ipOrgAssetId
 				ipOrgId
 				mediaUrl
@@ -415,6 +416,7 @@ func (s *theGraphServiceAlphaImpl) ListIPAssets(iporgId *string, options *TheGra
 	req.Var("skip", options.Skip)
 	req.Var("orderBy", options.OrderBy)
 	req.Var("orderDirection", options.OrderDirection)
+
 	ctx := context.Background()
 	var ipAssetsResponse v0alpha.IpAssetTheGraphAlphaResponse
 	if err := s.client.Run(ctx, req, &ipAssetsResponse); err != nil {
@@ -433,7 +435,8 @@ func (s *theGraphServiceAlphaImpl) GetIPAsset(ipAssetId string) (*v0alpha.IPAsse
 				ipOrgAssetId
 				owner
 				name
-				ipAssetType
+				ipAssetTypeValue
+				ipAssetTypeIndex
 				contentHash
 				mediaUrl
 				blockNumber

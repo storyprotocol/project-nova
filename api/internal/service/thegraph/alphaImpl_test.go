@@ -164,6 +164,8 @@ func TestListIPAssets_WithIpOrgId_Success(t *testing.T) {
 	ipAssets, err := service.ListIPAssets(&ipOrgId, nil)
 	assert.Nil(t, err)
 	assert.True(t, len(ipAssets) > 0)
+	assert.True(t, ipAssets[0].CreatedAt >= ipAssets[1].CreatedAt)
+	assert.NotNil(t, ipAssets[0].Type)
 }
 
 func TestListIPAssets_WithIpOrgId_WithLimit_Success(t *testing.T) {
