@@ -45,6 +45,7 @@ func (p *AlphaProtocolHandler) GetIpOrgHandler(c *gin.Context) {
 	ipOrdId := c.Param("ipOrgId")
 
 	if !utils.IsValidAddress(ipOrdId) {
+		logger.Errorf("Failed to validate ipOrgId: %v", ipOrdId)
 		c.JSON(http.StatusBadRequest, ErrorMessage("invalid ipOrgId"))
 		return
 	}
@@ -95,6 +96,7 @@ func (p *AlphaProtocolHandler) ListIpAssetsHandler(c *gin.Context) {
 	}
 
 	if !requestBody.Validate() {
+		logger.Errorf("Failed to validate request body: %+v", requestBody)
 		c.JSON(http.StatusBadRequest, ErrorMessage("invalid request body"))
 		return
 	}
@@ -117,6 +119,7 @@ func (p *AlphaProtocolHandler) GetRelationshipHandler(c *gin.Context) {
 	relationshipId := c.Param("relationshipId")
 
 	if !utils.IsValidNumberString(relationshipId) {
+		logger.Errorf("Failed to validate relationshipId: %v", relationshipId)
 		c.JSON(http.StatusBadRequest, ErrorMessage("invalid relationshipId"))
 		return
 	}
@@ -148,6 +151,7 @@ func (p *AlphaProtocolHandler) ListRelationshipsHandler(c *gin.Context) {
 	}
 
 	if !requestBody.Validate() {
+		logger.Errorf("Failed to validate request body: %+v", requestBody)
 		c.JSON(http.StatusBadRequest, ErrorMessage("invalid request body"))
 		return
 	}
@@ -174,6 +178,7 @@ func (p *AlphaProtocolHandler) GetRelationshipTypeHandler(c *gin.Context) {
 	}
 
 	if !requestBody.Validate() {
+		logger.Errorf("Failed to validate request body: %+v", requestBody)
 		c.JSON(http.StatusBadRequest, ErrorMessage("invalid request body"))
 		return
 	}
@@ -205,6 +210,7 @@ func (p *AlphaProtocolHandler) ListRelationshipTypesHandler(c *gin.Context) {
 	}
 
 	if !requestBody.Validate() {
+		logger.Errorf("Failed to validate request body: %+v", requestBody)
 		c.JSON(http.StatusBadRequest, ErrorMessage("invalid request body"))
 		return
 	}
@@ -230,6 +236,7 @@ func (p *AlphaProtocolHandler) ListModulesHandler(c *gin.Context) {
 	}
 
 	if !requestBody.Validate() {
+		logger.Errorf("Failed to validate request body: %+v", requestBody)
 		c.JSON(http.StatusBadRequest, ErrorMessage("invalid request body"))
 		return
 	}
@@ -251,6 +258,7 @@ func (p *AlphaProtocolHandler) GetModuleHandler(c *gin.Context) {
 	moduleId := c.Param("moduleId")
 
 	if !utils.IsValidAddress(moduleId) {
+		logger.Errorf("Failed to validate moduleId: %v", moduleId)
 		c.JSON(http.StatusBadRequest, ErrorMessage("invalid moduleId"))
 		return
 	}
@@ -281,6 +289,7 @@ func (p *AlphaProtocolHandler) ListHooksHandler(c *gin.Context) {
 	}
 
 	if !requestBody.Validate() {
+		logger.Errorf("Failed to validate request body: %+v", requestBody)
 		c.JSON(http.StatusBadRequest, ErrorMessage("invalid request body"))
 		return
 	}
@@ -302,6 +311,7 @@ func (p *AlphaProtocolHandler) GetHookHandler(c *gin.Context) {
 	hookId := c.Param("hookId")
 
 	if !utils.IsValidAddress(hookId) {
+		logger.Errorf("Failed to validate hookId: %v", hookId)
 		c.JSON(http.StatusBadRequest, ErrorMessage("invalid hookId"))
 		return
 	}
@@ -328,6 +338,7 @@ func (p *AlphaProtocolHandler) GetTransactionHandler(c *gin.Context) {
 	transactionId := c.Param("transactionId")
 
 	if !utils.IsValidHash(transactionId) {
+		logger.Errorf("Failed to validate transactionId: %v", transactionId)
 		c.JSON(http.StatusBadRequest, ErrorMessage("invalid transactionId"))
 		return
 	}
@@ -354,6 +365,7 @@ func (p *AlphaProtocolHandler) GetLicenseHandler(c *gin.Context) {
 	licenseId := c.Param("licenseId")
 
 	if !utils.IsValidAddress(licenseId) {
+		logger.Errorf("Failed to validate licenseId: %v", licenseId)
 		c.JSON(http.StatusBadRequest, ErrorMessage("invalid licenseId"))
 		return
 	}
@@ -384,6 +396,7 @@ func (p *AlphaProtocolHandler) ListLicensesHandler(c *gin.Context) {
 	}
 
 	if !requestBody.Validate() {
+		logger.Errorf("Failed to validate request body: %+v", requestBody)
 		c.JSON(http.StatusBadRequest, ErrorMessage("invalid request body"))
 		return
 	}
