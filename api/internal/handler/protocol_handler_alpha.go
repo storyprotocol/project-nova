@@ -70,6 +70,11 @@ func (p *AlphaProtocolHandler) GetIpOrgHandler(c *gin.Context) {
 // GET /ipasset/:ipAssetId
 func (p *AlphaProtocolHandler) GetIpAssetHandler(c *gin.Context) {
 	ipAssetId := c.Param("ipAssetId")
+	if !utils.IsValidNumberString(ipAssetId) {
+		logger.Errorf("Failed to validate ipAssetId: %v", ipAssetId)
+		c.JSON(http.StatusBadRequest, ErrorMessage("invalid ipAssetId"))
+		return
+	}
 	ipAsset, err := p.graphServiceAlpha.GetIPAsset(ipAssetId)
 	if err != nil {
 		logger.Errorf("Failed to get ipasset: %v", err)
@@ -234,20 +239,17 @@ func (p *AlphaProtocolHandler) ListModulesHandler(c *gin.Context) {
 		logger.Errorf("Failed to read request body: %v", err)
 		requestBody = v0alpha_entity.ListModulesRequest{}
 	}
-
 	if !requestBody.Validate() {
 		logger.Errorf("Failed to validate request body: %+v", requestBody)
 		c.JSON(http.StatusBadRequest, ErrorMessage("invalid request body"))
 		return
 	}
-
 	modules, err := p.graphServiceAlpha.ListModules(requestBody.IpOrgId, thegraph.FromRequestQueryOptions(requestBody.Options))
 	if err != nil {
 		logger.Errorf("Failed to get modules: %v", err)
 		c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
 		return
 	}
-
 	c.JSON(http.StatusOK, v0alpha_entity.ListModulesResponse{
 		Modules: modules,
 	})
@@ -256,25 +258,21 @@ func (p *AlphaProtocolHandler) ListModulesHandler(c *gin.Context) {
 // GET /module/:moduleId
 func (p *AlphaProtocolHandler) GetModuleHandler(c *gin.Context) {
 	moduleId := c.Param("moduleId")
-
 	if !utils.IsValidAddress(moduleId) {
 		logger.Errorf("Failed to validate moduleId: %v", moduleId)
 		c.JSON(http.StatusBadRequest, ErrorMessage("invalid moduleId"))
 		return
 	}
-
 	module, err := p.graphServiceAlpha.GetModule(moduleId)
 	if err != nil {
 		logger.Errorf("Failed to get module: %v", err)
 		c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
 		return
 	}
-
 	if module == nil {
 		c.JSON(http.StatusNotFound, ErrorMessage("Not found"))
 		return
 	}
-
 	c.JSON(http.StatusOK, v0alpha_entity.GetModuleResponse{
 		Module: module,
 	})

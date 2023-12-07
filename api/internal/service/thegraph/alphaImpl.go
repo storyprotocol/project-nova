@@ -7,6 +7,7 @@ import (
 
 	"github.com/machinebox/graphql"
 	v0alpha "github.com/project-nova/backend/api/internal/entity/v0-alpha"
+	"github.com/project-nova/backend/pkg/utils"
 )
 
 const (
@@ -25,6 +26,10 @@ type theGraphServiceAlphaImpl struct {
 }
 
 func (s *theGraphServiceAlphaImpl) GetRelationship(relationshipId string) (*v0alpha.Relationship, error) {
+	if !utils.IsValidNumberString(relationshipId) {
+		return nil, fmt.Errorf("invalid relationshipId")
+	}
+
 	req := graphql.NewRequest(`
 		query($relationshipId: String) {
 			relationshipCreateds(where: {relationshipId: $relationshipId}) {
