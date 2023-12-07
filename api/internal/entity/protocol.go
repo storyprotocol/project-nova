@@ -247,3 +247,7 @@ type VerifyWalletSignInRequest struct {
 	WalletAddress string `json:"walletAddress"`
 	Signature     string `json:"signature"`
 }
+
+type VerifyWalletSignInResponse struct {
+	Success bool `json:"success"`
+}

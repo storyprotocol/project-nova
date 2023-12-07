@@ -178,5 +178,7 @@ func (ph *PlatformProtocolHandler) VerifyWalletSignIn(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, nil)
+	c.JSON(http.StatusOK, &entity.VerifyWalletSignInResponse{
+		Success: true,
+	})
 }
