@@ -11,6 +11,7 @@ import (
 type WalletSignInfoRepository interface {
 	CreateNewWalletNonce(walletAddress string, nonce string) (*WalletSignInfoModel, error)
 	GetWalletNonce(walletAddress string) (*WalletSignInfoModel, error)
+	UpdateWalletSignature(walletAddress string, signature string) error
 }
 
 type WalletSignInfoModel struct {

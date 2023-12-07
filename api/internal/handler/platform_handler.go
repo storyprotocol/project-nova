@@ -183,5 +183,13 @@ func (ph *PlatformProtocolHandler) VerifyWalletSignIn(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, ErrorMessage("recovered address does not match"))
 		return
 	}
+
+	err = ph.walletSignInfoRepository.UpdateWalletSignature(walletAddress, requestBody.Signature)
+	if err != nil {
+		logger.Errorf("Failed to update wallet signature: %v", err)
+		c.JSON(http.StatusInternalServerError, ErrorMessage("failed to update wallet signature"))
+		return
+	}
+
 	c.JSON(http.StatusOK, nil)
 }
