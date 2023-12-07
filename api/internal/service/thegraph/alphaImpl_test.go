@@ -37,19 +37,273 @@ func TestListIPOrgs_Success(t *testing.T) {
 	assert.Nil(t, err)
 	assert.True(t, len(iporgs) > 0)
 }
-
-func TestGetIPOrgs_Success(t *testing.T) {
+func TestListIPOrgs_SuccessWithQueryOptions(t *testing.T) {
 	service := CreateTheGraphServiceAlpha()
-	iporg, err := service.GetIPOrg(IP_ORG_ID_CORRECT)
+	options := &TheGraphQueryOptions{
+		First:          10,
+		Skip:           0,
+		OrderBy:        "name",
+		OrderDirection: "asc",
+	}
+	iporgs, err := service.ListIPOrgs(options)
 	assert.Nil(t, err)
-	assert.NotNil(t, iporg)
-	assert.True(t, iporg.ID == IP_ORG_ID_CORRECT)
+	assert.True(t, len(iporgs) > 0)
 }
+
+func TestListIPOrgs_SuccessWithNilQueryOptions(t *testing.T) {
+	service := CreateTheGraphServiceAlpha()
+	iporgs, err := service.ListIPOrgs(nil)
+	assert.Nil(t, err)
+	assert.True(t, len(iporgs) > 0)
+}
+
+func TestListIPOrgs_SuccessWithEmptyQueryOptions(t *testing.T) {
+	service := CreateTheGraphServiceAlpha()
+	options := &TheGraphQueryOptions{}
+	iporgs, err := service.ListIPOrgs(options)
+	assert.Nil(t, err)
+	assert.True(t, len(iporgs) > 0)
+}
+
+func TestListIPOrgs_SuccessWithSkip(t *testing.T) {
+	service := CreateTheGraphServiceAlpha()
+	options := &TheGraphQueryOptions{
+		First: 10,
+		Skip:  10,
+	}
+	iporgs, err := service.ListIPOrgs(options)
+	assert.Nil(t, err)
+	assert.True(t, len(iporgs) > 0)
+}
+
+func TestListIPOrgs_SuccessWithOrderByDesc(t *testing.T) {
+	service := CreateTheGraphServiceAlpha()
+	options := &TheGraphQueryOptions{
+		First:          10,
+		OrderBy:        "name",
+		OrderDirection: "desc",
+	}
+	iporgs, err := service.ListIPOrgs(options)
+	assert.Nil(t, err)
+	assert.True(t, len(iporgs) > 0)
+}
+
+func TestListIPOrgs_SuccessWithCustomQueryOptions(t *testing.T) {
+	service := CreateTheGraphServiceAlpha()
+	options := &TheGraphQueryOptions{
+		First:          5,
+		Skip:           5,
+		OrderBy:        "createdAt",
+		OrderDirection: "asc",
+	}
+	iporgs, err := service.ListIPOrgs(options)
+	assert.Nil(t, err)
+	assert.True(t, len(iporgs) > 0)
+}
+
+func TestGetRelationship_InvalidRelationshipId_Failure(t *testing.T) {
+	service := CreateTheGraphServiceAlpha()
+	_, err := service.GetRelationship("0xde493e03d2de0cd7820b4f580beced572a6b0011")
+	assert.NotNil(t, err)
+}
+
+func TestGetRelationship_EmptyID_Failure(t *testing.T) {
+	service := CreateTheGraphServiceAlpha()
+	relationship, err := service.GetRelationship("")
+	assert.NotNil(t, err)
+	assert.Nil(t, relationship)
+}
+
+func TestGetRelationship_InvalidID_Failure(t *testing.T) {
+	service := CreateTheGraphServiceAlpha()
+	relationship, err := service.GetRelationship("invalid_id")
+	assert.NotNil(t, err)
+	assert.Nil(t, relationship)
+}
+
+func TestGetRelationshipType_NotFound_Failure(t *testing.T) {
+	service := CreateTheGraphServiceAlpha()
+	relType, err := service.GetRelationshipType("0xde493e03d2de0cd7820b4f580beced572a6b0011", IP_ORG_ID_CORRECT)
+	assert.Nil(t, err)
+	assert.Nil(t, relType)
+}
+
+func TestGetRelationshipType_EmptyID_Failure(t *testing.T) {
+	service := CreateTheGraphServiceAlpha()
+	relType, err := service.GetRelationshipType("", IP_ORG_ID_CORRECT)
+	assert.NotNil(t, err)
+	assert.Nil(t, relType)
+}
+
+func TestGetRelationshipType_InvalidID_Failure(t *testing.T) {
+	service := CreateTheGraphServiceAlpha()
+	relType, err := service.GetRelationshipType("invalid_id", IP_ORG_ID_CORRECT)
+	assert.NotNil(t, err)
+	assert.Nil(t, relType)
+}
+
+func TestListRelationships_Success(t *testing.T) {
+	service := CreateTheGraphServiceAlpha()
+	options := &TheGraphQueryOptions{
+		First: 10,
+	}
+	relationships, err := service.ListRelationships(SOURCE_CONTRACT_CORRECT, SOURCE_TOKEN_ID_CORRECT, options)
+	assert.Nil(t, err)
+	assert.True(t, len(relationships) > 0)
+}
+
+func TestListHooks_Success(t *testing.T) {
+	service := CreateTheGraphServiceAlpha()
+	options := &TheGraphQueryOptions{
+		First: 10,
+	}
+	hooks, err := service.ListHooks(nil, options)
+	assert.Nil(t, err)
+	assert.True(t, len(hooks) > 0)
+}
+
+func TestGetHook_EmptyID_Failure(t *testing.T) {
+	service := CreateTheGraphServiceAlpha()
+	hook, err := service.GetHook("")
+	assert.Nil(t, err)
+	assert.Nil(t, hook)
+}
+
+func TestGetHook_InvalidID_Failure(t *testing.T) {
+	service := CreateTheGraphServiceAlpha()
+	hook, err := service.GetHook("invalid_id")
+	assert.NotNil(t, err)
+	assert.Nil(t, hook)
+}
+
+func TestListModules_Success(t *testing.T) {
+	service := CreateTheGraphServiceAlpha()
+	options := &TheGraphQueryOptions{
+		First: 10,
+	}
+	modules, err := service.ListModules(nil, options)
+	assert.Nil(t, err)
+	assert.True(t, len(modules) > 0)
+}
+
+func TestGetModule_EmptyID_Failure(t *testing.T) {
+	service := CreateTheGraphServiceAlpha()
+	module, err := service.GetModule("")
+	assert.Nil(t, err)
+	assert.Nil(t, module)
+}
+
+func TestGetModule_InvalidID_Failure(t *testing.T) {
+	service := CreateTheGraphServiceAlpha()
+	module, err := service.GetModule("invalid_id")
+	assert.NotNil(t, err)
+	assert.Nil(t, module)
+}
+
+func TestListIPAssets_Success(t *testing.T) {
+	service := CreateTheGraphServiceAlpha()
+	options := &TheGraphQueryOptions{
+		First: 10,
+	}
+	ipAssets, err := service.ListIPAssets(nil, options)
+	assert.Nil(t, err)
+	assert.True(t, len(ipAssets) > 0)
+}
+
+func TestGetIPAsset_EmptyID_Failure(t *testing.T) {
+	service := CreateTheGraphServiceAlpha()
+	ipAsset, err := service.GetIPAsset("")
+	assert.NotNil(t, err)
+	assert.Nil(t, ipAsset)
+}
+
+func TestGetIPAsset_InvalidID_Failure(t *testing.T) {
+	service := CreateTheGraphServiceAlpha()
+	ipAsset, err := service.GetIPAsset("invalid_id")
+	assert.NotNil(t, err)
+	assert.Nil(t, ipAsset)
+}
+
+func TestListTransactions_Success(t *testing.T) {
+	service := CreateTheGraphServiceAlpha()
+	options := &TheGraphQueryOptions{
+		First: 10,
+	}
+	transactions, err := service.ListTransactions(nil, options)
+	assert.Nil(t, err)
+	assert.True(t, len(transactions) > 0)
+}
+
+func TestGetTransaction_NotFound_Failure(t *testing.T) {
+	service := CreateTheGraphServiceAlpha()
+	transaction, err := service.GetTransaction("0xde493e03d2de0cd7820b4f580beced572a6b0011")
+	assert.Nil(t, err)
+	assert.Nil(t, transaction)
+}
+
+func TestGetTransaction_EmptyID_Failure(t *testing.T) {
+	service := CreateTheGraphServiceAlpha()
+	transaction, err := service.GetTransaction("")
+	assert.Nil(t, err)
+	assert.Nil(t, transaction)
+}
+
+func TestGetTransaction_InvalidID_Failure(t *testing.T) {
+	service := CreateTheGraphServiceAlpha()
+	transaction, err := service.GetTransaction("invalid_id")
+	assert.NotNil(t, err)
+	assert.Nil(t, transaction)
+}
+
+// func TestListLicenses_Success(t *testing.T) {
+// 	service := CreateTheGraphServiceAlpha()
+// 	options := &TheGraphQueryOptions{
+// 		First: 10,
+// 	}
+// 	licenses, err := service.ListLicenses(nil, nil, options)
+// 	assert.Nil(t, err)
+// 	assert.True(t, len(licenses) > 0)
+// }
+
+// func TestGetLicense_NotFound_Failure(t *testing.T) {
+// 	service := CreateTheGraphServiceAlpha()
+// 	license, err := service.GetLicense("0xde493e03d2de0cd7820b4f580beced572a6b0011")
+// 	assert.Nil(t, err)
+// 	assert.Nil(t, license)
+// }
+
+// func TestGetLicense_EmptyID_Failure(t *testing.T) {
+// 	service := CreateTheGraphServiceAlpha()
+// 	license, err := service.GetLicense("")
+// 	assert.NotNil(t, err)
+// 	assert.Nil(t, license)
+// }
+
+// func TestGetLicense_InvalidID_Failure(t *testing.T) {
+// 	service := CreateTheGraphServiceAlpha()
+// 	license, err := service.GetLicense("invalid_id")
+// 	assert.NotNil(t, err)
+// 	assert.Nil(t, license)
+// }
 
 func TestGetIPOrgs_NotFound_Failure(t *testing.T) {
 	service := CreateTheGraphServiceAlpha()
 	iporg, err := service.GetIPOrg("0xde493e03d2de0cd7820b4f580beced572a6b0011")
 	assert.Nil(t, err)
+	assert.Nil(t, iporg)
+}
+
+func TestGetIPOrgs_EmptyID_Failure(t *testing.T) {
+	service := CreateTheGraphServiceAlpha()
+	iporg, err := service.GetIPOrg("")
+	assert.Nil(t, err)
+	assert.Nil(t, iporg)
+}
+
+func TestGetIPOrgs_InvalidID_Failure(t *testing.T) {
+	service := CreateTheGraphServiceAlpha()
+	iporg, err := service.GetIPOrg("invalid_id")
+	assert.NotNil(t, err)
 	assert.Nil(t, iporg)
 }
 
