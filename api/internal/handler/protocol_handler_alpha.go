@@ -362,7 +362,7 @@ func (p *AlphaProtocolHandler) GetTransactionHandler(c *gin.Context) {
 func (p *AlphaProtocolHandler) GetLicenseHandler(c *gin.Context) {
 	licenseId := c.Param("licenseId")
 
-	if !utils.IsValidAddress(licenseId) {
+	if !utils.IsValidNumberString(licenseId) {
 		logger.Errorf("Failed to validate licenseId: %v", licenseId)
 		c.JSON(http.StatusBadRequest, ErrorMessage("invalid licenseId"))
 		return
