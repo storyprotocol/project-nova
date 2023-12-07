@@ -83,6 +83,7 @@ func main() {
 	storyInfoRepository := repository.NewStoryInfoDbImpl(db)
 	characterInfoRepository := repository.NewCharacterInfoDbImpl(db)
 	storyInfoV2Repository := repository.NewStoryInfoV2DbImpl(db)
+	walletSignInfoRepository := repository.NewWalletSignInfoDbImpl(db)
 
 	var storyContentRepository repository.StoryContentRepository
 	var storyError error
@@ -131,7 +132,7 @@ func main() {
 
 	// initialize handlers
 	protocolHandler := handler.NewProtocolHandler(theGraphServiceAlpha, httpClient)
-	platformHandler := handler.NewPlatformProtocolHandler(s3Client, cfg.S3FileUploadBucketName, web3Gateway)
+	platformHandler := handler.NewPlatformProtocolHandler(s3Client, cfg.S3FileUploadBucketName, web3Gateway, walletSignInfoRepository)
 
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, "Hello")
@@ -360,6 +361,12 @@ func main() {
 
 		// Endpoint for confirming file upload
 		platform.POST("/file-upload/confirm", platformHandler.ConfirmFileUpload)
+
+		// Endpoint for requesting wallet sign in
+		platform.GET("/web3-sign/request", platformHandler.RequestWalletSignIn)
+
+		// Endpoint for verifying wallet sign in
+		platform.POST("/web3-sign/verify", platformHandler.VerifyWalletSignIn)
 	}
 
 	// Alpha endpoints
