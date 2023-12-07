@@ -2,9 +2,12 @@ package handler
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
 
+	"github.com/ethereum/go-ethereum/accounts"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -19,7 +22,19 @@ import (
 )
 
 const (
-	walletSignInMessage = "Welcome to Story Protocol!\n\nClick to sign in and accept the Story Protocol Terms of Service (https://storyprotocol.xyz/tos).\n\nThis request will not trigger a blockchain transaction or cost any gas fees.\n\nWallet address:\n%s\n\nNonce:\n%s"
+	walletSignInMessage = `
+	Welcome to Story Protocol!
+
+	Click to sign in and accept the Story Protocol Terms of Service (https://storyprotocol.xyz/tos).
+
+	This request will not trigger a blockchain transaction or cost any gas fees.
+
+	Wallet address:
+	%s
+
+	Nonce:
+	%s
+	`
 )
 
 type PlatformHandlerInterface interface {
@@ -103,12 +118,12 @@ func (ph *PlatformProtocolHandler) RequestWalletSignIn(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, ErrorMessage("invalid wallet address"))
 		return
 	}
-
-	signInfo, err := ph.walletSignInfoRepository.GetWalletNonce(requestBody.WalletAddress)
+	walletAddress := strings.ToUpper(requestBody.WalletAddress)
+	signInfo, err := ph.walletSignInfoRepository.GetWalletNonce(walletAddress)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			nonce := uuid.New().String()
-			signInfo, err = ph.walletSignInfoRepository.CreateNewWalletNonce(requestBody.WalletAddress, nonce)
+			signInfo, err = ph.walletSignInfoRepository.CreateNewWalletNonce(walletAddress, nonce)
 			if err != nil {
 				logger.Errorf("Failed to create new wallet nonce: %v", err)
 				c.JSON(http.StatusInternalServerError, ErrorMessage("failed to create new wallet nonce"))
@@ -121,7 +136,7 @@ func (ph *PlatformProtocolHandler) RequestWalletSignIn(c *gin.Context) {
 		}
 	}
 
-	message := fmt.Sprintf(walletSignInMessage, strings.ToLower(requestBody.WalletAddress), signInfo.Nonce)
+	message := fmt.Sprintf(walletSignInMessage, walletAddress, signInfo.Nonce)
 	c.JSON(http.StatusOK, &entity.SigninWalletResponse{
 		SigningMessage: message,
 	})
@@ -140,30 +155,33 @@ func (ph *PlatformProtocolHandler) VerifyWalletSignIn(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, ErrorMessage("invalid wallet address"))
 		return
 	}
-
-	signInfo, err := ph.walletSignInfoRepository.GetWalletNonce(requestBody.WalletAddress)
+	walletAddress := strings.ToUpper(requestBody.WalletAddress)
+	signInfo, err := ph.walletSignInfoRepository.GetWalletNonce(walletAddress)
 	if err != nil {
 		logger.Errorf("Failed to get wallet nonce: %v", err)
 		c.JSON(http.StatusBadRequest, ErrorMessage("failed to get wallet nonce"))
 		return
 	}
-
-	originalMessage := fmt.Sprintf(walletSignInMessage, strings.ToLower(requestBody.WalletAddress), signInfo.Nonce)
-	// Recover the public key from the signature
-	publicKey, err := crypto.SigToPub([]byte(originalMessage), []byte(requestBody.Signature))
+	sig, err := hexutil.Decode(requestBody.Signature)
 	if err != nil {
-		logger.Errorf("Failed to recover public key: %v", err)
-		c.JSON(http.StatusUnauthorized, ErrorMessage("Signature verification failed"))
+		logger.Errorf("Failed to decode signature: %v", err)
+		c.JSON(http.StatusBadRequest, ErrorMessage("failed to decode signature"))
 		return
 	}
 
-	recoveredAddress := crypto.PubkeyToAddress(*publicKey)
-
-	// compare the address
-	if recoveredAddress.Hex() != signInfo.WalletAddress {
-		c.JSON(http.StatusUnauthorized, ErrorMessage("Signature verification failed"))
+	sig[crypto.RecoveryIDOffset] -= 27
+	message := fmt.Sprintf(walletSignInMessage, walletAddress, signInfo.Nonce)
+	msg := accounts.TextHash([]byte(message))
+	sigPublicKeyECDSA, err := crypto.SigToPub(msg, sig)
+	if err != nil {
+		log.Printf("Failed to recover public key from signature: %v", err)
+		c.JSON(http.StatusBadRequest, ErrorMessage("failed to recover public key from signature"))
 		return
 	}
-
+	recoveredAddr := crypto.PubkeyToAddress(*sigPublicKeyECDSA)
+	if walletAddress != strings.ToUpper(recoveredAddr.Hex()) {
+		c.JSON(http.StatusBadRequest, ErrorMessage("recovered address does not match"))
+		return
+	}
 	c.JSON(http.StatusOK, nil)
 }
