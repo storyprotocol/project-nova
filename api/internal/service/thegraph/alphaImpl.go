@@ -556,21 +556,19 @@ func (s *theGraphServiceAlphaImpl) ListLicenses(ipOrgId *string, ipAssetId *stri
 	req := graphql.NewRequest(fmt.Sprintf(`
 		query(%s) {
 			licenseRegisterreds(%s) {
-				transactionHash
-				termsData
-				termIds
-				status
-				revoker
-				parentLicenseId
-				licensor
-				licenseeType
+				id
 				licenseId
-				isCommercial
+				status
+				isReciprocal
+				derivativeNeedsApproval
+				revoker
+				licensor
 				ipOrgId
 				ipAssetId
-				id
-				blockTimestamp
+				parentLicenseId
 				blockNumber
+				blockTimestamp
+				transactionHash
 			}
 		}
 	`, queryInterface, queryValue))
@@ -598,20 +596,18 @@ func (s *theGraphServiceAlphaImpl) GetLicense(licenseId string) (*v0alpha.Licens
 	req := graphql.NewRequest(` 
 		query($licenseId: String) {
 			licenseRegisterreds(where: {licenseId: $licenseId}) {
+				id
+				licenseId
+				status
+				isReciprocal
+				derivativeNeedsApproval
+				revoker
+				licensor
+				ipOrgId
+				ipAssetId
+				parentLicenseId
 				blockNumber
 				blockTimestamp
-				id
-				ipAssetId
-				ipOrgId
-				licenseId
-				isCommercial
-				licenseeType
-				licensor
-				parentLicenseId
-				revoker
-				status
-				termIds
-				termsData
 				transactionHash
 			}
 		}

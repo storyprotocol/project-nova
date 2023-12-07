@@ -5,19 +5,17 @@ import (
 )
 
 type License struct {
-	ID              string   `json:"id,omitempty"`
-	IsCommercial    bool     `json:"isCommercial,omitempty"`
-	Status          int      `json:"status,omitempty"`
-	Licensor        string   `json:"licensor,omitempty"`
-	Revoker         string   `json:"revoker,omitempty"`
-	IPOrgId         string   `json:"ipOrgId,omitempty"`
-	LicenseeType    int      `json:"licenseeType"`
-	IPAssetId       string   `json:"ipAssetId,omitempty"`
-	ParentLicenseId string   `json:"parentLicenseId,omitempty"`
-	TermIds         []string `json:"termIds,omitempty"`
-	TermsData       []string `json:"termsData,omitempty"`
-	CreatedAt       string   `json:"createdAt,omitempty"`
-	TxHash          string   `json:"txHash,omitempty"`
+	ID                      string `json:"id,omitempty"`
+	IsReciprocal            bool   `json:"isReciprocal"`
+	DerivativeNeedsApproval bool   `json:"derivativeNeedsApproval"`
+	Status                  int    `json:"status"`
+	Licensor                string `json:"licensor"`
+	Revoker                 string `json:"revoker"`
+	IpOrgId                 string `json:"ipOrgId"`
+	IpAssetId               string `json:"ipAssetId"`
+	ParentLicenseId         string `json:"parentLicenseId"`
+	CreatedAt               string `json:"createdAt"`
+	TxHash                  string `json:"txHash"`
 }
 
 type GetLicenseResponse struct {
@@ -47,21 +45,19 @@ type ListLicensesResponse struct {
 }
 
 type LicenseRegistryTheGraphAlpha struct {
-	ID              string   `json:"id"`
-	LicenseId       string   `json:"licenseId"`
-	IsCommercial    bool     `json:"isCommercial"`
-	Status          int      `json:"status"`
-	Licensor        string   `json:"licensor"`
-	Revoker         string   `json:"revoker"`
-	IpOrgId         string   `json:"ipOrgId"`
-	LicenseeType    int      `json:"licenseeType"`
-	IpAssetId       string   `json:"ipAssetId"`
-	ParentLicenseId string   `json:"parentLicenseId"`
-	TermIds         []string `json:"termIds"`
-	TermsData       []string `json:"termsData"`
-	BlockNumber     string   `json:"blockNumber"`
-	BlockTimestamp  string   `json:"blockTimestamp"`
-	TxHash          string   `json:"transactionHash"`
+	ID                      string `json:"id"`
+	LicenseId               string `json:"licenseId"`
+	Status                  int    `json:"status"`
+	IsReciprocal            bool   `json:"isReciprocal"`
+	DerivativeNeedsApproval bool   `json:"derivativeNeedsApproval"`
+	Revoker                 string `json:"revoker"`
+	Licensor                string `json:"licensor"`
+	IpOrgId                 string `json:"ipOrgId"`
+	IpAssetId               string `json:"ipAssetId"`
+	ParentLicenseId         string `json:"parentLicenseId"`
+	BlockNumber             string `json:"blockNumber"`
+	BlockTimestamp          string `json:"blockTimestamp"`
+	TxHash                  string `json:"transactionHash"`
 }
 
 type LicenseTheGraphAlphaResponse struct {
@@ -78,20 +74,17 @@ func (l *LicenseTheGraphAlphaResponse) ToLicenses() []*License {
 }
 
 func (l *LicenseRegistryTheGraphAlpha) ToLicense() *License {
-
 	return &License{
-		ID:              l.LicenseId,
-		IsCommercial:    l.IsCommercial,
-		Status:          l.Status,
-		Licensor:        l.Licensor,
-		Revoker:         l.Revoker,
-		IPOrgId:         l.IpOrgId,
-		LicenseeType:    l.LicenseeType,
-		IPAssetId:       l.IpAssetId,
-		ParentLicenseId: l.ParentLicenseId,
-		TermIds:         l.TermIds,
-		TermsData:       l.TermsData,
-		CreatedAt:       utils.TimestampInSecondsToISO8601(l.BlockTimestamp),
-		TxHash:          l.TxHash,
+		ID:                      l.LicenseId,
+		IsReciprocal:            l.IsReciprocal,
+		DerivativeNeedsApproval: l.DerivativeNeedsApproval,
+		Status:                  l.Status,
+		Licensor:                l.Licensor,
+		Revoker:                 l.Revoker,
+		IpOrgId:                 l.IpOrgId,
+		IpAssetId:               l.IpAssetId,
+		ParentLicenseId:         l.ParentLicenseId,
+		CreatedAt:               utils.TimestampInSecondsToISO8601(l.BlockTimestamp),
+		TxHash:                  l.TxHash,
 	}
 }
