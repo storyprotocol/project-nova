@@ -2,7 +2,6 @@ package handler
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"strings"
 
@@ -165,7 +164,7 @@ func (ph *PlatformProtocolHandler) VerifyWalletSignIn(c *gin.Context) {
 	sig, err := hexutil.Decode(requestBody.Signature)
 	if err != nil {
 		logger.Errorf("Failed to decode signature: %v", err)
-		c.JSON(http.StatusBadRequest, ErrorMessage("failed to decode signature"))
+		c.JSON(http.StatusUnauthorized, ErrorMessage("failed to decode signature"))
 		return
 	}
 
@@ -174,13 +173,13 @@ func (ph *PlatformProtocolHandler) VerifyWalletSignIn(c *gin.Context) {
 	msg := accounts.TextHash([]byte(message))
 	sigPublicKeyECDSA, err := crypto.SigToPub(msg, sig)
 	if err != nil {
-		log.Printf("Failed to recover public key from signature: %v", err)
-		c.JSON(http.StatusBadRequest, ErrorMessage("failed to recover public key from signature"))
+		logger.Errorf("Failed to recover public key from signature: %v", err)
+		c.JSON(http.StatusUnauthorized, ErrorMessage("failed to recover public key from signature"))
 		return
 	}
 	recoveredAddr := crypto.PubkeyToAddress(*sigPublicKeyECDSA)
 	if walletAddress != strings.ToUpper(recoveredAddr.Hex()) {
-		c.JSON(http.StatusBadRequest, ErrorMessage("recovered address does not match"))
+		c.JSON(http.StatusUnauthorized, ErrorMessage("recovered address does not match"))
 		return
 	}
 
