@@ -221,7 +221,8 @@ func TestListIpAssetsHandler_NoResults_Success(t *testing.T) {
 	ph.ListIpAssetsHandler(c)
 	assert.Equal(t, http.StatusOK, w.Code)
 	var response v0alpha_entity.ListIpAssetsResponse
-	json.Unmarshal(w.Body.Bytes(), &response)
+	err := json.Unmarshal(w.Body.Bytes(), &response)
+	assert.NoError(t, err)
 	// Assert that the response body is empty
 	assert.True(t, len(response.IPAssets) == 0)
 }
