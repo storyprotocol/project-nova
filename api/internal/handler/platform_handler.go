@@ -21,19 +21,7 @@ import (
 )
 
 const (
-	walletSignInMessage = `
-	Welcome to Story Protocol!
-
-	Click to sign in and accept the Story Protocol Terms of Service (https://storyprotocol.xyz/tos).
-
-	This request will not trigger a blockchain transaction or cost any gas fees.
-
-	Wallet address:
-	%s
-
-	Nonce:
-	%s
-	`
+	walletSignInMessage = "\nWelcome to Story Protocol!\n\nClick to sign in and accept the Story Protocol Terms of Service (https://explorer.storyprotocol.xyz/tos.pdf).\n\nThis request will not trigger a blockchain transaction or cost any gas fees.\n\nWallet address:\n%s\n\nNonce:\n%s\n"
 )
 
 type PlatformHandlerInterface interface {
