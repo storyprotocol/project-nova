@@ -8,6 +8,7 @@ type License struct {
 	ID                      string `json:"id,omitempty"`
 	IsReciprocal            bool   `json:"isReciprocal"`
 	DerivativeNeedsApproval bool   `json:"derivativeNeedsApproval"`
+	DerivativesAllowed      bool   `json:"derivativesAllowed"`
 	Status                  int    `json:"status"`
 	Licensor                string `json:"licensor"`
 	Revoker                 string `json:"revoker"`
@@ -50,6 +51,7 @@ type LicenseRegistryTheGraphAlpha struct {
 	Status                  int    `json:"status"`
 	IsReciprocal            bool   `json:"isReciprocal"`
 	DerivativeNeedsApproval bool   `json:"derivativeNeedsApproval"`
+	DerivativesAllowed      bool   `json:"derivativesAllowed"`
 	Revoker                 string `json:"revoker"`
 	Licensor                string `json:"licensor"`
 	IpOrgId                 string `json:"ipOrgId"`
@@ -78,6 +80,7 @@ func (l *LicenseRegistryTheGraphAlpha) ToLicense() *License {
 		ID:                      l.LicenseId,
 		IsReciprocal:            l.IsReciprocal,
 		DerivativeNeedsApproval: l.DerivativeNeedsApproval,
+		DerivativesAllowed:      l.DerivativesAllowed,
 		Status:                  l.Status,
 		Licensor:                l.Licensor,
 		Revoker:                 l.Revoker,
