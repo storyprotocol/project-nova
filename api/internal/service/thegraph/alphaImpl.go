@@ -546,6 +546,7 @@ func (s *theGraphServiceAlphaImpl) ListLicenses(ipOrgId *string, ipAssetId *stri
 	queryInterface := QUERY_INTERFACE
 	queryValue := QUERY_VALUE
 	whereClause := []string{}
+
 	if ipOrgId != nil && *ipOrgId != "" {
 		queryInterface += ", $ipOrgId: String"
 		whereClause = append(whereClause, "ipOrgId: $ipOrgId")

@@ -249,36 +249,29 @@ func TestGetTransaction_InvalidID_Failure(t *testing.T) {
 	assert.Nil(t, transaction)
 }
 
-// func TestListLicenses_Success(t *testing.T) {
-// 	service := CreateTheGraphServiceAlpha()
-// 	options := &TheGraphQueryOptions{
-// 		First: 10,
-// 	}
-// 	licenses, err := service.ListLicenses(nil, nil, options)
-// 	assert.Nil(t, err)
-// 	assert.True(t, len(licenses) > 0)
-// }
+func TestListLicenses_Success(t *testing.T) {
+	service := CreateTheGraphServiceAlpha()
+	options := &TheGraphQueryOptions{
+		First: 10,
+	}
+	licenses, err := service.ListLicenses(nil, nil, options)
+	assert.Nil(t, err)
+	assert.True(t, len(licenses) > 0)
+}
 
-// func TestGetLicense_NotFound_Failure(t *testing.T) {
-// 	service := CreateTheGraphServiceAlpha()
-// 	license, err := service.GetLicense("0xde493e03d2de0cd7820b4f580beced572a6b0011")
-// 	assert.Nil(t, err)
-// 	assert.Nil(t, license)
-// }
+func TestGetLicense_EmptyID_Failure(t *testing.T) {
+	service := CreateTheGraphServiceAlpha()
+	license, err := service.GetLicense("")
+	assert.NotNil(t, err)
+	assert.Nil(t, license)
+}
 
-// func TestGetLicense_EmptyID_Failure(t *testing.T) {
-// 	service := CreateTheGraphServiceAlpha()
-// 	license, err := service.GetLicense("")
-// 	assert.NotNil(t, err)
-// 	assert.Nil(t, license)
-// }
-
-// func TestGetLicense_InvalidID_Failure(t *testing.T) {
-// 	service := CreateTheGraphServiceAlpha()
-// 	license, err := service.GetLicense("invalid_id")
-// 	assert.NotNil(t, err)
-// 	assert.Nil(t, license)
-// }
+func TestGetLicense_InvalidID_Failure(t *testing.T) {
+	service := CreateTheGraphServiceAlpha()
+	license, err := service.GetLicense("invalid_id")
+	assert.NotNil(t, err)
+	assert.Nil(t, license)
+}
 
 func TestGetIPOrgs_NotFound_Failure(t *testing.T) {
 	service := CreateTheGraphServiceAlpha()
@@ -509,49 +502,61 @@ func TestGetHook_NotFound_Failure(t *testing.T) {
 	assert.Nil(t, hook)
 }
 
-// func TestListLicenses_WithIpOrgIdAndIpAssetId_Success(t *testing.T) {
-// 	service := CreateTheGraphServiceAlpha()
-// 	ipOrgId := "0xb422e54932c1dae83e78267a4dd2805aa64a8061"
-// 	ipAssetId := "0"
-// 	licenses, err := service.ListLicenses(&ipOrgId, &ipAssetId, nil)
-// 	assert.Nil(t, err)
-// 	assert.True(t, len(licenses) > 0)
-// }
+func TestListLicenses_WithIpOrgIdAndIpAssetId_Success(t *testing.T) {
+	service := CreateTheGraphServiceAlpha()
+	ipOrgId := "0xb422e54932c1dae83e78267a4dd2805aa64a8061"
+	ipAssetId := "0"
+	licenses, err := service.ListLicenses(&ipOrgId, &ipAssetId, nil)
+	assert.Nil(t, err)
+	assert.True(t, len(licenses) > 0)
+}
 
-// func TestListLicenses_WithIpOrgId_Success(t *testing.T) {
-// 	service := CreateTheGraphServiceAlpha()
-// 	ipOrgId := "0xb422e54932c1dae83e78267a4dd2805aa64a8061"
-// 	licenses, err := service.ListLicenses(&ipOrgId, nil, nil)
-// 	assert.Nil(t, err)
-// 	assert.True(t, len(licenses) > 0)
-// }
+func TestListLicenses_WithIpOrgIdAndIpAssetIdAndPagination_Success(t *testing.T) {
+	service := CreateTheGraphServiceAlpha()
+	ipOrgId := "0x0ceeefc9ac23755d8786d4d580e1e7cccc25de12"
+	ipAssetId := "0"
+	licenses, err := service.ListLicenses(&ipOrgId, &ipAssetId, &TheGraphQueryOptions{
+		First: 2,
+	})
 
-// func TestListLicenses_WithIpAssetId_Success(t *testing.T) {
-// 	service := CreateTheGraphServiceAlpha()
-// 	ipAssetId := "0"
-// 	licenses, err := service.ListLicenses(nil, &ipAssetId, nil)
-// 	assert.Nil(t, err)
-// 	assert.True(t, len(licenses) > 0)
-// }
+	logger.Infof(">>>> %+v", licenses)
+	assert.Nil(t, err)
+	assert.True(t, len(licenses) == 2)
+}
 
-// func TestListLicenses_WithoutIpOrgIdAndIpAssetId_Success(t *testing.T) {
-// 	service := CreateTheGraphServiceAlpha()
-// 	licenses, err := service.ListLicenses(nil, nil, nil)
-// 	assert.Nil(t, err)
-// 	assert.True(t, len(licenses) > 0)
-// }
+func TestListLicenses_WithIpOrgId_Success(t *testing.T) {
+	service := CreateTheGraphServiceAlpha()
+	ipOrgId := "0x35d3f0b8711df409dd996154ee82c1a4332e5fc8"
+	licenses, err := service.ListLicenses(&ipOrgId, nil, nil)
+	assert.Nil(t, err)
+	assert.True(t, len(licenses) > 0)
+}
 
-// func TestGetLicense_Success(t *testing.T) {
-// 	service := CreateTheGraphServiceAlpha()
-// 	license, err := service.GetLicense("1")
-// 	assert.Nil(t, err)
-// 	assert.True(t, license.ID == "1")
-// 	assert.True(t, license.CreatedAt == "2023-11-21T02:20:24Z")
-// }
+func TestListLicenses_WithIpAssetId_Success(t *testing.T) {
+	service := CreateTheGraphServiceAlpha()
+	ipAssetId := "0"
+	licenses, err := service.ListLicenses(nil, &ipAssetId, nil)
+	assert.Nil(t, err)
+	assert.True(t, len(licenses) > 0)
+}
 
-// func TestGetLicense_NotFound_Failure(t *testing.T) {
-// 	service := CreateTheGraphServiceAlpha()
-// 	license, err := service.GetLicense("1123")
-// 	assert.Nil(t, err)
-// 	assert.Nil(t, license)
-// }
+func TestListLicenses_WithoutIpOrgIdAndIpAssetId_Success(t *testing.T) {
+	service := CreateTheGraphServiceAlpha()
+	licenses, err := service.ListLicenses(nil, nil, nil)
+	assert.Nil(t, err)
+	assert.True(t, len(licenses) > 0)
+}
+
+func TestGetLicense_Success(t *testing.T) {
+	service := CreateTheGraphServiceAlpha()
+	license, err := service.GetLicense("13")
+	assert.Nil(t, err)
+	assert.True(t, license.ID == "13")
+}
+
+func TestGetLicense_NotFound_Failure(t *testing.T) {
+	service := CreateTheGraphServiceAlpha()
+	license, err := service.GetLicense("1123")
+	assert.Nil(t, err)
+	assert.Nil(t, license)
+}

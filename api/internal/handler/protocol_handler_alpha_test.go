@@ -597,21 +597,21 @@ func TestGetTransactionHandler_NotFound_Failure(t *testing.T) {
 // 	assert.Equal(t, http.StatusNotFound, w.Code)
 // }
 
-// func TestListLicensesHandler_Success(t *testing.T) {
-// 	c, w := test.MockGin(map[string]interface{}{
-// 		"ipOrgId":   "0xb422e54932c1dae83e78267a4dd2805aa64a8061",
-// 		"ipAssetId": "0",
-// 		"options": map[string]interface{}{
-// 			"pagination": map[string]interface{}{
-// 				"offset": 0,
-// 				"limit":  10,
-// 			},
-// 		},
-// 	})
-// 	ph := NewAlphaProtocolHandler(test.CreateTheGraphServiceAlpha())
-// 	ph.ListLicensesHandler(c)
-// 	assert.Equal(t, http.StatusOK, w.Code)
-// }
+func TestListLicensesHandler_Success(t *testing.T) {
+	c, w := test.MockGin(map[string]interface{}{
+		"ipOrgId":   "0x0ceeefc9ac23755d8786d4d580e1e7cccc25de12",
+		"ipAssetId": "1",
+		"options": map[string]interface{}{
+			"pagination": map[string]interface{}{
+				"offset": 3,
+				"limit":  1,
+			},
+		},
+	}, nil)
+	ph := NewAlphaProtocolHandler(test.CreateTheGraphServiceAlpha())
+	ph.ListLicensesHandler(c)
+	assert.Equal(t, http.StatusOK, w.Code)
+}
 
 func TestListTransactionsHandler_Success(t *testing.T) {
 	c, w := test.MockGin(map[string]interface{}{
