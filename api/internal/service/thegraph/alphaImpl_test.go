@@ -559,3 +559,20 @@ func TestGetLicense_NotFound_Failure(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Nil(t, license)
 }
+
+func TestListLicenseParams_WithIpOrgIdAndOptions_Success(t *testing.T) {
+	service := CreateTheGraphServiceAlpha()
+	options := &TheGraphQueryOptions{
+		First:   10,
+		OrderBy: "name",
+	}
+	licenseParams, err := service.ListLicenseParams("0x64eef5894bc9834ae0c1374c18426d47b8445076", options)
+	assert.Nil(t, err)
+	assert.True(t, len(licenseParams) > 0)
+}
+
+func TestListLicenseParams_WithoutIpOrgId_Failure(t *testing.T) {
+	service := CreateTheGraphServiceAlpha()
+	_, err := service.ListLicenseParams("", nil)
+	assert.NotNil(t, err)
+}

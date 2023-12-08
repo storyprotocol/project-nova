@@ -633,6 +633,42 @@ func (s *theGraphServiceAlphaImpl) GetLicense(licenseId string) (*v0alpha.Licens
 	return licenseResponse.LicenseRegistereds[0].ToLicense(), nil
 }
 
+func (s *theGraphServiceAlphaImpl) ListLicenseParams(ipOrgId string, options *TheGraphQueryOptions) ([]*v0alpha.IpOrgLicenseParam, error) {
+	if len(ipOrgId) == 0 {
+		return nil, fmt.Errorf("invalid ipOrgId")
+	}
+
+	options = s.setQueryOptions(options)
+	req := graphql.NewRequest(fmt.Sprintf(`
+		query($ipOrgId: String, %s) {
+			iporgLicenseParams(where: {id:$ipOrgId}, %s) {
+				blockNumber
+				blockTimestamp
+				frameworkId
+				id
+				licensorConfig
+				paramTags
+				paramValues
+				transactionHash
+				url
+			}
+		}
+	`, QUERY_INTERFACE, QUERY_VALUE))
+	req.Var("ipOrgId", ipOrgId)
+	req.Var("first", options.First)
+	req.Var("skip", options.Skip)
+	req.Var("orderBy", options.OrderBy)
+	req.Var("orderDirection", options.OrderDirection)
+
+	ctx := context.Background()
+	var licenseParamsResponse v0alpha.IpOrgLicenseParamTheGraphResponse
+	if err := s.client.Run(ctx, req, &licenseParamsResponse); err != nil {
+		return nil, fmt.Errorf("failed to get the license params from the graph. error: %v", err)
+	}
+
+	return licenseParamsResponse.ToLicenseParams(), nil
+}
+
 func (s *theGraphServiceAlphaImpl) setQueryOptions(options *TheGraphQueryOptions) *TheGraphQueryOptions {
 	if options == nil {
 		options = &TheGraphQueryOptions{

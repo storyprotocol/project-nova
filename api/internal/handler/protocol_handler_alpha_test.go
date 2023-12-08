@@ -657,3 +657,48 @@ func TestListTransactionsHandler_InvalidPaginationParams_Failure(t *testing.T) {
 	ph.ListTransactionsHandler(c)
 	assert.Equal(t, http.StatusBadRequest, w.Code)
 }
+
+func TestListLicenseParamsHandler_Success(t *testing.T) {
+	c, w := test.MockGin(map[string]interface{}{
+		"ipOrgId": "0x64eef5894bc9834ae0c1374c18426d47b8445076",
+		"options": map[string]interface{}{
+			"pagination": map[string]interface{}{
+				"offset": 0,
+				"limit":  10,
+			},
+		},
+	}, nil)
+	ph := NewAlphaProtocolHandler(test.CreateTheGraphServiceAlpha())
+	ph.ListLicenseParamsHandler(c)
+	assert.Equal(t, http.StatusOK, w.Code)
+}
+
+func TestListLicenseParamsHandler_EmptyIpOrgId_Failure(t *testing.T) {
+	c, w := test.MockGin(map[string]interface{}{
+		"ipOrgId": "",
+		"options": map[string]interface{}{
+			"pagination": map[string]interface{}{
+				"offset": 0,
+				"limit":  10,
+			},
+		},
+	}, nil)
+	ph := NewAlphaProtocolHandler(test.CreateTheGraphServiceAlpha())
+	ph.ListLicenseParamsHandler(c)
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+}
+
+func TestListLicenseParamsHandler_InvalidPaginationParams_Failure(t *testing.T) {
+	c, w := test.MockGin(map[string]interface{}{
+		"ipOrgId": "0x64eef5894bc9834ae0c1374c18426d47b8445076",
+		"options": map[string]interface{}{
+			"pagination": map[string]interface{}{
+				"offset": "invalid",
+				"limit":  10,
+			},
+		},
+	}, nil)
+	ph := NewAlphaProtocolHandler(test.CreateTheGraphServiceAlpha())
+	ph.ListLicenseParamsHandler(c)
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+}
