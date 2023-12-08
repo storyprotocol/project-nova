@@ -530,7 +530,7 @@ func TestGetHookHandler_NotFound_Failure(t *testing.T) {
 func TestGetTransactionHandler_Success(t *testing.T) {
 	c, w := test.MockGin(nil, nil)
 	c.Params = gin.Params{
-		{Key: "transactionId", Value: "0x587a29679b4afbb4e10c0f65b7bb76c562df3cd753fd197d53e477a35198233123000000"},
+		{Key: "transactionId", Value: "0x02e36e55c9b323667198354a1ad8eb98c063b2bc492d17340e77f8fc881c1b55"},
 	}
 	ph := NewAlphaProtocolHandler(test.CreateTheGraphServiceAlpha())
 	ph.GetTransactionHandler(c)
@@ -570,7 +570,7 @@ func TestGetTransactionHandler_LongId_Failure(t *testing.T) {
 func TestGetTransactionHandler_NotFound_Failure(t *testing.T) {
 	c, w := test.MockGin(nil, nil)
 	c.Params = gin.Params{
-		{Key: "transactionId", Value: "0x07da84387bbd29bf5476b0684677628f95d6b551fdb145c4accb27b6342cdfd12e000000"},
+		{Key: "transactionId", Value: "0x02e36e55c9b323667198354a1ad8eb98c063b2bc492d17340e77f8fc881c1b54"},
 	}
 	ph := NewAlphaProtocolHandler(test.CreateTheGraphServiceAlpha())
 	ph.GetTransactionHandler(c)
@@ -597,21 +597,21 @@ func TestGetTransactionHandler_NotFound_Failure(t *testing.T) {
 // 	assert.Equal(t, http.StatusNotFound, w.Code)
 // }
 
-// func TestListLicensesHandler_Success(t *testing.T) {
-// 	c, w := test.MockGin(map[string]interface{}{
-// 		"ipOrgId":   "0xb422e54932c1dae83e78267a4dd2805aa64a8061",
-// 		"ipAssetId": "0",
-// 		"options": map[string]interface{}{
-// 			"pagination": map[string]interface{}{
-// 				"offset": 0,
-// 				"limit":  10,
-// 			},
-// 		},
-// 	})
-// 	ph := NewAlphaProtocolHandler(test.CreateTheGraphServiceAlpha())
-// 	ph.ListLicensesHandler(c)
-// 	assert.Equal(t, http.StatusOK, w.Code)
-// }
+func TestListLicensesHandler_Success(t *testing.T) {
+	c, w := test.MockGin(map[string]interface{}{
+		"ipOrgId":   "0x0ceeefc9ac23755d8786d4d580e1e7cccc25de12",
+		"ipAssetId": "1",
+		"options": map[string]interface{}{
+			"pagination": map[string]interface{}{
+				"offset": 3,
+				"limit":  1,
+			},
+		},
+	}, nil)
+	ph := NewAlphaProtocolHandler(test.CreateTheGraphServiceAlpha())
+	ph.ListLicensesHandler(c)
+	assert.Equal(t, http.StatusOK, w.Code)
+}
 
 func TestListTransactionsHandler_Success(t *testing.T) {
 	c, w := test.MockGin(map[string]interface{}{

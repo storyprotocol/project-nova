@@ -29,7 +29,7 @@ func IsValidNumberString(s string) bool {
 
 // IsValidHash validate hex address
 func IsValidHash(tx string) bool {
-	re := regexp.MustCompile("^0x[0-9a-fA-F]{72}$")
+	re := regexp.MustCompile("^0x[0-9a-fA-F]{64}$")
 	return re.MatchString(tx)
 }
 

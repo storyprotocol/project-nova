@@ -29,7 +29,7 @@ type ListLicensesRequest struct {
 }
 
 func (l *ListLicensesRequest) Validate() bool {
-	if l.IpOrgId != nil && !utils.IsValidAddress(l.IpOrgId) {
+	if l.IpOrgId != nil && !utils.IsValidAddress(*l.IpOrgId) {
 		return false
 	}
 
