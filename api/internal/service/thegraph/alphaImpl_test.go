@@ -10,17 +10,17 @@ import (
 
 const (
 	THE_GRAPH_URL_ALPHA           string = "https://api.thegraph.com/subgraphs/name/edisonz0718/storyprotocol-v0-alpha"
-	IP_ORG_ID_CORRECT             string = "0x1ebb43775fcc45cf05eaa96182c8762220e17941"
+	IP_ORG_ID_CORRECT             string = "0xa8c41f0a54828a4a792c054bf7b255d514e16e16"
 	IP_ORG_ID_WRONG               string = "0x1ebb43775fcc45cf05eaa96182c8762220e17942"
-	RELATIONSHIP_TYPE_CORRECT     string = "0xc12a5f0d1e5a95f4fc32ff629c53defa11273a372e29ae51ab24323e4af84fc3"
-	SOURCE_CONTRACT_CORRECT       string = "0x309c205347e3826472643f9b7ebd8a50d64ccd9e"
+	RELATIONSHIP_TYPE_CORRECT     string = "appears_in"
+	SOURCE_CONTRACT_CORRECT       string = "0xad2377c8f9f0ca6382fef166b08aede8318fe49c"
 	SOURCE_TOKEN_ID_CORRECT       string = "2"
-	DST_CONTRACT_CORRECT          string = "0x309c205347e3826472643f9b7ebd8a50d64ccd9e"
-	DST_TOKEN_ID_CORRECT          string = "16"
-	MODULE_ID_CORRECT             string = "0xd692de739fe1c1aaa31c3d0847dc17976afc05ff"
-	TRANSACTION_ID_CORRECT        string = "0x07da84387bbd29bf5476b0684677628f95d6b551fdb145c4fccb27b6342cdfd12e000000"
-	HOOK_LOOKUP_MODULE_ID_CORRECT string = "0x948f67e1c4f75bc89c5fb42147d96356fb4b359f"
-	HOOK_ID_CORRECT               string = "0xa26ba8224fb6173063f63388685f80708a6f4d96"
+	DST_CONTRACT_CORRECT          string = "0xad2377c8f9f0ca6382fef166b08aede8318fe49c"
+	DST_TOKEN_ID_CORRECT          string = "2"
+	MODULE_ID_CORRECT             string = "0x6a3e5eb4ce11ae3b063903ab6530c34d6daf9dc0"
+	TRANSACTION_ID_CORRECT        string = "0x02e36e55c9b323667198354a1ad8eb98c063b2bc492d17340e77f8fc881c1b5573000000"
+	HOOK_LOOKUP_MODULE_ID_CORRECT string = "0xfb45e1274d9f0a2df5c0851a705eeb0665171c5b"
+	HOOK_ID_CORRECT               string = "0x1fdd8955a6d70c84a71ebb69de88f3ad0aac50d6"
 )
 
 func CreateTheGraphServiceAlpha() TheGraphServiceAlpha {
@@ -135,19 +135,13 @@ func TestGetRelationshipType_EmptyID_Failure(t *testing.T) {
 	assert.Nil(t, relType)
 }
 
-func TestGetRelationshipType_InvalidID_Failure(t *testing.T) {
-	service := CreateTheGraphServiceAlpha()
-	relType, err := service.GetRelationshipType("invalid_id", IP_ORG_ID_CORRECT)
-	assert.NotNil(t, err)
-	assert.Nil(t, relType)
-}
-
 func TestListRelationships_Success(t *testing.T) {
 	service := CreateTheGraphServiceAlpha()
 	options := &TheGraphQueryOptions{
 		First: 10,
 	}
-	relationships, err := service.ListRelationships(SOURCE_CONTRACT_CORRECT, SOURCE_TOKEN_ID_CORRECT, options)
+	relationships, err := service.ListRelationships(
+		SOURCE_CONTRACT_CORRECT, "1", options)
 	assert.Nil(t, err)
 	assert.True(t, len(relationships) > 0)
 }
@@ -414,7 +408,7 @@ func TestGetModule_NotFound_Failure(t *testing.T) {
 
 func TestListIPAssets_WithIpOrgId_Success(t *testing.T) {
 	service := CreateTheGraphServiceAlpha()
-	ipOrgId := IP_ORG_ID_CORRECT
+	ipOrgId := "0xa8c41f0a54828a4a792c054bf7b255d514e16e16"
 	ipAssets, err := service.ListIPAssets(&ipOrgId, nil)
 	assert.Nil(t, err)
 	assert.True(t, len(ipAssets) > 0)
@@ -424,7 +418,7 @@ func TestListIPAssets_WithIpOrgId_Success(t *testing.T) {
 
 func TestListIPAssets_WithIpOrgId_WithLimit_Success(t *testing.T) {
 	service := CreateTheGraphServiceAlpha()
-	ipOrgId := IP_ORG_ID_CORRECT
+	ipOrgId := "0xa8c41f0a54828a4a792c054bf7b255d514e16e16"
 	ipAssets, err := service.ListIPAssets(&ipOrgId, &TheGraphQueryOptions{
 		First: 2,
 		Skip:  0,

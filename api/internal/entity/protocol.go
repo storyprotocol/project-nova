@@ -234,3 +234,20 @@ type UploadFileRequestResp struct {
 type UploadFileConfirmRequestBody struct {
 	Key string `json:"key"`
 }
+
+type SignInWalletRequest struct {
+	WalletAddress string `form:"walletAddress"`
+}
+
+type SigninWalletResponse struct {
+	SigningMessage string `json:"signingMessage"`
+}
+
+type VerifyWalletSignInRequest struct {
+	WalletAddress string `json:"walletAddress"`
+	Signature     string `json:"signature"`
+}
+
+type VerifyWalletSignInResponse struct {
+	Success bool `json:"success"`
+}

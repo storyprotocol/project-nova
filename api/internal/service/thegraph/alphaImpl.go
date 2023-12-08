@@ -61,9 +61,14 @@ func (s *theGraphServiceAlphaImpl) GetRelationship(relationshipId string) (*v0al
 }
 
 func (s *theGraphServiceAlphaImpl) GetRelationshipType(relType string, ipOrgId string) (*v0alpha.RelationshipType, error) {
-	if relType == "" || ipOrgId == "" {
-		return nil, fmt.Errorf("relType and ipOrgId cannot be empty")
+	if len(relType) == 0 {
+		return nil, fmt.Errorf("invalid relType")
 	}
+
+	if !utils.IsValidAddress(ipOrgId) {
+		return nil, fmt.Errorf("invalid ipOrgId")
+	}
+
 	queryInterface := "$relType: String, $ipOrgId: String"
 	queryValue := "where: {relType: $relType, ipOrgId: $ipOrgId}"
 

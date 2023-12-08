@@ -67,7 +67,7 @@ func TestListIpOrgsHandler_InvalidPaginationParams_Failure(t *testing.T) {
 func TestGetIpOrgHandler_Success(t *testing.T) {
 	c, w := test.MockGin(nil, nil)
 	c.Params = gin.Params{
-		{Key: "ipOrgId", Value: "0x0dad65978b6c637598674ea03b1c6f3333d00f5b"},
+		{Key: "ipOrgId", Value: "0x09d6377058555be9d09bf7f6e4864ea202fd083f"},
 	}
 	ph := NewAlphaProtocolHandler(test.CreateTheGraphServiceAlpha())
 	ph.GetIpOrgHandler(c)
@@ -285,7 +285,7 @@ func TestGetRelationshipHandler_NotFound_Failure(t *testing.T) {
 func TestGetRelationshipTypeHandler_FindByRelType_AndIpOrgId_Success(t *testing.T) {
 	c, w := test.MockGin(nil, map[string]interface{}{
 		"ipOrgId": "0xb422e54932c1dae83e78267a4dd2805aa64a8061",
-		"relType": "0xc12a5f0d1e5a95f4fc32ff629c53defa11273a372e29ae51ab24323e4af84fc3",
+		"relType": "appears_in",
 	})
 	ph := NewAlphaProtocolHandler(test.CreateTheGraphServiceAlpha())
 	ph.GetRelationshipTypeHandler(c)
@@ -366,7 +366,7 @@ func TestListModulesHandler_Success(t *testing.T) {
 func TestGetModuleHandler_Success(t *testing.T) {
 	c, w := test.MockGin(nil, nil)
 	c.Params = gin.Params{
-		{Key: "moduleId", Value: "0xd692de739fe1c1aaa31c3d0847dc17976afc05ff"},
+		{Key: "moduleId", Value: "0x6a3e5eb4ce11ae3b063903ab6530c34d6daf9dc0"},
 	}
 	ph := NewAlphaProtocolHandler(test.CreateTheGraphServiceAlpha())
 	ph.GetModuleHandler(c)
@@ -480,7 +480,7 @@ func TestListHooksHandler_WithourParams_Success(t *testing.T) {
 func TestGetHookHandler_Success(t *testing.T) {
 	c, w := test.MockGin(nil, nil)
 	c.Params = gin.Params{
-		{Key: "hookId", Value: "0xa26ba8224fb6173063f63388685f80708a6f4d96"},
+		{Key: "hookId", Value: "0x1fdd8955a6d70c84a71ebb69de88f3ad0aac50d6"},
 	}
 	ph := NewAlphaProtocolHandler(test.CreateTheGraphServiceAlpha())
 	ph.GetHookHandler(c)
@@ -530,7 +530,7 @@ func TestGetHookHandler_NotFound_Failure(t *testing.T) {
 func TestGetTransactionHandler_Success(t *testing.T) {
 	c, w := test.MockGin(nil, nil)
 	c.Params = gin.Params{
-		{Key: "transactionId", Value: "0x07da84387bbd29bf5476b0684677628f95d6b551fdb145c4fccb27b6342cdfd12e000000"},
+		{Key: "transactionId", Value: "0x587a29679b4afbb4e10c0f65b7bb76c562df3cd753fd197d53e477a35198233123000000"},
 	}
 	ph := NewAlphaProtocolHandler(test.CreateTheGraphServiceAlpha())
 	ph.GetTransactionHandler(c)
