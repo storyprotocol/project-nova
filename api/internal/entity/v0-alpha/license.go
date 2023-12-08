@@ -33,7 +33,7 @@ func (l *ListLicensesRequest) Validate() bool {
 		return false
 	}
 
-	if l.IpAssetId != nil && !utils.IsValidAddress(l.IpAssetId) {
+	if l.IpAssetId != nil && !utils.IsValidNumberString(*l.IpAssetId) {
 		return false
 	}
 
