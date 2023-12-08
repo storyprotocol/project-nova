@@ -24,6 +24,7 @@ type ProtocolHandlerInterface interface {
 	ListLicensesHandler(c *gin.Context)          // POST /license
 	GetRelationshipTypeHandler(c *gin.Context)   // GET /relationship-type
 	ListRelationshipTypesHandler(c *gin.Context) // POST /relationship-type
+	ListLicenseParamsHandler(c *gin.Context)     // POST /license-param
 }
 
 type protocolHandler struct {
@@ -194,5 +195,15 @@ func (ph *protocolHandler) ListLicensesHandler(c *gin.Context) {
 		ph.alphaProtocolHandlers.ListLicensesHandler(c)
 	default:
 		ph.alphaProtocolHandlers.ListLicensesHandler(c)
+	}
+}
+
+func (ph *protocolHandler) ListLicenseParamsHandler(c *gin.Context) {
+	version := c.GetHeader(entity.HTTP_HEADER_VERSION)
+	switch version {
+	case entity.VERSION_V0_ALPHA:
+		ph.alphaProtocolHandlers.ListLicenseParamsHandler(c)
+	default:
+		ph.alphaProtocolHandlers.ListLicenseParamsHandler(c)
 	}
 }

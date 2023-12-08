@@ -47,6 +47,7 @@ type TheGraphServiceAlpha interface {
 	GetLicense(licenseId string) (*v0alpha.License, error)
 	GetRelationshipType(relType string, ipOrgId string) (*v0alpha.RelationshipType, error)
 	ListRelationshipTypes(ipOrgId *string, options *TheGraphQueryOptions) ([]*v0alpha.RelationshipType, error)
+	ListLicenseParams(ipOrgId string, options *TheGraphQueryOptions) ([]*v0alpha.IpOrgLicenseParam, error)
 }
 
 type TheGraphQueryOptions struct {

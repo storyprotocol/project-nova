@@ -436,3 +436,29 @@ func (p *AlphaProtocolHandler) ListTransactionsHandler(c *gin.Context) {
 		Transactions: transactions,
 	})
 }
+
+// POST /license-param
+func (p *AlphaProtocolHandler) ListLicenseParamsHandler(c *gin.Context) {
+	var requestBody v0alpha_entity.ListLicenseParamsRequest
+	if err := c.BindJSON(&requestBody); err != nil {
+		logger.Errorf("Failed to read request body: %v", err)
+		requestBody = v0alpha_entity.ListLicenseParamsRequest{}
+	}
+
+	if !requestBody.Validate() {
+		logger.Errorf("Failed to validate request body: %+v", requestBody)
+		c.JSON(http.StatusBadRequest, ErrorMessage("invalid request body"))
+		return
+	}
+
+	licenseParams, err := p.graphServiceAlpha.ListLicenseParams(requestBody.IpOrgId, thegraph.FromRequestQueryOptions(requestBody.Options))
+	if err != nil {
+		logger.Errorf("Failed to get license params: %v", err)
+		c.JSON(http.StatusInternalServerError, ErrorMessage("Internal server error"))
+		return
+	}
+
+	c.JSON(http.StatusOK, v0alpha_entity.ListLicenseParamsResponse{
+		LicenseParams: licenseParams,
+	})
+}
