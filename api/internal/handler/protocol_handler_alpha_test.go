@@ -570,7 +570,7 @@ func TestGetTransactionHandler_LongId_Failure(t *testing.T) {
 func TestGetTransactionHandler_NotFound_Failure(t *testing.T) {
 	c, w := test.MockGin(nil, nil)
 	c.Params = gin.Params{
-		{Key: "transactionId", Value: "0x07da84387bbd29bf5476b0684677628f95d6b551fdb145c4accb27b6342cdfd12e000000"},
+		{Key: "transactionId", Value: "0x02e36e55c9b323667198354a1ad8eb98c063b2bc492d17340e77f8fc881c1b54"},
 	}
 	ph := NewAlphaProtocolHandler(test.CreateTheGraphServiceAlpha())
 	ph.GetTransactionHandler(c)

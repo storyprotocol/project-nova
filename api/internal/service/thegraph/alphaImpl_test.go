@@ -18,7 +18,7 @@ const (
 	DST_CONTRACT_CORRECT          string = "0xad2377c8f9f0ca6382fef166b08aede8318fe49c"
 	DST_TOKEN_ID_CORRECT          string = "2"
 	MODULE_ID_CORRECT             string = "0x6a3e5eb4ce11ae3b063903ab6530c34d6daf9dc0"
-	TRANSACTION_ID_CORRECT        string = "0x02e36e55c9b323667198354a1ad8eb98c063b2bc492d17340e77f8fc881c1b5573000000"
+	TRANSACTION_ID_CORRECT        string = "0x02e36e55c9b323667198354a1ad8eb98c063b2bc492d17340e77f8fc881c1b55"
 	HOOK_LOOKUP_MODULE_ID_CORRECT string = "0xfb45e1274d9f0a2df5c0851a705eeb0665171c5b"
 	HOOK_ID_CORRECT               string = "0x1fdd8955a6d70c84a71ebb69de88f3ad0aac50d6"
 )
@@ -431,7 +431,6 @@ func TestListIPAssets_WithoutIpOrgId_Success(t *testing.T) {
 func TestGetIPAsset_Success(t *testing.T) {
 	service := CreateTheGraphServiceAlpha()
 	ipAsset, err := service.GetIPAsset("1")
-	logger.Infof("ipAsset: %+v", ipAsset)
 	assert.Nil(t, err)
 	assert.True(t, ipAsset.ID == "1")
 }
@@ -504,7 +503,7 @@ func TestGetHook_NotFound_Failure(t *testing.T) {
 
 func TestListLicenses_WithIpOrgIdAndIpAssetId_Success(t *testing.T) {
 	service := CreateTheGraphServiceAlpha()
-	ipOrgId := "0xb422e54932c1dae83e78267a4dd2805aa64a8061"
+	ipOrgId := "0xa8c41f0a54828a4a792c054bf7b255d514e16e16"
 	ipAssetId := "0"
 	licenses, err := service.ListLicenses(&ipOrgId, &ipAssetId, nil)
 	assert.Nil(t, err)
