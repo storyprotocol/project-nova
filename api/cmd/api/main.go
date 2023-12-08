@@ -422,7 +422,7 @@ func main() {
 		protocol.GET("/hook/:hookId", protocolHandler.GetHookHandler)
 
 		// Endpoint to list license params
-		protocol.POST("/license-param", protocolHandler.ListLicenseParamsHandler)
+		protocol.POST("/license-params", protocolHandler.ListLicenseParamsHandler)
 	}
 
 	port := fmt.Sprintf(":%d", cfg.Port)
