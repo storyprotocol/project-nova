@@ -156,6 +156,7 @@ func (ph *PlatformProtocolHandler) VerifyWalletSignIn(c *gin.Context) {
 		return
 	}
 
+	// Support both formats of recovery bit (27/28 or 0/1)
 	sig[crypto.RecoveryIDOffset] -= 27
 	message := fmt.Sprintf(walletSignInMessage, walletAddress, signInfo.Nonce)
 	msg := accounts.TextHash([]byte(message))
