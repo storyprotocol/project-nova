@@ -1,5 +1,4 @@
-ARG DOCKERHUB_URL
-FROM ${DOCKERHUB_URL}builder:latest as build
+FROM golang:1.19.4 as build
 
 WORKDIR /build/
 
@@ -8,19 +7,13 @@ RUN go mod download
 
 COPY pkg pkg
 COPY api api
-COPY proto proto
 COPY Makefile ./
 
 RUN make buildserver
 
 EXPOSE 8090
 
-# See https://docs.docker.com/develop/develop-images/dockerfile_best-practices/
-
 FROM alpine
-
-WORKDIR /var/log
-RUN mkdir -p /var/log/storyprotocol
 
 WORKDIR /app
 COPY --from=build /build/api /app/api
