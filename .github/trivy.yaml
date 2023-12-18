@@ -1,6 +1,0 @@
-format: 'table'
-output: 'trivy-results.sarif'
-exit-code: '0'
-severity: 'CRITICAL,HIGH'
-ignore-unfixed: true
-vulnerability-type: 'os,library'

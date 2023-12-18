@@ -1,9 +1,0 @@
-app_id: web3-gateway
-region: us-east-2
-server:
-  port: 8090
-
-arweave_config:
-  base_url: https://arweave.net/
-  bundlr_node: http://node2.bundlr.network 
-  wallet_chain: ethereum

@@ -15,12 +15,3 @@ deploy:
 
 	cd deploy/overlays/${ENV}; kustomize edit set image ${ECR}/${API_SERVER_IMAGE}=${ECR}/${API_SERVER_IMAGE}:latest
 	kubectl apply -f ${OUTPUT}/deploy.yaml
-
-.PHONY: deploy-streamer
-deploy-streamer:
-	cd deploy/streamer/overlays/${ENV}; kustomize edit set image ${ECR}/${STREAMER_IMAGE}=${ECR}/${STREAMER_IMAGE}:${TAG}
-	mkdir -p ${OUTPUT}
-	kustomize build deploy/streamer/overlays/${ENV} -o ${OUTPUT}/deploy-streamer.yaml
-
-	cd deploy/streamer/overlays/${ENV}; kustomize edit set image ${ECR}/${STREAMER_IMAGE}=${ECR}/${STREAMER_IMAGE}:latest
-	kubectl apply -f ${OUTPUT}/deploy-streamer.yaml

@@ -1,3 +1,0 @@
-BEGIN;
-DROP TABLE IF EXISTS story_info_v2;
-END
