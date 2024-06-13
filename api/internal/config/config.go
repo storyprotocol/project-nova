@@ -24,6 +24,7 @@ type AppConfig struct {
 	Protocol            *ProtocolConfig `yaml:"protocol"`
 	GrpcWeb3Gateway     string          `yaml:"grpc_web3_gateway"`
 	StoryBlocksRegistry string          `yaml:"story_blocks_registry"`
+	SSOProfile				  string					`yaml:"sso_profile"`
 }
 
 type StreamerConfig struct {
@@ -34,6 +35,7 @@ type StreamerConfig struct {
 	AdminAuthMessage     string `yaml:"admin_auth_message"`
 	AuthKeyId            string `yaml:"auth_key_id"`
 	OrchestratorContract string `yaml:"orchestrator_contract"`
+	SSOProfile           string `yaml:"sso_profile"`
 }
 
 type ProtocolConfig struct {

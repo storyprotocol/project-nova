@@ -40,7 +40,11 @@ var backfillCmd = &cobra.Command{
 
 		apiGateway := gateway.NewApiHttpGateway(cfg.ApiGatewayUrl)
 
-		kmsClient := keymanagement.NewKmsClient(cfg.Region)
+		kmsClient, err := keymanagement.NewKmsClient(cfg.Region, "")
+		if err != nil {
+			logger.Fatalf("Failed to create new kms clint: %v", err)
+		}
+
 		encryptedBytes, err := kmsClient.Encrypt([]byte(cfg.AdminAuthMessage), cfg.AuthKeyId)
 		if err != nil {
 			logger.Fatalf("Failed to encrypt with kms: %v", err)
