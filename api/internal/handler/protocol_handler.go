@@ -51,7 +51,7 @@ func NewGetFranchiseCollectionsHandler(client *ethclient.Client, franchiseMap ma
 
 		franchise, ok := franchiseMap[franchiseAddress]
 		if !ok {
-			logger.Errorf("Unkown franchise address: %s", franchiseAddress)
+			logger.Errorf("Unknown franchise address: %s", franchiseAddress)
 			c.JSON(http.StatusBadRequest, ErrorMessage("Invalid franchise address"))
 			return
 		}
