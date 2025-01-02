@@ -26,7 +26,7 @@ var backfillCmd = &cobra.Command{
 	Short: "backfill task for backfilling nft onchain data to database",
 	Long: `The task accepts flags: --start, ---end, --collection.
 --collection is required and will be used to determine which nft collection to backfill.
---start and --end tell the task the range of nft token id to backfill. When they are specified. The default is to backfill all nft data from a colleciton.	
+--start and --end tell the task the range of nft token id to backfill. When they are specified. The default is to backfill all nft data from a collection.	
 	`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if collectionAddress == "" {
