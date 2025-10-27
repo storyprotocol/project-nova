@@ -13,12 +13,25 @@ type KeyManagementClient interface {
 	Decrypt(encryptedBytes []byte, keyId string) ([]byte, error)
 }
 
-func NewKmsClient(region string) KeyManagementClient {
-	sess := session.Must(session.NewSession())
+func NewKmsClient(region string, profile string) (KeyManagementClient, error) {
+	var sess *session.Session
+	var err error
+
+	if profile != "" {
+		sess, err = session.NewSessionWithOptions(session.Options{
+			SharedConfigState: session.SharedConfigEnable,
+			Profile:           "stage",
+		})
+		if err != nil {
+			return nil, fmt.Errorf("failed to create new kms session with profile %s: %w", profile, err)
+		}
+	} else {
+		sess = session.Must(session.NewSession())
+	}
 	kms := kms.New(sess, aws.NewConfig().WithRegion(region))
 	return &kmsClient{
 		kms: kms,
-	}
+	}, nil
 }
 
 type kmsClient struct {
